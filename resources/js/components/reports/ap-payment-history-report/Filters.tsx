@@ -6,60 +6,95 @@ import {
     type FieldDescriptor,
     type SelectOption,
 } from '@/components/common/filters';
+import { useTranslatableText } from '@/components/common/TranslatedText';
+
+function TranslatedDatePicker({
+    placeholder,
+}: Readonly<{ placeholder: { key: string; fallback: string } }>) {
+    const translated = useTranslatableText(placeholder);
+    return <FilterDatePicker placeholder={translated} />;
+}
 
 export function createApPaymentHistoryReportFilterFields(): FieldDescriptor[] {
     const paymentMethodOptions: SelectOption[] = [
-        { value: 'bank_transfer', label: 'Bank Transfer' },
-        { value: 'cash', label: 'Cash' },
-        { value: 'check', label: 'Check' },
-        { value: 'giro', label: 'Giro' },
-        { value: 'other', label: 'Other' },
+        {
+            value: 'bank_transfer',
+            label: { key: 'filter.bank_transfer', fallback: 'Bank Transfer' },
+        },
+        { value: 'cash', label: { key: 'filter.cash', fallback: 'Cash' } },
+        { value: 'check', label: { key: 'filter.check', fallback: 'Check' } },
+        { value: 'giro', label: { key: 'filter.giro', fallback: 'Giro' } },
+        { value: 'other', label: { key: 'filter.other', fallback: 'Other' } },
     ];
 
     const statusOptions: SelectOption[] = [
-        { value: 'confirmed', label: 'Confirmed' },
-        { value: 'reconciled', label: 'Reconciled' },
+        {
+            value: 'confirmed',
+            label: { key: 'status.confirmed', fallback: 'Confirmed' },
+        },
+        {
+            value: 'reconciled',
+            label: { key: 'status.reconciled', fallback: 'Reconciled' },
+        },
     ];
 
     return [
-        createTextFilterField('search', 'Search', {
-            key: 'page.ap_payment_history.search_placeholder',
-            fallback:
-                'Search payment number, supplier, branch, bank account, reference, or notes...',
-        }),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            {
+                key: 'page.ap_payment_history.search_placeholder',
+                fallback:
+                    'Search payment number, supplier, branch, bank account, reference, or notes...',
+            },
+        ),
         createAsyncSelectFilterField(
             'supplier_id',
-            'Supplier',
-            'Select supplier',
+            { key: 'column.supplier', fallback: 'Supplier' },
             '/api/suppliers/select-options',
+            { key: 'filter.select_supplier', fallback: 'Select a supplier' },
         ),
         createAsyncSelectFilterField(
             'branch_id',
-            'Branch',
-            'Select branch',
+            { key: 'column.branch', fallback: 'Branch' },
             '/api/branches/select-options',
+            { key: 'filter.select_branch', fallback: 'Select a branch' },
         ),
         createSelectFilterField(
             'payment_method',
-            'Payment Method',
+            { key: 'column.payment_method', fallback: 'Payment Method' },
             paymentMethodOptions,
-            'Select method',
+            { key: 'filter.select_method', fallback: 'Select method' },
         ),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'filter_field.status', fallback: 'Status' },
             statusOptions,
-            'Select status',
+            { key: 'filter.select_status', fallback: 'Select status' },
         ),
         {
             name: 'payment_date_from',
-            label: 'Payment Date From',
-            component: <FilterDatePicker placeholder="From" />,
+            label: {
+                key: 'filter_field.payment_date_from',
+                fallback: 'Payment Date From',
+            },
+            component: (
+                <TranslatedDatePicker
+                    placeholder={{ key: 'filter.from', fallback: 'From' }}
+                />
+            ),
         },
         {
             name: 'payment_date_to',
-            label: 'Payment Date To',
-            component: <FilterDatePicker placeholder="To" />,
+            label: {
+                key: 'filter_field.payment_date_to',
+                fallback: 'Payment Date To',
+            },
+            component: (
+                <TranslatedDatePicker
+                    placeholder={{ key: 'filter.to', fallback: 'To' }}
+                />
+            ),
         },
     ];
 }

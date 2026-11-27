@@ -25,22 +25,6 @@ const pendingFiles = new Set([
     'pipelines/PipelineFilters.tsx',
     'report-configurations/ReportConfigurationFilters.tsx',
     'security-logs/Filters.tsx',
-    'reports/inventory-valuation/Filters.tsx',
-    'reports/purchase-order-status/Filters.tsx',
-    'reports/trial-balance-detailed/Filters.tsx',
-    'reports/asset-stocktake-variances/Filters.tsx',
-    'reports/ar-outstanding-report/Filters.tsx',
-    'reports/customer-statement-report/Filters.tsx',
-    'reports/ap-aging-report/Filters.tsx',
-    'reports/ar-aging-report/Filters.tsx',
-    'reports/inventory-stocktake-variance/Filters.tsx',
-    'reports/ap-payment-history-report/Filters.tsx',
-    'reports/ap-outstanding-report/Filters.tsx',
-    'reports/stock-adjustment/Filters.tsx',
-    'reports/budget-variance/Filters.tsx',
-    'reports/goods-receipt/Filters.tsx',
-    'reports/purchase-history/Filters.tsx',
-    'reports/maintenance-cost/Filters.tsx',
 ]);
 
 // Literal English label/placeholder: 'Branch', 'Select a category', 'All Statuses'.

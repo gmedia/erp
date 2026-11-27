@@ -2,36 +2,56 @@ import { AsyncSelect } from '@/components/common/AsyncSelect';
 import {
     createSelectFilterField,
     type FieldDescriptor,
+    type SelectOption,
 } from '@/components/common/filters';
+import { useTranslatableText } from '@/components/common/TranslatedText';
+
+const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+];
+
+const monthOptions: SelectOption[] = monthNames.map((fallback, index) => ({
+    value: String(index + 1),
+    label: { key: `filter.month_${index + 1}`, fallback },
+}));
+
+function TranslatedFiscalYearSelect() {
+    const placeholder = useTranslatableText({
+        key: 'filter.select_fiscal_year',
+        fallback: 'Select fiscal year',
+    });
+    return (
+        <AsyncSelect
+            url="/api/fiscal-years"
+            placeholder={placeholder}
+            preferredMetaKey="preferred_fiscal_year_id"
+        />
+    );
+}
 
 export function createTrialBalanceDetailedFilterFields(): FieldDescriptor[] {
-    const months = [
-        { value: '1', label: 'January' },
-        { value: '2', label: 'February' },
-        { value: '3', label: 'March' },
-        { value: '4', label: 'April' },
-        { value: '5', label: 'May' },
-        { value: '6', label: 'June' },
-        { value: '7', label: 'July' },
-        { value: '8', label: 'August' },
-        { value: '9', label: 'September' },
-        { value: '10', label: 'October' },
-        { value: '11', label: 'November' },
-        { value: '12', label: 'December' },
-    ];
-
     return [
         {
             name: 'fiscal_year_id',
-            label: 'Fiscal Year',
-            component: (
-                <AsyncSelect
-                    url="/api/fiscal-years"
-                    placeholder="Select fiscal year"
-                    preferredMetaKey="preferred_fiscal_year_id"
-                />
-            ),
+            label: { key: 'filter.gl_fiscal_year', fallback: 'Fiscal Year' },
+            component: <TranslatedFiscalYearSelect />,
         },
-        createSelectFilterField('period_month', 'Month', months, 'All months'),
+        createSelectFilterField(
+            'period_month',
+            { key: 'filter_field.month', fallback: 'Month' },
+            monthOptions,
+            { key: 'filter.all_months', fallback: 'All months' },
+        ),
     ];
 }
