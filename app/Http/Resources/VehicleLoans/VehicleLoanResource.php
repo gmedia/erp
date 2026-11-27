@@ -45,6 +45,7 @@ class VehicleLoanResource extends SimpleCrudResource
                     'completed_at' => $approval->completed_at?->toIso8601String(),
                     'steps' => $approval->steps->map(fn ($step): array => [
                         'step_order' => $step->step_order,
+                        'step_name' => $step->flowStep?->name,
                         'status' => $step->status,
                         'action' => $step->action,
                         'comments' => $step->comments,

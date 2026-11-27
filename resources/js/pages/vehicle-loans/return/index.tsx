@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RequiredLabel } from '@/components/vehicle-loans/RequiredLabel';
 import { VehicleLoanQrPanel } from '@/components/vehicle-loans/VehicleLoanQrPanel';
 import { VehicleLoanSummaryCard } from '@/components/vehicle-loans/VehicleLoanSummaryCard';
+import { submitVehicleLoanFormData } from '@/components/vehicle-loans/submitVehicleLoanFormData';
 import { useVehicleLoanPageText } from '@/components/vehicle-loans/useVehicleLoanPageText';
 import AppLayout from '@/layouts/app-layout';
 import axios from '@/lib/axios';
@@ -124,33 +125,36 @@ export default function VehicleLoanReturnPage() {
         if (incident) body.append('incident_note', incidentNote);
         if (odometerEnd) body.append('odometer_end', odometerEnd);
 
-        setLoading(true);
-        try {
-            await axios.post(
-                `/api/vehicle-loans/pickups/${pickupId}/returns`,
-                body,
-            );
-            toast.success(
-                tToast('return_recorded', 'Pengembalian berhasil dicatat.'),
-            );
-            setPickupId('');
-            setHandoverPhoto(null);
-            setConditionPhoto(null);
-            setIncident(false);
-            setIncidentNote('');
-            setOdometerEnd('');
-        } catch {
-            toast.error(
-                tToast('return_failed', 'Gagal mencatat pengembalian.'),
-            );
-        } finally {
-            setLoading(false);
-        }
+        await submitVehicleLoanFormData({
+            url: `/api/vehicle-loans/pickups/${pickupId}/returns`,
+            body,
+            setLoading,
+            successMessage: tToast(
+                'return_recorded',
+                'Pengembalian berhasil dicatat.',
+            ),
+            failureMessage: tToast(
+                'return_failed',
+                'Gagal mencatat pengembalian.',
+            ),
+            onSuccess: () => {
+                setPickupId('');
+                setHandoverPhoto(null);
+                setConditionPhoto(null);
+                setIncident(false);
+                setIncidentNote('');
+                setOdometerEnd('');
+            },
+        });
     }
 
     return (
         <AppLayout
             breadcrumbs={[
+                {
+                    title: tPage('request.breadcrumb', 'Peminjaman Kendaraan'),
+                    href: '/vehicle-loans/request',
+                },
                 {
                     title: tPage('return.breadcrumb', 'Pengembalian'),
                     href: '/vehicle-loans/return',
@@ -236,7 +240,7 @@ export default function VehicleLoanReturnPage() {
                                     {tPage(
                                         'return.pickup_empty_hint',
                                         'Belum ada kendaraan yang sedang dipinjam. ' +
-                                            'Pengembalian tersedia setelah kunci diserahkan security.',
+                                            'Pengembalian tersedia setelah kunci diserahkan petugas keamanan.',
                                     )}
                                 </p>
                             )}

@@ -267,7 +267,7 @@ export default function VehicleLoanSecurityPage() {
                                                     </span>
                                                 )}
                                                 <VehicleLoanStatusBadge
-                                                    status={loan.status}
+                                                    loan={loan}
                                                 />
                                             </div>
                                         </div>
