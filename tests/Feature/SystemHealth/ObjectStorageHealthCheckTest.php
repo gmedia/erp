@@ -26,7 +26,9 @@ test('object storage check fails when the disk rejects writes', function () {
     $result = (new ObjectStorageCheck)->run();
 
     expect((string) $result->status)->toBe('failed');
-    expect($result->getNotificationMessage())->toContain('gagal menulis');
+    expect($result->getNotificationMessage())
+        ->toContain('gagal menulis')
+        ->toContain('bash scripts/minio-bucket.sh');
 });
 
 test('object storage check hides connection details when the disk throws', function () {
