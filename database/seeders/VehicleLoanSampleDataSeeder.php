@@ -79,7 +79,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
             ['code' => 'VL-2026-0003', 'status' => 'in_progress', 'unit' => 2, 'purpose' => 'Kunjungan koordinasi proyek di Gedung Menara Kuningan'],
             ['code' => 'VL-2026-0004', 'status' => 'approved', 'unit' => 0, 'purpose' => 'Penjemputan tamu dari Bandara Soekarno-Hatta'],
             ['code' => 'VL-2026-0005', 'status' => 'rejected', 'unit' => 1, 'purpose' => 'Survey lokasi gudang di Cikarang'],
-            ['code' => 'VL-2026-0006', 'status' => 'pickup_done', 'unit' => 0, 'purpose' => 'Pengiriman sparepart ke vendor di Tangerang', 'ready' => true],
+            ['code' => 'VL-2026-0006', 'status' => 'pickup_done', 'unit' => 0, 'purpose' => 'Pengiriman suku cadang ke pemasok di Tangerang', 'ready' => true],
             ['code' => 'VL-2026-0007', 'status' => 'returned', 'unit' => 1, 'purpose' => 'Rapat koordinasi bulanan di kantor pusat'],
             ['code' => 'VL-2026-0008', 'status' => 'cancelled', 'unit' => 2, 'purpose' => 'Kunjungan supplier ke pabrik Karawang'],
             ['code' => 'VL-2026-0009', 'status' => 'pickup_done', 'unit' => 2, 'purpose' => 'Perjalanan dinas ke Surabaya', 'overdue' => true],
@@ -147,7 +147,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
             : null;
 
         $reviewNotes = in_array($status, ['in_progress', 'approved'], true)
-            ? 'Driver dan unit disesuaikan setelah pengecekan jadwal operasional.'
+            ? 'Pengemudi dan unit disesuaikan setelah pengecekan jadwal operasional.'
             : null;
 
         return VehicleLoan::updateOrCreate(
@@ -244,7 +244,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
                     'action' => $acted ? ($stepStatus === 'rejected' ? 'reject' : 'approve') : null,
                     'comments' => match (true) {
                         $status === 'rejected' && $step->step_order === 1 => $rejectedComment,
-                        $isInProgress && $step->step_order === 1 => 'Driver dan unit sudah sesuai jadwal operasional.',
+                        $isInProgress && $step->step_order === 1 => 'Pengemudi dan unit sudah sesuai jadwal operasional.',
                         default => null,
                     },
                     'acted_at' => $acted ? ($loan->approved_at ?? now()) : null,
@@ -254,7 +254,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
 
         if ($isInProgress) {
             $loan->update([
-                'review_notes' => 'Penugasan driver dan unit diperbarui oleh atasan.',
+                'review_notes' => 'Penugasan pengemudi dan unit diperbarui oleh atasan.',
             ]);
         }
     }
