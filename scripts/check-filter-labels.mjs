@@ -8,24 +8,11 @@ import { fileURLToPath } from 'node:url';
  * *Filters.tsx wajib lewat kunci i18n ({ key, fallback }), bukan literal English
  * seperti 'Branch' atau 'Select a category' yang tampil apa adanya di locale id.
  *
- * Allowlist di bawah adalah kelompok yang BELUM dikerjakan (utang sementara).
- * Hapus berkas dari allowlist setiap kali kelompoknya sudah diterjemahkan.
+ * Tidak ada allowlist: semua berkas harus bersih.
  */
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const componentsDir = resolve(root, 'resources/js/components');
-
-const pendingFiles = new Set([
-    'approval-audit-trail/Filters.tsx',
-    'approval-delegations/ApprovalDelegationFilters.tsx',
-    'approval-flows/ApprovalFlowFilters.tsx',
-    'aging-dashboard/AgingFilters.tsx',
-
-    'pipeline-audit-trail/Filters.tsx',
-    'pipelines/PipelineFilters.tsx',
-    'report-configurations/ReportConfigurationFilters.tsx',
-    'security-logs/Filters.tsx',
-]);
 
 // Literal English label/placeholder: 'Branch', 'Select a category', 'All Statuses'.
 // Kode ISO mata uang (IDR/USD/EUR) bukan teks yang diterjemahkan, jadi dilewati.
@@ -72,14 +59,11 @@ function scanFile(rel, source) {
 
 for (const file of walk(componentsDir)) {
     const rel = relative(componentsDir, file).split('\\').join('/');
-    if (pendingFiles.has(rel)) {
-        continue;
-    }
     scanned.push(rel);
     scanFile(rel, readFileSync(file, 'utf8'));
 }
 
-// Helper bersama (Issue #599 sub-langkah A): sudah tanpa allowlist, wajib bersih.
+// Helper bersama (Issue #599 sub-langkah A): wajib bersih.
 {
     const rel = relative(componentsDir, sharedHelper).split('\\').join('/');
     scanned.push(rel);
@@ -95,5 +79,5 @@ if (violations.length > 0) {
 }
 
 console.log(
-    `Filter label check passed: ${scanned.length} filter file(s) scanned, ${pendingFiles.size} pending (allowlist).`,
+    `Filter label check passed: ${scanned.length} filter file(s) scanned, 0 pending.`,
 );

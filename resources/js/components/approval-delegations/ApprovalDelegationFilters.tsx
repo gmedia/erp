@@ -27,8 +27,14 @@ export function ApprovalDelegationFilters() {
                 name="is_active"
                 label="Status"
                 options={[
-                    { label: 'Active', value: 'true' },
-                    { label: 'Inactive', value: 'false' },
+                    {
+                        label: { key: 'status.active', fallback: 'Active' },
+                        value: 'true',
+                    },
+                    {
+                        label: { key: 'status.inactive', fallback: 'Inactive' },
+                        value: 'false',
+                    },
                 ]}
             />
             <DatePickerField name="start_date_from" label="Start Date From" />
@@ -47,28 +53,44 @@ import {
 
 export function createApprovalDelegationFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', {
-            key: 'page.approval_delegations.search_placeholder',
-            fallback: 'Search reason...',
-        }),
+        createTextFilterField(
+            'search',
+            { key: 'filter_field.search', fallback: 'Search' },
+            {
+                key: 'page.approval_delegations.search_placeholder',
+                fallback: 'Search reason...',
+            },
+        ),
         ...createApprovalDelegationUserFilterFields(),
         createBinaryStatusFilterField(
             'is_active',
-            'Status',
+            { key: 'filter_field.status', fallback: 'Status' },
             'true',
             'false',
-            'Select status',
+            { key: 'filter_field.select_status', fallback: 'Select status' },
         ),
         ...createDateFilterFields([
             {
                 name: 'start_date_from',
-                label: 'Start Date From',
-                placeholder: 'Start Date From',
+                label: {
+                    key: 'filter_field.start_date_from',
+                    fallback: 'Start Date From',
+                },
+                placeholder: {
+                    key: 'filter_field.start_date_from',
+                    fallback: 'Start Date From',
+                },
             },
             {
                 name: 'start_date_to',
-                label: 'Start Date To',
-                placeholder: 'Start Date To',
+                label: {
+                    key: 'filter_field.start_date_to',
+                    fallback: 'Start Date To',
+                },
+                placeholder: {
+                    key: 'filter_field.start_date_to',
+                    fallback: 'Start Date To',
+                },
             },
         ]),
     ];

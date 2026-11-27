@@ -8,17 +8,24 @@ import {
 
 export function createApprovalAuditTrailFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', {
-            key: 'page.approval_audit_trail.search_placeholder',
-            fallback: 'Search IP, Document ID, user...',
-        }),
+        createTextFilterField(
+            'search',
+            { key: 'filter_field.search', fallback: 'Search' },
+            {
+                key: 'page.approval_audit_trail.search_placeholder',
+                fallback: 'Search IP, Document ID, user...',
+            },
+        ),
         createTextFilterField(
             'approvable_type',
-            'Document Type',
+            { key: 'filter_field.document_type', fallback: 'Document Type' },
             'e.g. PurchaseRequest',
         ),
         createApprovalAuditEventFilterField(),
-        createUserFilterField('actor_user_id', 'Actor'),
+        createUserFilterField('actor_user_id', {
+            key: 'filter_field.actor',
+            fallback: 'Actor',
+        }),
         ...createDateRangeFilterFields(),
     ];
 }

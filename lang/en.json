@@ -3575,6 +3575,18 @@
         }
     },
     "filter_field": {
+        "actor": "Actor",
+        "performed_by": "Performed By",
+        "document_type": "Document Type",
+        "entity_type": "Entity Type",
+        "approvable_type": "Approvable Type",
+        "all_entities": "All Entities",
+        "start_date_from": "Start Date From",
+        "start_date_to": "Start Date To",
+        "report_type": "Report Type",
+        "select_report_type": "Select Report Type",
+        "search_ellipsis": "Search...",
+        "as_of": "As of",
         "as_of_date": "As of Date",
         "due_date_from": "Due Date From",
         "due_date_to": "Due Date To",

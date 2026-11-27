@@ -3578,6 +3578,18 @@
         }
     },
     "filter_field": {
+        "actor": "Pelaku",
+        "performed_by": "Dijalankan oleh",
+        "document_type": "Jenis Dokumen",
+        "entity_type": "Jenis Entitas",
+        "approvable_type": "Jenis Persetujuan",
+        "all_entities": "Semua Entitas",
+        "start_date_from": "Tanggal Mulai Dari",
+        "start_date_to": "Tanggal Mulai Sampai",
+        "report_type": "Jenis Laporan",
+        "select_report_type": "Pilih jenis laporan",
+        "search_ellipsis": "Cari...",
+        "as_of": "Per",
         "as_of_date": "Per Tanggal",
         "due_date_from": "Jatuh Tempo Dari",
         "due_date_to": "Jatuh Tempo Sampai",
