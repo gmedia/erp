@@ -107,6 +107,9 @@ export function SummaryCell({
     );
 }
 
+const NUMERIC_CELL_CLASS =
+    'min-w-[6.5rem] whitespace-nowrap text-right tabular-nums';
+
 function TruncatedText({
     value,
     className,
@@ -126,10 +129,20 @@ function TruncatedText({
 export function TextCell({
     value,
     className,
+    numeric = false,
 }: Readonly<{
     value: DisplayValue;
     className?: string;
+    numeric?: boolean;
 }>) {
+    if (numeric) {
+        return (
+            <div className={cn(NUMERIC_CELL_CLASS, className)}>
+                {resolveDisplayValue(value)}
+            </div>
+        );
+    }
+
     return (
         <TruncatedText
             className={cn('max-w-[12rem]', className)}
@@ -274,10 +287,8 @@ export function createReportTextColumn<TData>(
         renderCell: (row) => (
             <TextCell
                 value={options.getValue(row)}
-                className={cn(
-                    options.className,
-                    align === 'right' && 'text-right tabular-nums',
-                )}
+                className={options.className}
+                numeric={align === 'right'}
             />
         ),
     });

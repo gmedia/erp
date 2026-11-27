@@ -562,91 +562,89 @@ export function DataTable<T>({
                 </div>
             )}
 
-            <div className="overflow-x-auto">
-                <Table className="min-w-max" edgeFade={edgeFade}>
-                    <TableHeader className="[&_th]:text-muted-foreground">
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map(
-                                    (header, index, headers) => {
-                                        return (
-                                            <TableHead
-                                                key={header.id}
-                                                data-sticky-column={stickyColumnAttr(
+            {/* Satu-satunya kontainer scroll horizontal ada di <Table>. */}
+            <Table className="min-w-max" edgeFade={edgeFade}>
+                <TableHeader className="[&_th]:text-muted-foreground">
+                    {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id}>
+                            {headerGroup.headers.map(
+                                (header, index, headers) => {
+                                    return (
+                                        <TableHead
+                                            key={header.id}
+                                            data-sticky-column={stickyColumnAttr(
+                                                header.column.id,
+                                                hasStickyGrandTotal,
+                                            )}
+                                            className={cn(
+                                                'h-9 border-border px-2 py-1.5 text-sm font-medium select-none',
+                                                isNumericColumn(
+                                                    header.column.columnDef,
+                                                ) && 'pr-4',
+                                                stickyHeadClass(
                                                     header.column.id,
                                                     hasStickyGrandTotal,
-                                                )}
-                                                className={cn(
-                                                    'h-9 border-border px-2 py-1.5 text-sm font-medium select-none',
-                                                    isNumericColumn(
-                                                        header.column.columnDef,
-                                                    ) && 'pr-4',
-                                                    stickyHeadClass(
-                                                        header.column.id,
-                                                        hasStickyGrandTotal,
-                                                    ),
-                                                    isActionsColumn(
-                                                        headers[index + 1]
-                                                            ?.column.id ?? '',
+                                                ),
+                                                isActionsColumn(
+                                                    headers[index + 1]?.column
+                                                        .id ?? '',
+                                                ) &&
+                                                    !(
+                                                        header.column.id ===
+                                                            'grand_total' &&
+                                                        hasStickyGrandTotal
                                                     ) &&
-                                                        !(
-                                                            header.column.id ===
-                                                                'grand_total' &&
-                                                            hasStickyGrandTotal
-                                                        ) &&
-                                                        CELL_BEFORE_STICKY_ACTIONS,
-                                                )}
-                                            >
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(
-                                                          header.column
-                                                              .columnDef.header,
-                                                          header.getContext(),
-                                                      )}
-                                            </TableHead>
-                                        );
-                                    },
-                                )}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>{tableContent}</TableBody>
-                    {summaryRow ? (
-                        <TableFooter data-testid="report-summary">
-                            <TableRow className="border-t-2 border-border bg-muted/70 font-semibold">
-                                {table.getVisibleLeafColumns().map((column) => {
-                                    const labelColumnId =
-                                        summaryRow.labelColumnId ??
-                                        table.getVisibleLeafColumns()[0]?.id;
-                                    const isLabel = column.id === labelColumnId;
-                                    return (
-                                        <TableCell
-                                            key={column.id}
-                                            data-testid={`report-total-cell-${column.id}`}
-                                            className={cn(
-                                                'border-border bg-muted/70 px-2 py-1.5 tabular-nums',
-                                                !isLabel && 'text-right',
-                                                !isLabel &&
-                                                    isNumericColumn(
-                                                        column.columnDef,
-                                                    ) &&
-                                                    'pr-4',
+                                                    CELL_BEFORE_STICKY_ACTIONS,
                                             )}
                                         >
-                                            {isLabel
-                                                ? summaryRow.label
-                                                : (summaryRow.values[
-                                                      column.id
-                                                  ] ?? null)}
-                                        </TableCell>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef
+                                                          .header,
+                                                      header.getContext(),
+                                                  )}
+                                        </TableHead>
                                     );
-                                })}
-                            </TableRow>
-                        </TableFooter>
-                    ) : null}
-                </Table>
-            </div>
+                                },
+                            )}
+                        </TableRow>
+                    ))}
+                </TableHeader>
+                <TableBody>{tableContent}</TableBody>
+                {summaryRow ? (
+                    <TableFooter data-testid="report-summary">
+                        <TableRow className="border-t-2 border-border bg-muted/70 font-semibold">
+                            {table.getVisibleLeafColumns().map((column) => {
+                                const labelColumnId =
+                                    summaryRow.labelColumnId ??
+                                    table.getVisibleLeafColumns()[0]?.id;
+                                const isLabel = column.id === labelColumnId;
+                                return (
+                                    <TableCell
+                                        key={column.id}
+                                        data-testid={`report-total-cell-${column.id}`}
+                                        className={cn(
+                                            'border-border bg-muted/70 px-2 py-1.5 tabular-nums',
+                                            !isLabel && 'text-right',
+                                            !isLabel &&
+                                                isNumericColumn(
+                                                    column.columnDef,
+                                                ) &&
+                                                'pr-4',
+                                        )}
+                                    >
+                                        {isLabel
+                                            ? summaryRow.label
+                                            : (summaryRow.values[column.id] ??
+                                              null)}
+                                    </TableCell>
+                                );
+                            })}
+                        </TableRow>
+                    </TableFooter>
+                ) : null}
+            </Table>
 
             {footer ? <div className="mt-3">{footer}</div> : null}
 

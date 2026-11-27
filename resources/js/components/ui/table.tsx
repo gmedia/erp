@@ -7,8 +7,10 @@ import { cn } from "@/lib/utils"
 // ruang (W5-02) agar fade tidak menutupi angka/header.
 const TABLE_EDGE_RIGHT = [
   "after:pointer-events-none after:absolute after:inset-y-0 after:right-0",
-  "after:z-10 after:w-8 after:bg-linear-to-r after:from-transparent after:via-background/80 after:to-background",
-  "after:shadow-[inset_-1px_0_0_var(--border)]",
+  "after:z-10 after:w-12 after:bg-linear-to-r",
+  "after:from-transparent after:via-background/80 after:to-background",
+  "after:shadow-[inset_-1px_0_0_var(--border),",
+  "inset_-10px_0_8px_-8px_color-mix(in_oklab,var(--foreground)_18%,transparent)]",
 ].join(" ")
 
 const ACTIONS_SHADOW =
