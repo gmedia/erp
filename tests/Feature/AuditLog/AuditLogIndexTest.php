@@ -4,8 +4,8 @@ use App\Models\Employee;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Spatie\Activitylog\Models\Activity;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Activitylog\Models\Activity;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
