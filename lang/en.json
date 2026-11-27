@@ -47,6 +47,12 @@
     },
     "approval.status_manual_forbidden": "This status can only be set through the approval process or by the system.",
     "approval.items_locked": "Items can only be changed while the document is still a draft.",
+    "settings": {
+        "appearance": {
+            "title": "Appearance settings",
+            "description": "Update your account's appearance settings"
+        }
+    },
     "approval.flow_not_found": "Approval flow not found, inactive, or has no steps.",
     "status_transition.invalid": "Cannot change status from :from to :to.",
     "posted_document.values_locked": "This document is already posted. Its items and amounts are locked; use cancel or void instead.",
@@ -1414,7 +1420,16 @@
         },
         "general_ledger": {
             "title": "General Ledger Report",
-            "description": "Every journal line posted to an account within a period, with running balance."
+            "description": "Every journal line posted to an account within a period, with running balance.",
+            "columns": {
+                "date": "Date",
+                "entry_number": "Entry Number",
+                "description": "Description",
+                "reference": "Reference",
+                "debit": "Debit",
+                "credit": "Credit",
+                "running_balance": "Running Balance"
+            }
         },
         "financial_dashboard": {
             "description": "Monitor key financial metrics, cash flow, and expense trends."
