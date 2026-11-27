@@ -49,6 +49,10 @@ class AdminSettingRequest extends AuthorizedFormRequest
             'social_login_allowed_domains' => ['nullable', 'string', 'max:4000'],
             'social_login_allowed_tenants' => ['nullable', 'string', 'max:4000'],
 
+            'security_log_retention_days' => ['nullable', 'integer', 'min:30', 'max:3650'],
+            'security_log_failed_login_threshold' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'security_log_failed_login_window_minutes' => ['nullable', 'integer', 'min:1', 'max:1440'],
+
             // Akun laba/rugi pelepasan aset (#442): id akun daun di COA aktif.
             'asset_disposal_gain_account_id' => ['nullable', 'integer', 'exists:accounts,id'],
             'asset_disposal_loss_account_id' => ['nullable', 'integer', 'exists:accounts,id'],

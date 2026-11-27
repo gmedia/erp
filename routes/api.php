@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
     require __DIR__ . '/api/approval-delegations.php';
     require __DIR__ . '/api/approval-flows.php';
     require __DIR__ . '/api/approval-monitoring.php';
+    require __DIR__ . '/api/security-logs.php';
     require __DIR__ . '/api/asset-categories.php';
     require __DIR__ . '/api/asset-depreciation-runs.php';
     require __DIR__ . '/api/asset-locations.php';

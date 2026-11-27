@@ -117,6 +117,19 @@ export const approvalAuditEventOptions = translatedOptions(
     ],
 );
 
+export const securityLogEventOptions = translatedOptions(
+    'filter.security_event_',
+    [
+        ['login_success', 'Login Success'],
+        ['login_failed', 'Login Failed'],
+        ['logout', 'Logout'],
+        ['password_reset', 'Password Reset'],
+        ['role_changed', 'Role Changed'],
+        ['user_created', 'User Created'],
+        ['user_deactivated', 'User Deactivated'],
+    ],
+);
+
 export const maintenanceTypeOptions = translatedOptions(
     'form_fields.asset_maintenances.maintenance_type_',
     [
@@ -708,6 +721,20 @@ export function createApprovalAuditEventFilterField(
         'event',
         'Event',
         approvalAuditEventOptions,
+        placeholder,
+    );
+}
+
+export function createSecurityLogEventFilterField(
+    placeholder: TranslatableLabel = {
+        key: 'page.security_logs.select_event',
+        fallback: 'Select Event',
+    },
+): FieldDescriptor {
+    return createSelectFilterField(
+        'event',
+        { key: 'page.security_logs.column_event', fallback: 'Event' },
+        securityLogEventOptions,
         placeholder,
     );
 }

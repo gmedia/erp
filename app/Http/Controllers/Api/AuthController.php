@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\SecurityLogs\RecordSecurityLogAction;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MenuResource;
 use App\Models\ApprovalRequestStep;
 use App\Models\Employee;
 use App\Models\Menu;
+use App\Models\SecurityLog;
 use App\Models\Setting;
 use App\Models\User;
 use App\Services\SocialAuth\SocialLoginPolicy;
@@ -107,6 +109,15 @@ class AuthController extends Controller
 
         if ($token instanceof PersonalAccessToken) {
             $token->delete();
+        }
+
+        if ($user) {
+            // Token-based (Sanctum) logout does not dispatch Laravel's Logout event, so record it here.
+            app(RecordSecurityLogAction::class)->execute(
+                SecurityLog::EVENT_LOGOUT,
+                userId: $user->id,
+                request: $request,
+            );
         }
 
         return response()->json(['message' => __('auth_api.logged_out')]);

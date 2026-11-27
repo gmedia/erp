@@ -2,6 +2,7 @@
 
 use App\Actions\Approvals\RepairMissingApprovalStepsAction;
 use App\Actions\RecurringJournals\ExecuteRecurringJournalAction;
+use App\Actions\SecurityLogs\PruneSecurityLogsAction;
 use App\Actions\VehicleLoans\CleanupVehicleLoansAction;
 use App\Actions\VehicleLoans\NotifyOverdueVehicleLoansAction;
 use App\Console\Commands\CleanupSocialLoginTickets;
@@ -56,6 +57,18 @@ Schedule::command('recurring-journals:execute')->daily();
 Schedule::command(CleanupSocialLoginTickets::class)
     ->everyFiveMinutes()
     ->name('cleanup-social-login-tickets');
+
+Artisan::command('security-logs:prune', function () {
+    $deleted = app(PruneSecurityLogsAction::class)->execute();
+
+    $this->info("Security logs pruned: {$deleted}");
+
+    return Command::SUCCESS;
+})->purpose('Delete security logs older than the retention setting');
+
+Schedule::command('security-logs:prune')
+    ->daily()
+    ->name('prune-security-logs');
 
 Schedule::command(PruneStaleDeviceTokens::class)
     ->daily()
