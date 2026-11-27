@@ -63,8 +63,10 @@ it('keeps stock on hand equal to the sum of stock movements per product and ware
             ->orderByDesc('id')
             ->value('balance_after');
 
-        expect(round((float) $row->on_hand, 4))
-            ->toBe(round((float) $lastBalance, 4), "Stok on hand produk {$row->product_id} gudang {$row->warehouse_id} tidak sama dengan jumlah pergerakan");
+        $message = "Stok on hand produk {$row->product_id} gudang {$row->warehouse_id} "
+            . 'tidak sama dengan jumlah pergerakan';
+
+        expect(round((float) $row->on_hand, 4))->toBe(round((float) $lastBalance, 4), $message);
     }
 
     expect(DB::table('stock_movements')->where('balance_after', '<', 0)->count())->toBe(0);
