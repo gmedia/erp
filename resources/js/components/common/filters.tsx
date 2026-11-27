@@ -726,11 +726,14 @@ export function createApprovalAuditEventFilterField(
 }
 
 export function createSecurityLogEventFilterField(
-    placeholder = 'Select Event',
+    placeholder: TranslatableLabel = {
+        key: 'page.security_logs.select_event',
+        fallback: 'Select Event',
+    },
 ): FieldDescriptor {
     return createSelectFilterField(
         'event',
-        'Event',
+        { key: 'page.security_logs.column_event', fallback: 'Event' },
         securityLogEventOptions,
         placeholder,
     );

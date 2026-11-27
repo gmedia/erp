@@ -1,19 +1,28 @@
 import {
+    createAsyncSelectFilterField,
     createDateRangeFilterFields,
     createSecurityLogEventFilterField,
     createTextFilterField,
-    createUserFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
 export function createSecurityLogFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', {
-            key: 'page.security_logs.search_placeholder',
-            fallback: 'Search email, IP, user...',
-        }),
+        createTextFilterField(
+            'search',
+            { key: 'common.search', fallback: 'Search' },
+            {
+                key: 'page.security_logs.search_placeholder',
+                fallback: 'Search email, IP, user...',
+            },
+        ),
         createSecurityLogEventFilterField(),
-        createUserFilterField('user_id', 'User'),
+        createAsyncSelectFilterField(
+            'user_id',
+            { key: 'page.security_logs.column_user', fallback: 'User' },
+            '/api/users',
+            'Select a user',
+        ),
         createTextFilterField(
             'ip_address',
             {

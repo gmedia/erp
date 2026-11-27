@@ -1029,6 +1029,7 @@
         "security_logs": {
             "description": "Aktivitas login, logout, dan perubahan akses. Disimpan 1 tahun; data pribadi hanya dipakai untuk keamanan.",
             "search_placeholder": "Cari email, IP, pengguna...",
+            "select_event": "Pilih Kejadian",
             "column_date": "Waktu",
             "column_event": "Kejadian",
             "column_user": "Pengguna",
