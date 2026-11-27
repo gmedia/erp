@@ -3,7 +3,9 @@ import { login } from '../helpers';
 import {
     seedApprovedLoan,
     VEHICLE_LOAN_DASHBOARD_PATH,
+    VEHICLE_LOAN_PICKUP_PATH,
     VEHICLE_LOAN_REQUEST_PATH,
+    VEHICLE_LOAN_SECURITY_PATH,
 } from './helpers';
 
 test.beforeEach(async ({ page }) => {
@@ -98,7 +100,9 @@ test('sidebar submenu uses Permintaan, Dasbor and Antrean Keamanan', async ({
     await expect(
         sidebar.getByText('Permintaan', { exact: true }),
     ).toBeVisible();
-    await expect(sidebar.getByText('Dasbor', { exact: true })).toBeVisible();
+    await expect(
+        sidebar.locator(`a[href="${VEHICLE_LOAN_DASHBOARD_PATH}"]`),
+    ).toBeVisible();
     await expect(
         sidebar.getByText('Antrean Keamanan', { exact: true }),
     ).toBeVisible();
@@ -114,4 +118,48 @@ test('request form breadcrumb leaf matches the page title', async ({
     await expect(
         breadcrumb.locator('[data-slot="breadcrumb-page"]'),
     ).toHaveText('Permintaan Peminjaman Kendaraan');
+});
+
+test('disabled submit button on pickup has no vertical artifact', async ({
+    page,
+}) => {
+    await login(page);
+    await page.goto(VEHICLE_LOAN_PICKUP_PATH);
+    const submit = page.getByRole('button', { name: 'Kirim Pengambilan' });
+    await expect(submit).toBeDisabled();
+
+    const style = await submit.evaluate((node) => {
+        const cs = getComputedStyle(node);
+        const childBorders = Array.from(node.querySelectorAll('*')).filter(
+            (el) => parseFloat(getComputedStyle(el).borderLeftWidth) > 0,
+        ).length;
+        return {
+            boxShadow: cs.boxShadow,
+            borderLeft: cs.borderLeftWidth,
+            borderRight: cs.borderRightWidth,
+            childBorders,
+        };
+    });
+    expect(style.boxShadow).toBe('none');
+    expect(style.borderLeft).toBe('0px');
+    expect(style.borderRight).toBe('0px');
+    expect(style.childBorders).toBe(0);
+});
+
+test('form pages keep a narrow max width and list pages a wide one', async ({
+    page,
+}) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await login(page);
+
+    // Form page: max-w-2xl (672px).
+    await page.goto(VEHICLE_LOAN_REQUEST_PATH);
+    const form = await page.locator('div.mx-auto.max-w-2xl').first().boundingBox();
+    expect(form?.width ?? 0).toBeLessThanOrEqual(672);
+
+    // Full-width list page: max-w-7xl (1280px).
+    await page.goto(VEHICLE_LOAN_SECURITY_PATH);
+    const list = await page.locator('div.mx-auto.max-w-7xl').first().boundingBox();
+    expect(list?.width ?? 0).toBeLessThanOrEqual(1280);
+    expect(list?.width ?? 0).toBeGreaterThan(672);
 });

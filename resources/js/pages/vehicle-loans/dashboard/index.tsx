@@ -293,7 +293,7 @@ export default function VehicleLoanDashboardPage() {
                                                 loan.start_at,
                                             )}
                                         </p>
-                                        <div className="flex items-center gap-2 self-start sm:self-auto">
+                                        <div className="flex items-center gap-2 self-start sm:w-56 sm:shrink-0 sm:justify-end sm:self-auto">
                                             {loan.is_overdue && (
                                                 <span className="rounded-full bg-destructive-soft px-2 py-1 text-xs font-medium text-destructive-foreground">
                                                     {tPage(
