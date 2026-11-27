@@ -277,7 +277,7 @@ export default function VehicleLoanReturnPage() {
                                 )}
                                 hint={tPage(
                                     'return.handover_photo_hint',
-                                    'Foto bersama petugas keamanan saat mengembalikan kunci. JPG/PNG, maks. 5 MB.',
+                                    'Foto bersama petugas keamanan saat mengembalikan kunci. Format JPG/PNG, maksimal 5 MB.',
                                 )}
                                 capture
                             />
@@ -315,6 +315,10 @@ export default function VehicleLoanReturnPage() {
                                 <Input
                                     id="odometer"
                                     inputMode="numeric"
+                                    placeholder={tPage(
+                                        'return.odometer_placeholder',
+                                        'Contoh: 45230',
+                                    )}
                                     value={odometerEnd}
                                     onChange={(e) =>
                                         setOdometerEnd(e.target.value)

@@ -8,6 +8,21 @@ import axios from '@/lib/axios';
 import { formatDateTimeByRegionalSettings } from '@/utils/date-format';
 import { approvalStepStatusLabel } from '@/utils/vehicle-loan-status';
 import { useQuery } from '@tanstack/react-query';
+import {
+    AlertTriangle,
+    ArrowRightCircle,
+    Ban,
+    Camera,
+    CarFront,
+    CheckCircle2,
+    Circle,
+    FilePen,
+    KeyRound,
+    Send,
+    UserRoundCog,
+    XCircle,
+    type LucideIcon,
+} from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useParams } from 'react-router-dom';
 
@@ -99,6 +114,55 @@ function activityLabel(event: string, tPage: PageText): string {
         default:
             return event.replaceAll('_', ' ');
     }
+}
+
+interface ActivityTone {
+    icon: LucideIcon;
+    className: string;
+}
+
+const ACTIVITY_TONE_NEUTRAL: ActivityTone = {
+    icon: Circle,
+    className: 'bg-muted text-muted-foreground',
+};
+
+const ACTIVITY_TONES: Record<string, ActivityTone> = {
+    draft_created: {
+        icon: FilePen,
+        className: 'bg-muted text-muted-foreground',
+    },
+    submitted: { icon: Send, className: 'bg-info/10 text-info' },
+    approval_step_advanced: {
+        icon: ArrowRightCircle,
+        className: 'bg-warning-soft text-warning',
+    },
+    approval_completed: {
+        icon: CheckCircle2,
+        className: 'bg-success-soft text-success',
+    },
+    approval_rejected: {
+        icon: XCircle,
+        className: 'bg-destructive-soft text-destructive-foreground',
+    },
+    assignment_changed: {
+        icon: UserRoundCog,
+        className: 'bg-info/10 text-info',
+    },
+    cancelled: { icon: Ban, className: 'bg-muted text-muted-foreground' },
+    pickup_submitted: { icon: Camera, className: 'bg-info/10 text-info' },
+    key_handed_over: {
+        icon: KeyRound,
+        className: 'bg-success-soft text-success',
+    },
+    return_submitted: { icon: CarFront, className: 'bg-info/10 text-info' },
+    return_overdue: {
+        icon: AlertTriangle,
+        className: 'bg-destructive-soft text-destructive-foreground',
+    },
+};
+
+function activityTone(event: string): ActivityTone {
+    return ACTIVITY_TONES[event] ?? ACTIVITY_TONE_NEUTRAL;
 }
 
 const STEP_STATUS_CLASS: Record<string, string> = {
@@ -227,7 +291,7 @@ export default function VehicleLoanDetailPage() {
                     <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
                             <Link to="/vehicle-loans/dashboard">
-                                {tPage('detail_page.back', 'Kembali')}
+                                {tPage('detail_page.back', 'Kembali ke daftar')}
                             </Link>
                         </Button>
                         <Button
@@ -423,7 +487,7 @@ export default function VehicleLoanDetailPage() {
                                 </Card>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-4 lg:sticky lg:top-4 lg:self-start">
                                 <Card>
                                     <CardHeader className="pb-3">
                                         <CardTitle className="text-base">
@@ -444,32 +508,35 @@ export default function VehicleLoanDetailPage() {
                                             </p>
                                         )}
                                         <dl className="space-y-2 text-sm">
-                                            <div className="flex justify-between gap-3">
-                                                <dt className="text-muted-foreground">
-                                                    {tPage(
-                                                        'detail_page.submitted_label',
-                                                        'Diajukan',
-                                                    )}
-                                                </dt>
-                                                <dd>
-                                                    {formatDateTimeByRegionalSettings(
-                                                        data.submitted_at,
-                                                    )}
-                                                </dd>
-                                            </div>
-                                            <div className="flex justify-between gap-3">
+                                            <div className="flex items-start justify-between gap-3">
                                                 <dt className="text-muted-foreground">
                                                     {tPage(
                                                         'detail_page.approved_label',
                                                         'Disetujui',
                                                     )}
                                                 </dt>
-                                                <dd>
+                                                <dd className="text-right">
                                                     {formatDateTimeByRegionalSettings(
                                                         data.approved_at,
                                                     )}
                                                 </dd>
                                             </div>
+                                            {data.status === 'returned' && (
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <dt className="text-muted-foreground">
+                                                        {tPage(
+                                                            'detail_page.completed_label',
+                                                            'Selesai pada',
+                                                        )}
+                                                    </dt>
+                                                    <dd className="text-right">
+                                                        {formatDateTimeByRegionalSettings(
+                                                            data.returns
+                                                                ?.returned_at,
+                                                        )}
+                                                    </dd>
+                                                </div>
+                                            )}
                                         </dl>
                                         {action && (
                                             <Button className="w-full" asChild>
@@ -559,56 +626,69 @@ export default function VehicleLoanDetailPage() {
                                         )}
                                     </CardContent>
                                 </Card>
+
+                                <Card>
+                                    <CardHeader className="pb-3">
+                                        <CardTitle className="text-base">
+                                            {tPage(
+                                                'detail_page.activity_heading',
+                                                'Riwayat Aktivitas',
+                                            )}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        {!data.activity_logs?.length ? (
+                                            <p className="text-sm text-muted-foreground">
+                                                {tPage(
+                                                    'detail_page.activity_empty',
+                                                    'Belum ada aktivitas tercatat.',
+                                                )}
+                                            </p>
+                                        ) : (
+                                            <ol className="relative space-y-3 before:absolute before:inset-y-3 before:left-3 before:w-px before:bg-border">
+                                                {data.activity_logs.map(
+                                                    (log) => {
+                                                        const tone =
+                                                            activityTone(
+                                                                log.event,
+                                                            );
+                                                        const Icon = tone.icon;
+                                                        return (
+                                                            <li
+                                                                key={log.id}
+                                                                className="relative flex gap-3 pb-1 last:pb-0"
+                                                            >
+                                                                <span
+                                                                    className={`relative z-10 flex size-6 shrink-0 items-center justify-center rounded-full ${tone.className}`}
+                                                                >
+                                                                    <Icon className="size-3.5" />
+                                                                </span>
+                                                                <div className="min-w-0 pb-1">
+                                                                    <p className="text-sm font-medium">
+                                                                        {activityLabel(
+                                                                            log.event,
+                                                                            tPage,
+                                                                        )}
+                                                                    </p>
+                                                                    <p className="text-xs text-muted-foreground">
+                                                                        {formatDateTimeByRegionalSettings(
+                                                                            log.created_at,
+                                                                        )}
+                                                                        {log.actor_name
+                                                                            ? ` · ${log.actor_name}`
+                                                                            : ''}
+                                                                    </p>
+                                                                </div>
+                                                            </li>
+                                                        );
+                                                    },
+                                                )}
+                                            </ol>
+                                        )}
+                                    </CardContent>
+                                </Card>
                             </div>
                         </div>
-
-                        <Card>
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base">
-                                    {tPage(
-                                        'detail_page.activity_heading',
-                                        'Riwayat Aktivitas',
-                                    )}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {!data.activity_logs?.length ? (
-                                    <p className="text-sm text-muted-foreground">
-                                        {tPage(
-                                            'detail_page.activity_empty',
-                                            'Belum ada aktivitas tercatat.',
-                                        )}
-                                    </p>
-                                ) : (
-                                    <ol className="space-y-3">
-                                        {data.activity_logs.map((log) => (
-                                            <li
-                                                key={log.id}
-                                                className="flex gap-3"
-                                            >
-                                                <span className="mt-1.5 size-2 shrink-0 rounded-full bg-muted-foreground" />
-                                                <div>
-                                                    <p className="text-sm font-medium">
-                                                        {activityLabel(
-                                                            log.event,
-                                                            tPage,
-                                                        )}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {formatDateTimeByRegionalSettings(
-                                                            log.created_at,
-                                                        )}
-                                                        {log.actor_name
-                                                            ? ` · ${log.actor_name}`
-                                                            : ''}
-                                                    </p>
-                                                </div>
-                                            </li>
-                                        ))}
-                                    </ol>
-                                )}
-                            </CardContent>
-                        </Card>
                     </>
                 )}
             </div>

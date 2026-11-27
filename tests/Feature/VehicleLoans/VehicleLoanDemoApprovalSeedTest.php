@@ -62,6 +62,31 @@ it('seeds a two-step demo flow where in_progress means step 1 approved and step 
         ->and($steps[1]->acted_at)->toBeNull();
 });
 
+it('uses Indonesian operational wording in demo notes and purposes', function () {
+    seedVehicleLoanDemoFixtures();
+
+    $texts = collect()
+        ->merge(VehicleLoan::query()->pluck('review_notes'))
+        ->merge(VehicleLoan::query()->pluck('purpose'))
+        ->merge(ApprovalRequestStep::query()->pluck('comments'))
+        ->filter()
+        ->implode(' | ');
+
+    expect($texts)->not->toBe('');
+
+    foreach (['driver', 'sparepart', 'vendor'] as $englishTerm) {
+        expect(mb_strtolower($texts))->not->toContain($englishTerm);
+    }
+
+    foreach (['sample', 'dummy', 'lorem', 'contoh'] as $placeholderTerm) {
+        expect(mb_strtolower($texts))->not->toContain($placeholderTerm);
+    }
+
+    expect($texts)->toContain('pengemudi')
+        ->and($texts)->toContain('suku cadang')
+        ->and($texts)->toContain('pemasok');
+});
+
 it('keeps demo approval and loan counts identical when seeded again', function () {
     seedVehicleLoanDemoFixtures();
 
