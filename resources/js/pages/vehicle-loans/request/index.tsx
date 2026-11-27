@@ -158,10 +158,7 @@ export default function VehicleLoanRequestPage() {
                     href: '/vehicle-loans/request',
                 },
                 {
-                    title: tPage(
-                        'request.title',
-                        'Permintaan Peminjaman Kendaraan',
-                    ),
+                    title: tPage('request.breadcrumb_leaf', 'Permintaan'),
                     href: '/vehicle-loans/request',
                 },
             ]}
@@ -268,7 +265,18 @@ export default function VehicleLoanRequestPage() {
                                     )
                                 }
                             >
-                                <SelectTrigger id="driver_id">
+                                <SelectTrigger
+                                    id="driver_id"
+                                    className="min-w-0 text-left"
+                                    title={
+                                        form.driver_id
+                                            ? undefined
+                                            : tPage(
+                                                  'request.undecided_option',
+                                                  'Belum ditentukan (penyetuju melengkapi)',
+                                              )
+                                    }
+                                >
                                     <SelectValue
                                         className="min-w-0 truncate"
                                         placeholder={tPage(
@@ -314,7 +322,18 @@ export default function VehicleLoanRequestPage() {
                                     )
                                 }
                             >
-                                <SelectTrigger id="vehicle_unit_id">
+                                <SelectTrigger
+                                    id="vehicle_unit_id"
+                                    className="min-w-0 text-left"
+                                    title={
+                                        form.vehicle_unit_id
+                                            ? undefined
+                                            : tPage(
+                                                  'request.undecided_option',
+                                                  'Belum ditentukan (penyetuju melengkapi)',
+                                              )
+                                    }
+                                >
                                     <SelectValue
                                         className="min-w-0 truncate"
                                         placeholder={tPage(
