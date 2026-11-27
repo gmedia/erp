@@ -85,7 +85,7 @@ export function DatePickerField({
                                         ) : (
                                             <span>{translatedPlaceholder}</span>
                                         )}
-                                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        <CalendarIcon className="ml-auto size-3.5 text-muted-foreground" />
                                     </Button>
                                 </FormControl>
                             </PopoverTrigger>

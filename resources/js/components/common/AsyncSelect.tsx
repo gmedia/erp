@@ -1,5 +1,5 @@
 import axios from '@/lib/axios';
-import { Check, ChevronsUpDown, Loader2, Search } from 'lucide-react';
+import { Check, ChevronDown, Loader2, Search } from 'lucide-react';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -209,7 +209,7 @@ export function AsyncSelect<T extends object = Record<string, unknown>>({
                     <span className="flex-1 truncate text-left">
                         {selectedLabel || placeholder}
                     </span>
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    <ChevronDown className="ml-2 size-3.5 shrink-0 text-muted-foreground" />
                 </Button>
             </PopoverTrigger>
             <PopoverContent
