@@ -265,6 +265,33 @@ if ! cache_config; then
     exit 1
 fi
 
+# --- 2b. Guard object storage (tulis-baca-hapus) sebelum Playwright ---
+# Tanpa ini test unggah gagal 422 satu per satu. Dicek setelah config:cache
+# supaya memakai config yang sama dengan web server. Pesan tidak memuat nilai.
+check_object_storage() {
+    local out
+    out="$(sail_run artisan tinker --no-interaction --execute='
+        $d = config("filesystems.default");
+        $p = "e2e-guard/" . uniqid() . ".txt";
+        try {
+            $ok = \Illuminate\Support\Facades\Storage::disk($d)->put($p, "ok");
+            \Illuminate\Support\Facades\Storage::disk($d)->delete($p);
+            echo $ok ? "OBJECT_STORAGE_OK" : "OBJECT_STORAGE_FAIL";
+        } catch (\Throwable $e) {
+            echo "OBJECT_STORAGE_FAIL";
+        }
+    ' 2>/dev/null)"
+    [[ "$out" == *OBJECT_STORAGE_OK* ]]
+}
+
+if ! check_object_storage; then
+    log_err "MinIO: AWS_SECRET_ACCESS_KEY kosong atau bucket belum dibuat — jalankan: bash scripts/minio-bucket.sh"
+    log_err "Lalu cek AWS_SECRET_ACCESS_KEY di .env (nilai dev: lihat .env.example)."
+    log_err "Tanpa ini test unggah akan gagal 422."
+    exit 1
+fi
+log "Object storage (MinIO) siap."
+
 # --- 3. Watchdog background ---
 PW_FILE="$LOG_DIR/pw-pid"
 : > "$PW_FILE"

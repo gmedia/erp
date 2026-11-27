@@ -41,6 +41,12 @@ This Enterprise Resource Planning (ERP) system is a comprehensive business manag
     ```
     bash project_setup.sh
     ```
+- Gejala unggah logo 422 / object storage gagal / cek Kesehatan `object_storage` merah
+    > Biasanya `AWS_SECRET_ACCESS_KEY` di `.env` kosong atau bucket `local` belum dibuat.
+    > Perbaikan untuk server yang sudah berjalan (idempoten):
+    ```
+    bash scripts/minio-bucket.sh
+    ```
 - Apply project setup (Windows 11)
     ```
     bash ./project_setup.sh

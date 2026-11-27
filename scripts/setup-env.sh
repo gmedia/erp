@@ -37,12 +37,6 @@ print_summary() {
   grep -E "^(HOST_IP|$(printf '%s|' "${PORT_VARS[@]%%:*}" | sed 's/|$//'))=" "$ENV_FILE" | sed 's/^/  /'
 }
 
-if [ -f "$ENV_FILE" ]; then
-  echo "• $ENV_FILE sudah ada — tidak diubah."
-  print_summary
-  exit 0
-fi
-
 [ -f "$EXAMPLE_FILE" ] || { echo "✗ $EXAMPLE_FILE tidak ditemukan" >&2; exit 1; }
 
 # Set KEY=VALUE: ganti baris yang ada, atau tambahkan di akhir.
@@ -58,6 +52,32 @@ set_env() {
 get_env() {
   grep -E "^$1=" "$ENV_FILE" | tail -1 | cut -d= -f2- | tr -d '"' || true
 }
+
+# AWS_SECRET_ACCESS_KEY dev (MinIO Sail) harus terisi; jangan timpa nilai yang sudah ada.
+# Nilai TIDAK pernah dicetak — hanya status.
+fill_minio_secret() {
+  local current
+  current="$(get_env AWS_SECRET_ACCESS_KEY)"
+  if [ -n "$current" ]; then
+    echo "• AWS_SECRET_ACCESS_KEY: sudah terisi — tidak diubah."
+    return 0
+  fi
+  local dev_secret
+  dev_secret="$(grep -E 'MINIO_ROOT_PASSWORD:' docker-compose.yml | head -1 | sed -E "s/.*['\"]([^'\"]*)['\"].*/\1/")"
+  dev_secret="${dev_secret:-password}"
+  set_env AWS_SECRET_ACCESS_KEY "$dev_secret"
+  echo "• AWS_SECRET_ACCESS_KEY: diisi nilai dev."
+}
+
+if [ -f "$ENV_FILE" ]; then
+  echo "• $ENV_FILE sudah ada — tidak menimpa."
+  fill_minio_secret
+  print_summary
+  # Setup ulang: pastikan bucket MinIO ada (idempoten; gagal bila container belum jalan).
+  bash scripts/minio-bucket.sh local \
+    || echo "• Bucket MinIO belum bisa dipastikan (jalankan: bash scripts/minio-bucket.sh)."
+  exit 0
+fi
 
 port_busy() {
   ss -ltnH "sport = :$1" 2>/dev/null | grep -q .
@@ -85,6 +105,8 @@ for entry in "${PORT_VARS[@]}"; do
   fi
   set_env "$key" "$port"
 done
+
+fill_minio_secret
 
 echo "✅ $ENV_FILE dibuat dari $EXAMPLE_FILE (chmod 600)."
 print_summary
