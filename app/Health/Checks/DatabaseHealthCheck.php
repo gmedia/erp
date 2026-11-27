@@ -2,6 +2,7 @@
 
 namespace App\Health\Checks;
 
+use App\Health\SystemHealthMessage;
 use App\Health\SystemHealthThresholds;
 use Illuminate\Support\Facades\DB;
 use Spatie\Health\Checks\Check;
@@ -24,24 +25,35 @@ class DatabaseHealthCheck extends Check
             report($exception);
 
             return Result::make()
-                ->failed('Database tidak dapat diakses (' . class_basename($exception) . ').');
+                ->failed('Database tidak dapat diakses (' . class_basename($exception) . ').')
+                ->meta(SystemHealthMessage::meta('system_health.database.unreachable', [
+                    'exception' => class_basename($exception),
+                ]));
         }
 
         $warningAt = SystemHealthThresholds::get(SystemHealthThresholds::DB_CONNECTIONS_WARNING);
 
+        $baseMeta = [
+            'size_mb' => $sizeMb,
+            'connections' => $connections,
+            'connections_warning_at' => $warningAt,
+        ];
+
         $result = Result::make()
-            ->meta([
-                'size_mb' => $sizeMb,
-                'connections' => $connections,
-                'connections_warning_at' => $warningAt,
-            ])
             ->shortSummary($connections . ' koneksi');
 
         if ($connections !== null && $connections >= $warningAt) {
-            return $result->warning("Jumlah koneksi database {$connections} mendekati batas peringatan {$warningAt}.");
+            return $result
+                ->meta($baseMeta + SystemHealthMessage::meta('system_health.database.connections_high', [
+                    'connections' => $connections,
+                    'warning_at' => $warningAt,
+                ]))
+                ->warning("Jumlah koneksi database {$connections} mendekati batas peringatan {$warningAt}.");
         }
 
-        return $result->ok('Database dapat diakses.');
+        return $result
+            ->meta($baseMeta + SystemHealthMessage::meta('system_health.database.ok'))
+            ->ok('Database dapat diakses.');
     }
 
     private function databaseSizeMb(): ?float
