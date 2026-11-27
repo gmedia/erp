@@ -22,21 +22,28 @@ interface ReportConfigurationViewModalProps {
     onClose: () => void;
 }
 
-const reportTypeLabels: Record<string, string> = {
-    balance_sheet: 'Balance Sheet',
-    income_statement: 'Income Statement',
-    cash_flow: 'Cash Flow',
-    trial_balance: 'Trial Balance',
-    custom: 'Custom',
-};
+const REPORT_TYPE_KEYS = [
+    'balance_sheet',
+    'income_statement',
+    'cash_flow',
+    'trial_balance',
+    'custom',
+] as const;
 
-const sectionTypeLabels: Record<string, string> = {
-    header: 'Header',
-    detail: 'Detail',
-    subtotal: 'Subtotal',
-    total: 'Total',
-    separator: 'Separator',
-};
+const SECTION_TYPE_KEYS = [
+    'header',
+    'detail',
+    'subtotal',
+    'total',
+    'separator',
+] as const;
+
+const SIGN_KEYS = ['normal', 'reversed'] as const;
+
+const isKnown = <T extends string>(
+    keys: readonly T[],
+    value: string,
+): value is T => (keys as readonly string[]).includes(value);
 
 export const ReportConfigurationViewModal =
     memo<ReportConfigurationViewModalProps>(
@@ -46,8 +53,21 @@ export const ReportConfigurationViewModal =
             if (!item) return null;
 
             const sections = item.sections ?? [];
+            const reportTypeLabel = isKnown(REPORT_TYPE_KEYS, item.report_type)
+                ? t(
+                      `page.report_configurations.view.report_type_labels.${item.report_type}`,
+                  )
+                : formatClassName(item.report_type);
             const sectionTypeLabel = (type: string) =>
-                sectionTypeLabels[type] ?? formatClassName(type);
+                isKnown(SECTION_TYPE_KEYS, type)
+                    ? t(
+                          `page.report_configurations.view.section_type_labels.${type}`,
+                      )
+                    : formatClassName(type);
+            const signLabel = (sign: string) =>
+                isKnown(SIGN_KEYS, sign)
+                    ? t(`page.report_configurations.view.sign_labels.${sign}`)
+                    : sign;
 
             return (
                 <ViewModalShell
@@ -78,10 +98,7 @@ export const ReportConfigurationViewModal =
                                     label={t(
                                         'page.report_configurations.view.report_type',
                                     )}
-                                    value={
-                                        reportTypeLabels[item.report_type] ??
-                                        formatClassName(item.report_type)
-                                    }
+                                    value={reportTypeLabel}
                                 />
                                 <ViewField
                                     label={t(
@@ -203,41 +220,36 @@ export const ReportConfigurationViewModal =
                                                                 {section.code}
                                                             </span>
                                                         </TableCell>
-                                                        <TableCell>
-                                                            <span
-                                                                className="block max-w-48 truncate sm:max-w-none"
-                                                                title={
-                                                                    section.name
-                                                                }
-                                                            >
+                                                        <TableCell className="min-w-0 break-words whitespace-normal">
+                                                            <span className="block font-medium">
                                                                 {section.name}
                                                             </span>
                                                             <span
                                                                 className={cn(
-                                                                    'mt-1 flex flex-wrap gap-1',
+                                                                    'mt-1 flex min-w-0 flex-wrap gap-1',
                                                                     'text-xs text-muted-foreground sm:hidden',
                                                                 )}
                                                             >
-                                                                <span>
+                                                                <span className="max-w-full truncate">
                                                                     {sectionTypeLabel(
                                                                         section.section_type,
                                                                     )}
                                                                 </span>
                                                                 <span>·</span>
-                                                                <span>
+                                                                <span className="max-w-full truncate">
                                                                     {section.account_type_filter ||
                                                                         '-'}
                                                                 </span>
                                                                 <span>·</span>
-                                                                <span>
+                                                                <span className="max-w-full truncate">
                                                                     {section.account_sub_type_filter ||
                                                                         '-'}
                                                                 </span>
                                                                 <span>·</span>
-                                                                <span>
-                                                                    {
-                                                                        section.sign_convention
-                                                                    }
+                                                                <span className="max-w-full truncate">
+                                                                    {signLabel(
+                                                                        section.sign_convention,
+                                                                    )}
                                                                 </span>
                                                             </span>
                                                         </TableCell>
@@ -257,9 +269,9 @@ export const ReportConfigurationViewModal =
                                                                 '-'}
                                                         </TableCell>
                                                         <TableCell className="hidden sm:table-cell">
-                                                            {
-                                                                section.sign_convention
-                                                            }
+                                                            {signLabel(
+                                                                section.sign_convention,
+                                                            )}
                                                         </TableCell>
                                                         <TableCell className="max-w-48 font-mono text-xs">
                                                             <span

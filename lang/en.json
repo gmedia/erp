@@ -1178,7 +1178,25 @@
                 "formula": "Formula",
                 "active": "Active",
                 "inactive": "Inactive",
-                "close": "Close"
+                "close": "Close",
+                "report_type_labels": {
+                    "balance_sheet": "Balance Sheet",
+                    "income_statement": "Income Statement",
+                    "cash_flow": "Cash Flow",
+                    "trial_balance": "Trial Balance",
+                    "custom": "Custom"
+                },
+                "section_type_labels": {
+                    "header": "Header",
+                    "detail": "Detail",
+                    "subtotal": "Subtotal",
+                    "total": "Total",
+                    "separator": "Separator"
+                },
+                "sign_labels": {
+                    "normal": "Normal",
+                    "reversed": "Reversed"
+                }
             }
         },
         "bank_reconciliations": {

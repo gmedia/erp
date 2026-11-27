@@ -1178,7 +1178,25 @@
                 "formula": "Formula",
                 "active": "Aktif",
                 "inactive": "Nonaktif",
-                "close": "Tutup"
+                "close": "Tutup",
+                "report_type_labels": {
+                    "balance_sheet": "Neraca",
+                    "income_statement": "Laba Rugi",
+                    "cash_flow": "Arus Kas",
+                    "trial_balance": "Neraca Saldo",
+                    "custom": "Kustom"
+                },
+                "section_type_labels": {
+                    "header": "Judul",
+                    "detail": "Rincian",
+                    "subtotal": "Subtotal",
+                    "total": "Total",
+                    "separator": "Pemisah"
+                },
+                "sign_labels": {
+                    "normal": "Normal",
+                    "reversed": "Dibalik"
+                }
             }
         },
         "bank_reconciliations": {

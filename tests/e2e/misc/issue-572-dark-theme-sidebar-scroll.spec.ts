@@ -169,12 +169,106 @@ test.describe('issue #572 appearance, sidebar scroll, report sections', () => {
             dialog.getByText('Report Configuration Details'),
         ).toHaveCount(0);
         await expect(
-            dialog.getByRole('button', { name: 'Tutup', exact: true }),
+            dialog
+                .locator('[data-slot="dialog-footer"]')
+                .getByRole('button', { name: 'Tutup', exact: true }),
         ).toBeVisible();
         await expect(
             dialog
                 .locator('[data-slot="dialog-footer"]')
                 .getByRole('button', { name: 'Close', exact: true }),
+        ).toHaveCount(0);
+    });
+
+    test('income statement modal at 390 dark: no hard-clipped text, Tutup footer, localized type badge', async ({
+        page,
+    }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await page.emulateMedia({ colorScheme: 'dark' });
+        await login(page);
+        await page.goto('/report-configurations', {
+            waitUntil: 'domcontentloaded',
+        });
+
+        const row = page
+            .locator('table tbody tr')
+            .filter({ hasText: 'income_statement' })
+            .first();
+        await row.getByRole('button', { name: 'Aksi' }).click();
+        await page
+            .getByRole('menuitem')
+            .filter({ hasText: /Lihat|View/ })
+            .first()
+            .click();
+
+        const dialog = page.getByRole('dialog');
+        await expect(dialog).toBeVisible();
+        await expect(dialog.getByText('Laba Rugi')).toBeVisible();
+
+        const hardClipped = await dialog
+            .locator('table td, table th')
+            .evaluateAll((cells) =>
+                cells.flatMap((cell) => {
+                    const container = cell.closest(
+                        '[data-slot="dialog-content"]',
+                    );
+                    const limit = container
+                        ? container.getBoundingClientRect().right + 1
+                        : Number.POSITIVE_INFINITY;
+                    return Array.from(cell.querySelectorAll('span, td'))
+                        .filter((node) => {
+                            const el = node as HTMLElement;
+                            const text = el.textContent?.trim() ?? '';
+                            if (!text) return false;
+                            const range = document.createRange();
+                            range.selectNodeContents(el);
+                            const right = range.getBoundingClientRect().right;
+                            if (right <= limit) return false;
+                            const ellipsis =
+                                getComputedStyle(el).textOverflow ===
+                                'ellipsis';
+                            return !ellipsis;
+                        })
+                        .map((node) => node.textContent?.trim() ?? '');
+                }),
+            );
+        expect(hardClipped).toEqual([]);
+
+        const tableScroll = await dialog
+            .locator('table')
+            .first()
+            .evaluate((table) => {
+                const scroller = table.parentElement;
+                return {
+                    scrollable:
+                        !!scroller &&
+                        scroller.scrollWidth > scroller.clientWidth,
+                    hasEdgeCue: !!table.closest(
+                        '[data-slot="table-container"]',
+                    ),
+                };
+            });
+        expect(tableScroll.hasEdgeCue).toBe(true);
+        expect(tableScroll.scrollable).toBe(true);
+
+        await expect(
+            dialog
+                .locator('table tbody tr td [data-slot="badge"]')
+                .filter({ hasText: /^(Judul|Rincian|Subtotal|Total)$/ })
+                .first(),
+        ).toBeAttached();
+        await expect(
+            dialog
+                .locator('table tbody tr td [data-slot="badge"]')
+                .filter({ hasText: /^(Header|Detail|header|detail)$/ }),
+        ).toHaveCount(0);
+        await expect(
+            dialog
+                .locator('[data-slot="dialog-footer"]')
+                .getByRole('button', { name: 'Tutup', exact: true }),
+        ).toBeVisible();
+        await expect(
+            dialog.getByRole('button', { name: 'Close', exact: true }),
         ).toHaveCount(0);
     });
 });
