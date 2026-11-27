@@ -137,7 +137,16 @@ class ArSampleDataSeeder extends Seeder
     ): array {
         $invoices = [];
         $postJournal = app(PostCustomerInvoiceJournalAction::class);
-        $salesDepartmentId = Department::query()->where('name', DemoMasterData::DEPARTMENT_SALES)->value('id');
+        // Departemen dokumen pendapatan disebar bergilir; sebagian sengaja tanpa departemen.
+        $revenueDepartmentIds = Department::query()
+            ->whereIn('name', [
+                DemoMasterData::DEPARTMENT_SALES,
+                DemoMasterData::DEPARTMENT_OPERATIONS,
+                DemoMasterData::DEPARTMENT_FINANCE,
+            ])
+            ->orderBy('id')
+            ->pluck('id')
+            ->all();
 
         $invoiceDefinitions = [
             [
@@ -244,7 +253,9 @@ class ArSampleDataSeeder extends Seeder
                     'customer_id' => $customer->id,
                     'branch_id' => $branch->id,
                     // Sebagian invoice membawa departemen; sisanya sengaja tanpa departemen.
-                    'department_id' => $index % 2 === 0 ? $salesDepartmentId : null,
+                    'department_id' => $index % 4 === 3 || $revenueDepartmentIds === []
+                        ? null
+                        : $revenueDepartmentIds[intdiv($index, 2) % count($revenueDepartmentIds)],
                     'fiscal_year_id' => $fiscalYear->id,
                     'invoice_date' => $invoiceDate->toDateString(),
                     'due_date' => $dueDate->toDateString(),

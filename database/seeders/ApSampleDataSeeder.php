@@ -124,7 +124,16 @@ class ApSampleDataSeeder extends Seeder
         $goodsReceipts
     ): array {
         $year = now()->format('Y');
-        $operationsDepartmentId = Department::query()->where('name', DemoMasterData::DEPARTMENT_OPERATIONS)->value('id');
+        // Departemen dokumen beban disebar bergilir; sebagian sengaja tanpa departemen.
+        $expenseDepartmentIds = Department::query()
+            ->whereIn('name', [
+                DemoMasterData::DEPARTMENT_OPERATIONS,
+                DemoMasterData::DEPARTMENT_ENGINEERING,
+                DemoMasterData::DEPARTMENT_FINANCE,
+            ])
+            ->orderBy('id')
+            ->pluck('id')
+            ->all();
 
         $billDefinitions = [
             [
@@ -225,7 +234,9 @@ class ApSampleDataSeeder extends Seeder
                     'supplier_id' => $supplier->id,
                     'branch_id' => $branchId,
                     // Sebagian bill membawa departemen; sisanya sengaja tanpa departemen.
-                    'department_id' => $index % 2 === 0 ? $operationsDepartmentId : null,
+                    'department_id' => $index % 4 === 3 || $expenseDepartmentIds === []
+                        ? null
+                        : $expenseDepartmentIds[intdiv($index, 2) % count($expenseDepartmentIds)],
                     'fiscal_year_id' => $fiscalYearId,
                     'purchase_order_id' => $purchaseOrder?->id,
                     'goods_receipt_id' => $goodsReceipt?->id,
