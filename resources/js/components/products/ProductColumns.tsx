@@ -26,10 +26,7 @@ const renderCategoryCell = ({ row }: { row: { original: Product } }) => {
 /**
  * Cell renderer for type column with badge
  */
-const PRODUCT_TYPE_LABELS: Record<
-    string,
-    { key: string; fallback: string }
-> = {
+const PRODUCT_TYPE_LABELS: Record<string, { key: string; fallback: string }> = {
     raw_material: {
         key: 'form_fields.products.type_raw_material',
         fallback: 'Raw Material',
