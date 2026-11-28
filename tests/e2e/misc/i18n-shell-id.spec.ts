@@ -253,7 +253,7 @@ test.describe('i18n filter inputs (locale id)', () => {
 
         await page.getByRole('button', { name: /filter/i }).click();
         const dialog = page.getByRole('dialog');
-        const thresholdInput = dialog.getByPlaceholder('Example: 10');
+        const thresholdInput = dialog.getByPlaceholder('Contoh: 10');
         await expect(thresholdInput).toBeVisible({ timeout: 15000 });
         await thresholdInput.fill('1000');
 

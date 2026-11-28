@@ -12,23 +12,33 @@ import {
 
 export function createPurchaseRequestFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', {
-            key: 'page.purchase_requests.search_placeholder',
-            fallback: 'Search PR number, notes, or rejection reason...',
-        }),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            {
+                key: 'page.purchase_requests.search_placeholder',
+                fallback: 'Search PR number, notes, or rejection reason...',
+            },
+        ),
         ...createPurchaseRequestContextFilterFields(),
         ...createSelectFilterFields([
             {
                 name: 'priority',
                 label: { key: 'column.priority', fallback: 'Priority' },
                 options: purchaseRequestPriorityOptions,
-                placeholder: 'Select Priority',
+                placeholder: {
+                    key: 'filter.select_priority',
+                    fallback: 'Select Priority',
+                },
             },
             {
                 name: 'status',
                 label: { key: 'column.status', fallback: 'Status' },
                 options: purchaseRequestStatusOptions,
-                placeholder: 'Select Status',
+                placeholder: {
+                    key: 'filter.select_status',
+                    fallback: 'Select Status',
+                },
             },
         ]),
         ...createDateFilterFields([
@@ -38,7 +48,10 @@ export function createPurchaseRequestFilterFields(): FieldDescriptor[] {
                     key: 'column.request_date_from',
                     fallback: 'Request Date From',
                 },
-                placeholder: 'Request Date From',
+                placeholder: {
+                    key: 'column.request_date_from',
+                    fallback: 'Request Date From',
+                },
             },
             {
                 name: 'request_date_to',
@@ -46,7 +59,10 @@ export function createPurchaseRequestFilterFields(): FieldDescriptor[] {
                     key: 'column.request_date_to',
                     fallback: 'Request Date To',
                 },
-                placeholder: 'Request Date To',
+                placeholder: {
+                    key: 'column.request_date_to',
+                    fallback: 'Request Date To',
+                },
             },
         ]),
     ];

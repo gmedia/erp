@@ -14,6 +14,9 @@ export function createAssetModelFilterFields(): FieldDescriptor[] {
                 fallback: 'Search by model name or manufacturer...',
             },
         ),
-        createAssetCategoryFilterField('All Categories'),
+        createAssetCategoryFilterField({
+            key: 'filter.all_categories',
+            fallback: 'All Categories',
+        }),
     ];
 }

@@ -6,42 +6,56 @@ import {
     createSelectFilterField,
     createTextFilterField,
     type FieldDescriptor,
+    type SelectOption,
 } from '@/components/common/filters';
 
-const customerInvoiceStatusOptions = [
-    { label: 'Draft', value: 'draft' },
-    { label: 'Sent', value: 'sent' },
-    { label: 'Partially Paid', value: 'partially_paid' },
-    { label: 'Paid', value: 'paid' },
-    { label: 'Overdue', value: 'overdue' },
-    { label: 'Cancelled', value: 'cancelled' },
-    { label: 'Void', value: 'void' },
+const customerInvoiceStatusOptions: SelectOption[] = [
+    { label: { key: 'status.draft', fallback: 'Draft' }, value: 'draft' },
+    { label: { key: 'status.sent', fallback: 'Sent' }, value: 'sent' },
+    {
+        label: { key: 'status.partially_paid', fallback: 'Partially Paid' },
+        value: 'partially_paid',
+    },
+    { label: { key: 'status.paid', fallback: 'Paid' }, value: 'paid' },
+    { label: { key: 'status.overdue', fallback: 'Overdue' }, value: 'overdue' },
+    {
+        label: { key: 'status.cancelled', fallback: 'Cancelled' },
+        value: 'cancelled',
+    },
+    { label: { key: 'status.void', fallback: 'Void' }, value: 'void' },
 ];
 
 export function createArAgingReportFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', {
-            key: 'page.ar_aging.search_placeholder',
-            fallback: 'Search invoice number, customer, or branch...',
-        }),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            {
+                key: 'page.ar_aging.search_placeholder',
+                fallback: 'Search invoice number, customer, or branch...',
+            },
+        ),
         createAsyncSelectFilterField(
             'customer_id',
-            'Customer',
+            { key: 'column.customer', fallback: 'Customer' },
             '/api/customers',
-            'Select customer',
+            { key: 'filter.select_customer', fallback: 'Select customer' },
         ),
         createAsyncSelectFilterField(
             'branch_id',
-            'Branch',
+            { key: 'column.branch', fallback: 'Branch' },
             '/api/branches',
-            'Select branch',
+            { key: 'filter.select_branch_short', fallback: 'Select branch' },
         ),
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'filter_field.status', fallback: 'Status' },
             customerInvoiceStatusOptions,
-            'Select status',
+            { key: 'filter.select_status', fallback: 'Select status' },
         ),
-        ...createDateRangeFilterFields('Start Date', 'End Date'),
+        ...createDateRangeFilterFields(
+            { key: 'column.start_date', fallback: 'Start Date' },
+            { key: 'column.end_date', fallback: 'End Date' },
+        ),
     ];
 }

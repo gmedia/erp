@@ -1,49 +1,25 @@
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
-    createAsyncSelectFilterField,
-    createSelectFilterField,
-    createTextFilterField,
+    apBillStatusOptions,
+    createApReportCommonFilterFields,
+    createFilterFieldDateFields,
+    createFilterFieldStatusSelect,
     type FieldDescriptor,
-    type SelectOption,
 } from '@/components/common/filters';
 
 export function createApAgingReportFilterFields(): FieldDescriptor[] {
-    const statusOptions: SelectOption[] = [
-        { value: 'confirmed', label: 'Confirmed' },
-        { value: 'partially_paid', label: 'Partially Paid' },
-        { value: 'overdue', label: 'Overdue' },
-    ];
-
     return [
-        createTextFilterField('search', 'Search', {
-            key: 'page.ap_aging.search_placeholder',
-            fallback:
-                'Search bill number, supplier invoice, supplier, branch, PO number, GR number, or notes...',
-        }),
-        createAsyncSelectFilterField(
-            'supplier_id',
-            'Supplier',
-            'Select supplier',
-            '/api/suppliers/select-options',
+        ...createApReportCommonFilterFields(
+            'page.ap_aging.search_placeholder',
+            'Search bill number, supplier invoice, supplier, branch, PO number, GR number, or notes...',
         ),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            'Select branch',
-            '/api/branches/select-options',
-        ),
-        createSelectFilterField(
-            'status',
-            'Status',
-            statusOptions,
-            'Select status',
-        ),
-        {
-            name: 'as_of_date',
-            label: 'As of Date',
-            component: (
-                <FilterDatePicker placeholder="Select aging calculation date" />
-            ),
-        },
+        createFilterFieldStatusSelect(apBillStatusOptions),
+        ...createFilterFieldDateFields([
+            [
+                'as_of_date',
+                'As of Date',
+                'filter.select_aging_date',
+                'Select aging calculation date',
+            ],
+        ]),
     ];
 }

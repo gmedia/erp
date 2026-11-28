@@ -18,7 +18,7 @@ export const createAssetMovementFilterFields = (): FieldDescriptor[] => [
         'asset_id',
         { key: 'column.asset', fallback: 'Asset' },
         '/api/assets',
-        'Filter by asset',
+        { key: 'filter.filter_by_asset', fallback: 'Filter by asset' },
     ),
     createSelectFilterField(
         'movement_type',
@@ -48,6 +48,6 @@ export const createAssetMovementFilterFields = (): FieldDescriptor[] => [
                 },
             },
         ],
-        'Filter by type',
+        { key: 'filter.filter_by_type', fallback: 'Filter by type' },
     ),
 ];
