@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsFinancialActivity;
 use Database\Factories\PeriodClosingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -60,7 +61,7 @@ use Illuminate\Support\Carbon;
 class PeriodClosing extends Model
 {
     /** @use HasFactory<PeriodClosingFactory> */
-    use HasFactory;
+    use HasFactory, LogsFinancialActivity;
 
     /**
      * The attributes that are mass assignable.

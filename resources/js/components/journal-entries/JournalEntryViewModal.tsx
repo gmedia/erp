@@ -1,4 +1,5 @@
 import { ViewModalShell } from '@/components/common/ViewModalShell';
+import { JournalEntryAuditHistory } from '@/components/journal-entries/JournalEntryAuditHistory';
 import { Badge } from '@/components/ui/badge';
 import {
     Table,
@@ -9,6 +10,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { useTranslation } from '@/contexts/i18n-context';
 import { JournalEntry } from '@/types/journal-entry';
 import { formatDateByRegionalSettings } from '@/utils/date-format';
 import { FORMAT_LOCALE } from '@/utils/formatters';
@@ -36,6 +38,7 @@ export function JournalEntryViewModal({
     open,
     onClose,
 }: Readonly<JournalEntryViewModalProps>) {
+    const { t } = useTranslation();
     if (!item) return null;
 
     return (
@@ -152,6 +155,13 @@ export function JournalEntryViewModal({
                                 </TableRow>
                             </TableFooter>
                         </Table>
+                    </div>
+
+                    <div className="space-y-2">
+                        <p className="text-sm font-medium text-muted-foreground">
+                            {t('page.journal_entries.audit_history_title')}
+                        </p>
+                        <JournalEntryAuditHistory journalEntryId={item.id} />
                     </div>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Actions\Approvals\RepairMissingApprovalStepsAction;
+use App\Actions\AuditLog\PruneAuditLogAction;
 use App\Actions\RecurringJournals\ExecuteRecurringJournalAction;
 use App\Actions\SecurityLogs\PruneSecurityLogsAction;
 use App\Actions\VehicleLoans\CleanupVehicleLoansAction;
@@ -69,6 +70,18 @@ Artisan::command('security-logs:prune', function () {
 Schedule::command('security-logs:prune')
     ->daily()
     ->name('prune-security-logs');
+
+Artisan::command('audit-logs:prune', function () {
+    $deleted = app(PruneAuditLogAction::class)->execute();
+
+    $this->info("Audit logs pruned: {$deleted}");
+
+    return Command::SUCCESS;
+})->purpose('Delete audit (activity) logs older than the retention setting');
+
+Schedule::command('audit-logs:prune')
+    ->daily()
+    ->name('prune-audit-logs');
 
 Schedule::command(PruneStaleDeviceTokens::class)
     ->daily()

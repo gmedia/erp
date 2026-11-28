@@ -1074,6 +1074,17 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'audit_log',
+                'display_name' => 'Audit Log',
+                'child' => [
+                    [
+                        'name' => 'audit_log.export',
+                        'display_name' => 'Export Audit Log',
+                        'child' => [],
+                    ],
+                ],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],

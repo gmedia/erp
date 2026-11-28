@@ -656,6 +656,7 @@
         "ap_payment_history_report": "AP Payment History",
         "approval_audit_trail": "Approval Audit Trail",
         "security_log": "Security Log",
+        "audit_log": "Audit Log",
         "approval_delegation": "Approval Delegation",
         "approval_flow": "Approval Flow",
         "approval_monitoring": "Approval Monitoring",
@@ -1066,6 +1067,36 @@
             "pick_date": "Pick a date",
             "ip_placeholder": "e.g. 192.168.1.10"
         },
+        "audit_logs": {
+            "description": "History of changes to financial and settings data: who changed what, when, and old → new values.",
+            "search_placeholder": "Search summary, document ID...",
+            "select_user": "Select user",
+            "start_date": "Start date",
+            "end_date": "End date",
+            "column_date": "Date",
+            "column_user": "User",
+            "column_module": "Module",
+            "column_document_id": "Document ID",
+            "column_action": "Action",
+            "column_summary": "Summary",
+            "system_user": "System",
+            "summary_created": "Created record",
+            "summary_updated": "Changed {count} field(s): {fields}",
+            "summary_updated_empty": "Changed record",
+            "summary_deleted": "Deleted record",
+            "summary_unknown": "Data change",
+            "field_description": "description",
+            "field_entry_date": "date",
+            "field_date": "date",
+            "field_reference": "reference",
+            "field_status": "status",
+            "field_name": "name",
+            "field_value": "value",
+            "field_type": "type",
+            "field_key": "key",
+            "field_code": "code",
+            "field_amount": "amount"
+        },
         "approval_audit_trail": {
             "description": "History of approval actions taken on requests.",
             "search_placeholder": "Search IP, Document ID, user..."
@@ -1089,7 +1120,10 @@
         "journal_entries": {
             "title": "Journal Entries",
             "description": "Manual journal entries with debit and credit lines.",
-            "search_placeholder": "Search entry..."
+            "search_placeholder": "Search entry...",
+            "audit_history_title": "Change history",
+            "audit_history_loading": "Loading history…",
+            "audit_history_empty": "No change history yet."
         },
         "stock_monitor": {
             "title": "Stock Monitor",
@@ -1525,6 +1559,9 @@
     },
     "filter": {
         "security_event_login_success": "Login Success",
+        "audit_event_created": "Created",
+        "audit_event_updated": "Updated",
+        "audit_event_deleted": "Deleted",
         "security_event_login_failed": "Login Failed",
         "security_event_logout": "Logout",
         "security_event_password_reset": "Password Reset",
@@ -3454,6 +3491,17 @@
             "ip_address": "IP Address",
             "user_agent": "User Agent",
             "metadata": "Metadata"
+        }
+    },
+    "audit_logs": {
+        "export_headers": {
+            "date": "Date",
+            "event": "Action",
+            "user": "User",
+            "module": "Module",
+            "document_id": "Document ID",
+            "summary": "Summary",
+            "changes": "Changes"
         }
     }
 }
