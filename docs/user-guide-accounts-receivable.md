@@ -4,18 +4,36 @@
 
 Modul Accounts Receivable mengelola **siklus piutang lengkap** — dari penerbitan faktur pelanggan (Customer Invoices), penerimaan pembayaran (AR Receipts), hingga pengurangan piutang melalui nota kredit (Credit Notes). Modul ini terintegrasi dengan Pipeline dan Chart of Accounts.
 
----
+## Akses & Izin
+
+- **`customer_invoice`** — membuka dan mengekspor daftar Faktur Pelanggan.
+- **`customer_invoice.create`** — membuat faktur baru.
+- **`customer_invoice.edit`** — mengubah faktur, termasuk mengirim dan membatalkan.
+- **`customer_invoice.delete`** — menghapus faktur berstatus Draf.
+- **`ar_receipt`** — membuka dan mengekspor daftar Penerimaan Piutang.
+- **`ar_receipt.create`** — membuat penerimaan baru.
+- **`ar_receipt.edit`** — mengubah penerimaan, termasuk mengonfirmasi dan membatalkan.
+- **`ar_receipt.delete`** — menghapus penerimaan berstatus Draf.
+- **`credit_note`** — membuka dan mengekspor daftar Nota Kredit.
+- **`credit_note.create`** — membuat nota kredit baru.
+- **`credit_note.edit`** — mengubah, menerapkan (**Apply**), dan membatalkan nota kredit.
+- **`credit_note.delete`** — menghapus nota kredit berstatus Draf.
+- **`ar_aging_report`**, **`ar_outstanding_report`**, **`customer_statement_report`** — membuka
+  laporan terkait.
+
+Tombol **Ekspor** pada daftar Faktur Pelanggan, Penerimaan Piutang, dan Nota Kredit memakai
+permission tampilan masing-masing, bukan permission terpisah.
 
 ## Menu & Navigasi
 
 | Menu | URL | Fungsi |
 |------|-----|--------|
-| Customer Invoices | `/customer-invoices` | Kelola faktur pelanggan |
-| AR Receipts | `/ar-receipts` | Kelola penerimaan pembayaran |
-| Credit Notes | `/credit-notes` | Kelola nota kredit |
-| AR Aging Report | `/reports/ar-aging` | Laporan umur piutang |
-| AR Outstanding Report | `/reports/ar-outstanding` | Daftar faktur belum lunas |
-| Customer Statement | `/reports/customer-statement` | Laporan transaksi per pelanggan |
+| Faktur Pelanggan | `/customer-invoices` | Kelola faktur pelanggan |
+| Penerimaan Piutang | `/ar-receipts` | Kelola penerimaan pembayaran |
+| Nota Kredit | `/credit-notes` | Kelola nota kredit |
+| Laporan Umur Piutang | `/reports/ar-aging` | Laporan umur piutang |
+| Laporan Piutang Belum Lunas | `/reports/ar-outstanding` | Daftar faktur belum lunas |
+| Laporan Mutasi Pelanggan | `/reports/customer-statement` | Laporan transaksi per pelanggan |
 
 ---
 
@@ -65,6 +83,27 @@ Cancelled         Overdue (jika melewati due date)
 - **Send**: Edit invoice → ubah status ke `Sent` → Save (otomatis set `sent_by` dan `sent_at`)
 - **Cancel**: Edit invoice (status Draf) → ubah ke `Cancelled` → Save
 - **Batal**: Edit invoice (status Terkirim) → ubah ke `Void` → Save
+
+### Aksi Posting & Pembatalan
+
+- **Kirim memposting jurnal.** Saat status diubah menjadi **Terkirim**, sistem otomatis memposting
+  jurnal piutang, lalu mengisi `sent_by` dan `sent_at`. Pengiriman dapat dilakukan saat membuat
+  faktur baru atau saat mengubah faktur berstatus Draf.
+- **Pembatalan dokumen terposting memakai jurnal pembalik.** Untuk faktur berstatus **Terkirim**,
+  gunakan aksi baris **Cancel Invoice** atau ubah status menjadi **Dibatalkan**/**Batal**. Sistem
+  membalik jurnal, mengubah status menjadi final, dan menyimpan dokumen sebagai jejak audit.
+- **Pembatalan ditolak bila masih ada turunan aktif.** Faktur tidak dapat dibatalkan selama masih
+  memiliki alokasi penerimaan berstatus **Dikonfirmasi**/**Direkonsiliasi**, atau nota kredit
+  berstatus **Diterapkan**. Lepaskan atau batalkan dokumen tersebut terlebih dahulu.
+- **Hapus hanya untuk Draf.** Faktur yang sudah dikirim atau memiliki jurnal tidak dapat dihapus;
+  gunakan pembatalan agar jurnal pembalik tercatat.
+
+### Ekspor Faktur Pelanggan
+
+Tombol **Ekspor** mengunduh data sesuai filter aktif dalam format Excel (`.xlsx`) atau CSV. Kolom
+yang diekspor: ID, Invoice Number, Customer, Branch, Department, Fiscal Year, Invoice Date, Due Date,
+Payment Terms, Currency, Status, Subtotal, Tax Amount, Discount Amount, Grand Total, Amount
+Received, Credit Note Amount, Amount Due, Notes, dan Created At.
 
 ---
 
@@ -119,6 +158,24 @@ Saat receipt dihapus:
 - Semua alokasi di-revert
 - `amount_received` di setiap invoice yang terkait dikurangi
 - Status invoice otomatis disesuaikan (bisa kembali ke `Sent`)
+
+### Aksi Posting & Pembatalan
+
+- **Konfirmasi memposting jurnal.** Saat status diubah menjadi **Dikonfirmasi**, sistem otomatis
+  memposting jurnal penerimaan (mendebit akun bank/kas dan mengkredit akun piutang), lalu mengisi
+  `confirmed_by` dan `confirmed_at`.
+- **Pembatalan memakai jurnal pembalik.** Untuk penerimaan berstatus **Dikonfirmasi**, gunakan aksi
+  baris **Cancel Receipt** atau ubah status menjadi **Dibatalkan**. Sistem membalik jurnal,
+  melepaskan seluruh alokasi, menghitung ulang `amount_received`/`amount_due` invoice, dan
+  menyimpan dokumen sebagai jejak audit.
+- **Hapus hanya untuk Draf.** Penerimaan yang sudah diposting tidak dapat dihapus; gunakan
+  pembatalan agar jurnal pembalik tercatat.
+
+### Ekspor Penerimaan Piutang
+
+Tombol **Ekspor** mengunduh data sesuai filter aktif. Kolom yang diekspor: ID, Receipt Number,
+Customer, Branch, Fiscal Year, Receipt Date, Payment Method, Bank Account, Currency, Status, Total
+Amount, Total Allocated, Total Unallocated, Reference, Notes, dan Created At.
 
 ---
 
@@ -177,6 +234,26 @@ Setelah CN berstatus `Confirmed`, CN bisa diterapkan ke invoice:
 | Status check | Hanya CN `Confirmed` yang bisa di-apply |
 | Invoice link | CN harus terhubung ke invoice (`customer_invoice_id` wajib) |
 | Amount check | CN grand_total tidak boleh melebihi invoice amount_due |
+
+### Aksi Posting & Pembatalan
+
+- **Konfirmasi belum memposting jurnal.** Mengubah status menjadi **Dikonfirmasi** hanya mengisi
+  `confirmed_by` dan `confirmed_at`. Jurnal nota kredit baru dibuat saat CN **diterapkan**.
+- **Apply memposting jurnal dan mengurangi piutang.** Saat CN diterapkan, sistem memposting jurnal
+  nota kredit, mengubah status menjadi **Diterapkan**, menambah `credit_note_amount`, mengurangi
+  `amount_due` invoice, lalu memperbarui status pembayaran invoice.
+- **Pembatalan memakai jurnal pembalik.** Untuk CN berstatus **Dikonfirmasi** atau **Diterapkan**,
+  gunakan aksi baris **Cancel Credit Note** atau ubah status menjadi **Dibatalkan**. Sistem membalik
+  jurnal, menghitung ulang `credit_note_amount`/`amount_due` invoice, dan menyimpan dokumen sebagai
+  jejak audit.
+- **Hapus hanya untuk Draf.** CN yang sudah dikonfirmasi atau diterapkan tidak dapat dihapus;
+  gunakan pembatalan agar jurnal pembalik tercatat.
+
+### Ekspor Nota Kredit
+
+Tombol **Ekspor** mengunduh data sesuai filter aktif. Kolom yang diekspor: ID, Credit Note Number,
+Customer, Invoice Number, Branch, Department, Fiscal Year, Credit Note Date, Reason, Status,
+Subtotal, Tax Amount, Grand Total, Notes, dan Created At.
 
 ---
 
