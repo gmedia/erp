@@ -4,17 +4,31 @@
 
 Modul Accounts Payable mengelola **siklus utang lengkap** — dari pencatatan tagihan vendor (Supplier Bills) hingga pelunasan pembayaran (AP Payments). Modul ini terintegrasi dengan Purchasing (PO/GR), Pipeline, dan Chart of Accounts.
 
----
+## Akses & Izin
+
+- **`supplier_bill`** — membuka dan mengekspor daftar Tagihan Pemasok.
+- **`supplier_bill.create`** — membuat tagihan baru.
+- **`supplier_bill.edit`** — mengubah tagihan, termasuk mengonfirmasi dan membatalkan.
+- **`supplier_bill.delete`** — menghapus tagihan berstatus Draf.
+- **`ap_payment`** — membuka dan mengekspor daftar Pembayaran Utang.
+- **`ap_payment.create`** — membuat pembayaran baru.
+- **`ap_payment.edit`** — mengubah pembayaran, termasuk mengonfirmasi dan membatalkan.
+- **`ap_payment.delete`** — menghapus pembayaran berstatus Draf.
+- **`ap_aging_report`**, **`ap_outstanding_report`**, **`ap_payment_history_report`** — membuka
+  laporan terkait.
+
+Tombol **Ekspor** pada daftar Tagihan Pemasok dan Pembayaran Utang memakai permission tampilan
+masing-masing (`supplier_bill` / `ap_payment`), bukan permission terpisah.
 
 ## Menu & Navigasi
 
 | Menu | URL | Fungsi |
 |------|-----|--------|
-| Supplier Bills | `/supplier-bills` | Kelola tagihan dari supplier |
-| AP Payments | `/ap-payments` | Kelola pembayaran ke supplier |
-| AP Aging Report | `/reports/ap-aging-report` | Laporan umur utang |
-| AP Outstanding Report | `/reports/ap-outstanding-report` | Daftar tagihan belum lunas |
-| AP Payment History | `/reports/ap-payment-history-report` | Riwayat pembayaran |
+| Tagihan Pemasok | `/supplier-bills` | Kelola tagihan dari pemasok |
+| Pembayaran Utang | `/ap-payments` | Kelola pembayaran ke pemasok |
+| Laporan Umur Utang | `/reports/ap-aging-report` | Laporan umur utang |
+| Laporan Utang Belum Lunas | `/reports/ap-outstanding-report` | Daftar tagihan belum lunas |
+| Riwayat Pembayaran Utang | `/reports/ap-payment-history-report` | Riwayat pembayaran |
 
 ---
 
@@ -63,8 +77,33 @@ Cancelled              Overdue (jika melewati due date)
 ### Mengubah Status
 
 - **Confirm**: Edit bill → ubah status ke `Confirmed` → Save
-- **Cancel**: Edit bill (status Draf) → ubah ke `Cancelled` → Save
-- **Batal**: Edit bill (status Dikonfirmasi) → ubah ke `Void` → Save
+- **Cancel (Draf)**: Edit bill (status Draf) → ubah ke `Cancelled` → Save
+- **Cancel (terposting)**: Pada baris berstatus `Confirmed`, klik **Cancel Bill** atau ubah status
+  ke `Cancelled` → jurnal dibalik
+
+### Aksi Posting & Pembatalan
+
+- **Konfirmasi memposting jurnal.** Saat status diubah menjadi **Dikonfirmasi**, sistem otomatis
+  memposting jurnal utang, lalu mengisi `confirmed_by` dan `confirmed_at`. Konfirmasi dapat
+  dilakukan saat membuat tagihan baru atau saat mengubah tagihan berstatus Draf.
+- **Pembatalan dokumen terposting memakai jurnal pembalik.** Untuk tagihan berstatus
+  **Dikonfirmasi**, gunakan aksi baris **Cancel Bill** atau ubah status menjadi **Dibatalkan**.
+  Sistem membalik jurnal, mengubah status menjadi **Dibatalkan**, dan menyimpan dokumen sebagai
+  jejak audit — dokumen tidak dihapus.
+- **Pembatalan ditolak bila masih ada pembayaran aktif.** Tagihan tidak dapat dibatalkan selama
+  masih memiliki alokasi pembayaran berstatus **Dikonfirmasi** atau **Direkonsiliasi**. Batalkan
+  atau lepaskan alokasi pembayaran tersebut terlebih dahulu.
+- **Hapus hanya untuk Draf.** Tagihan yang sudah dikonfirmasi atau memiliki jurnal tidak dapat
+  dihapus; gunakan pembatalan agar jurnal pembalik tercatat.
+- **Status Batal** (`void`) ditampilkan sebagai status final pada filter. Untuk membatalkan tagihan
+  terposting, gunakan **Dibatalkan** agar jurnal pembalik dibuat.
+
+### Ekspor Tagihan Pemasok
+
+Tombol **Ekspor** mengunduh data sesuai filter aktif dalam format Excel (`.xlsx`) atau CSV. Kolom
+yang diekspor: ID, Bill Number, Supplier, Branch, Department, Bill Date, Due Date, Supplier Invoice
+#, Payment Terms, Currency, Status, Subtotal, Tax Amount, Discount Amount, Grand Total, Amount Paid,
+Amount Due, Notes, dan Created At.
 
 ---
 
@@ -118,6 +157,26 @@ Saat payment dihapus:
 - Semua alokasi di-revert
 - `amount_paid` di setiap bill yang terkait dikurangi
 - Status bill otomatis disesuaikan (bisa kembali ke `Confirmed`)
+
+### Aksi Posting & Pembatalan
+
+- **Konfirmasi memposting jurnal.** Saat status diubah menjadi **Dikonfirmasi**, sistem otomatis
+  memposting jurnal pembayaran (mendebit akun utang pemasok dan mengkredit akun bank/kas yang
+  dipilih), lalu mengisi `confirmed_by` dan `confirmed_at`.
+- **Menunggu Persetujuan mereset persetujuan.** Saat status diubah menjadi **Menunggu Persetujuan**,
+  `approved_by` dan `approved_at` dikosongkan agar persetujuan lama tidak terbawa.
+- **Pembatalan memakai jurnal pembalik.** Untuk pembayaran berstatus **Dikonfirmasi**, gunakan aksi
+  baris **Cancel Payment** atau ubah status menjadi **Dibatalkan**. Sistem membalik jurnal,
+  melepaskan seluruh alokasi, menghitung ulang sisa tagihan, dan menyimpan dokumen sebagai jejak
+  audit.
+- **Hapus hanya untuk Draf.** Pembayaran yang sudah diposting tidak dapat dihapus; gunakan
+  pembatalan agar jurnal pembalik tercatat.
+
+### Ekspor Pembayaran Utang
+
+Tombol **Ekspor** mengunduh data sesuai filter aktif. Kolom yang diekspor: ID, Payment Number,
+Supplier, Branch, Bank Account, Payment Date, Payment Method, Currency, Status, Total Amount, Total
+Allocated, Total Unallocated, Reference, Notes, dan Created At.
 
 ---
 
