@@ -1,4 +1,4 @@
-# User Guide: Employee
+# Panduan: Karyawan
 
 ## Gambaran Umum
 
@@ -19,7 +19,7 @@ Modul Employee mengelola **data karyawan** lengkap — NIK, nama, email, telepon
 
 ### Langkah-langkah
 
-1. Buka menu **Employees** → klik **Add New**
+1. Buka menu **Karyawan** → klik **Add New**
 2. Isi form dengan data karyawan:
 
    **Informasi Dasar:**
@@ -62,7 +62,7 @@ Modul Employee mengelola **data karyawan** lengkap — NIK, nama, email, telepon
 
 ## 2. Melihat Detail Karyawan
 
-1. Buka menu **Employees**
+1. Buka menu **Karyawan**
 2. Cari karyawan yang ingin dilihat menggunakan search atau filter
 3. Klik icon **View** (eye) pada baris karyawan tersebut
 4. Dialog detail akan menampilkan semua informasi karyawan
@@ -84,7 +84,7 @@ Modul Employee mengelola **data karyawan** lengkap — NIK, nama, email, telepon
 
 ## 3. Mengedit Data Karyawan
 
-1. Buka menu **Employees**
+1. Buka menu **Karyawan**
 2. Cari karyawan yang ingin diedit
 3. Klik icon **Edit** (pencil) pada baris karyawan
 4. Form edit akan terbuka dengan data karyawan yang sudah terisi
@@ -97,7 +97,7 @@ Modul Employee mengelola **data karyawan** lengkap — NIK, nama, email, telepon
 
 ## 4. Menghapus Karyawan
 
-1. Buka menu **Employees**
+1. Buka menu **Karyawan**
 2. Cari karyawan yang ingin dihapus
 3. Klik icon **Delete** (trash) pada baris karyawan
 4. Konfirmasi penghapusan pada dialog yang muncul
@@ -162,7 +162,7 @@ Klik kolom sekali untuk ascending (A-Z, 0-9), klik lagi untuk descending (Z-A, 9
 
 ## 7. Export ke Excel
 
-1. Buka menu **Employees**
+1. Buka menu **Karyawan**
 2. Terapkan filter jika ingin export data tertentu
 3. Klik tombol **Export** pada toolbar
 4. File Excel (.xlsx) akan diunduh dengan semua kolom data
@@ -193,7 +193,7 @@ Klik kolom sekali untuk ascending (A-Z, 0-9), klik lagi untuk descending (Z-A, 9
 
 ### Langkah Import
 
-1. Buka menu **Employees** → klik tombol **Import Employees**
+1. Buka menu **Karyawan** → klik tombol **Import Employees**
 2. Dialog import akan muncul
 
 [Screenshot: Dialog Import Employees]

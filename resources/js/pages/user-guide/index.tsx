@@ -137,7 +137,7 @@ export default function UserGuidePage() {
                                     <BookOpen className="h-4 w-4 shrink-0" />
                                     <span className="truncate text-left">
                                         {guide.title.replace(
-                                            /^(User Guide:|Panduan Pengguna:)\s*/i,
+                                            /^(User Guide:|Panduan Pengguna:|Panduan:)\s*/i,
                                             '',
                                         )}
                                     </span>

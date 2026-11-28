@@ -1,4 +1,4 @@
-# User Guide: Accounts Payable (AP)
+# Panduan: Utang Usaha
 
 ## Gambaran Umum
 
@@ -22,7 +22,7 @@ Modul Accounts Payable mengelola **siklus utang lengkap** — dari pencatatan ta
 
 ### Membuat Supplier Bill
 
-1. Buka menu **Supplier Bills** → klik **Add New**
+1. Buka menu **Tagihan Pemasok** → klik **Add New**
 2. Isi header:
    - **Supplier** — pilih vendor penerima tagihan
    - **Branch** — cabang yang bertanggung jawab
@@ -72,7 +72,7 @@ Cancelled              Overdue (jika melewati due date)
 
 ### Membuat Pembayaran
 
-1. Buka menu **AP Payments** → klik **Add New**
+1. Buka menu **Pembayaran Utang** → klik **Add New**
 2. Isi header:
    - **Supplier** — supplier yang dibayar
    - **Branch** — cabang pembayar

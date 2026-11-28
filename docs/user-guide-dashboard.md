@@ -1,4 +1,4 @@
-# User Guide: Dashboard
+# Panduan: Dasbor
 
 > **Disambiguasi dashboard:**
 > - **Dashboard** (`/dashboard`) — ringkasan jumlah master data (customer, employee, supplier, asset). Guide ini.

@@ -1,4 +1,4 @@
-# User Guide: Posting Journals
+# Panduan: Jurnal Posting
 
 ## Gambaran Umum
 
@@ -19,7 +19,7 @@ Backend menggunakan `PostJournalAction` untuk validasi batch posting dan eksekus
 ### Langkah-langkah:
 
 1. Login ke aplikasi dengan akun yang memiliki permission `posting_journal`.
-2. Klik menu **Posting Journals** di sidebar atau akses langsung melalui URL `/posting-journals`.
+2. Klik menu **Jurnal Posting** di sidebar atau akses langsung melalui URL `/posting-journals`.
 3. Halaman akan menampilkan daftar jurnal dengan status `draft` yang siap untuk diposting.
 
 [Screenshot: Halaman Posting Journals dengan daftar jurnal draft]

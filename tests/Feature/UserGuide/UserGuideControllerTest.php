@@ -55,8 +55,8 @@ test('show returns guide content with extracted title', function () {
         ->assertJsonPath('data.slug', 'accounts-payable');
 
     $payload = $response->json('data');
-    expect($payload['title'])->toBe('User Guide: Accounts Payable (AP)');
-    expect($payload['content'])->toStartWith('# User Guide: Accounts Payable (AP)');
+    expect($payload['title'])->toBe('Panduan: Utang Usaha');
+    expect($payload['content'])->toStartWith('# Panduan: Utang Usaha');
 });
 
 test('show returns 404 for non-existent guide', function () {

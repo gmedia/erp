@@ -1,4 +1,4 @@
-# User Guide: Inventory Stocktakes
+# Panduan: Stock Opname Persediaan
 
 ## Gambaran Umum
 
@@ -21,7 +21,7 @@ Stock opname dimulai dengan membuat dokumen perencanaan yang mendefinisikan ruan
 
 ### Langkah-langkah
 
-1. Buka menu **Inventory Stocktakes** → klik **Add New**
+1. Buka menu **Stock Opname Persediaan** → klik **Add New**
 2. Isi form header:
 
    | Field | Keterangan | Contoh |
@@ -331,7 +331,7 @@ Setelah stock opname selesai, laporan variance dapat diakses untuk analisis lebi
 
 ### Inventory Stocktake Variance Report
 
-Buka menu **Reports → Inventory Stocktake Variance** untuk melihat:
+Buka menu **Laporan → Selisih Stock Opname Persediaan** untuk melihat:
 - Daftar semua item dengan variance
 - Breakdown per stocktake, produk, dan gudang
 - System Qty vs Counted Qty vs Variance

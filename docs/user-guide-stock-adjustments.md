@@ -1,4 +1,4 @@
-# User Guide: Stock Adjustments
+# Panduan: Penyesuaian Stok
 
 ## Gambaran Umum
 
@@ -22,8 +22,8 @@ Fitur utama:
 Untuk mengakses halaman Stock Adjustments:
 
 1. Login ke aplikasi dengan akun yang memiliki permission `stock_adjustment`
-2. Buka menu **Inventory** di sidebar
-3. Klik submenu **Stock Adjustments**
+2. Buka menu **Persediaan** di sidebar
+3. Klik submenu **Penyesuaian Stok**
 4. Halaman daftar stock adjustments akan ditampilkan
 
 [Screenshot: Halaman daftar stock adjustments dengan tabel dan filter]

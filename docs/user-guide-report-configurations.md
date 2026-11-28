@@ -1,4 +1,4 @@
-# User Guide: Report Configurations
+# Panduan: Konfigurasi Laporan
 
 ## Gambaran Umum
 
@@ -16,7 +16,7 @@ Modul ini memungkinkan akuntan membuat struktur laporan kustom tanpa perubahan k
 |------|-----|--------|
 | Report Configurations | `/report-configurations` | Kelola template dan layout laporan (tambah, edit, hapus, lihat detail) |
 
-Untuk mengakses modul ini, pengguna memerlukan permission `report_configuration`. Modul ini berada di bawah grup menu Accounting.
+Untuk mengakses modul ini, pengguna memerlukan permission `report_configuration`. Modul ini berada di bawah grup menu Akuntansi.
 
 ---
 

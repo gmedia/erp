@@ -1,4 +1,4 @@
-# User Guide: Asset Categories
+# Panduan: Kategori Aset
 
 ## Gambaran Umum
 
@@ -15,7 +15,7 @@ Kategori aset menjadi fondasi untuk:
 |------|------|------------|
 | Asset Categories | `/asset-categories` | `asset_category` |
 
-Modul ini berada di grup menu **Asset** dan dapat diakses melalui navigasi sidebar.
+Modul ini berada di grup menu **Aset** dan dapat diakses melalui navigasi sidebar.
 
 [Screenshot: Sidebar menu dengan grup Asset dan submenu Asset Categories]
 

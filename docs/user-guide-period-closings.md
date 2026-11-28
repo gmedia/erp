@@ -1,4 +1,4 @@
-# User Guide: Period Closings
+# Panduan: Penutupan Periode
 
 ## Gambaran Umum
 
