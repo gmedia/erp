@@ -1085,6 +1085,11 @@ class PermissionSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'mobile_app_release',
+                'display_name' => 'Mobile App Release',
+                'child' => [],
+            ],
+            [
                 'name' => 'permission',
                 'display_name' => 'Permission',
                 'child' => [],
