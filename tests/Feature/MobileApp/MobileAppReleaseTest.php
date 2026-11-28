@@ -234,3 +234,84 @@ it('activates a single release and deactivates it again', function () {
 
     expect($second->fresh()->is_active)->toBeFalse();
 });
+
+it('lists releases with search, active filter, and pagination', function () {
+    mobileAppTestRelease(1, true, '1.0.0');
+    mobileAppTestRelease(2, false, '2.0.0');
+
+    Sanctum::actingAs($this->admin, ['*']);
+
+    getJson('/api/mobile-app-releases?search=2.0.0&per_page=10')
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.version_name', '2.0.0');
+
+    getJson('/api/mobile-app-releases?is_active=1')
+        ->assertOk()
+        ->assertJsonPath('meta.total', 1)
+        ->assertJsonPath('data.0.version_code', 1);
+
+    getJson('/api/mobile-app-releases?per_page=1')
+        ->assertOk()
+        ->assertJsonPath('meta.per_page', 1)
+        ->assertJsonPath('meta.total', 2);
+});
+
+it('validates the release index filters', function () {
+    Sanctum::actingAs($this->admin, ['*']);
+
+    getJson('/api/mobile-app-releases?per_page=500')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('per_page');
+});
+
+it('requires the apk file on upload', function () {
+    Sanctum::actingAs($this->admin, ['*']);
+
+    post('/api/mobile-app-releases', [
+        'version_name' => '1.0.0',
+        'version_code' => 1,
+        'min_supported_version_code' => 1,
+    ], ['Accept' => 'application/json'])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('file');
+});
+
+it('rejects an apk whose declared MIME type is not allowed', function () {
+    Sanctum::actingAs($this->admin, ['*']);
+
+    post('/api/mobile-app-releases', [
+        'file' => UploadedFile::fake()
+            ->createWithContent('app-release.apk', mobileAppTestApkContent())
+            ->mimeType('text/plain'),
+        'version_name' => '1.0.0',
+        'version_code' => 1,
+        'min_supported_version_code' => 1,
+    ], ['Accept' => 'application/json'])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('file');
+});
+
+it('rejects a duplicate version code', function () {
+    mobileAppTestRelease(5, false, '0.9.0');
+
+    Sanctum::actingAs($this->admin, ['*']);
+
+    post('/api/mobile-app-releases', [
+        'file' => UploadedFile::fake()->createWithContent('app-release.apk', mobileAppTestApkContent()),
+        'version_name' => '1.0.0',
+        'version_code' => 5,
+        'min_supported_version_code' => 1,
+    ], ['Accept' => 'application/json'])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('version_code');
+});
+
+it('returns not found when the active release file is missing', function () {
+    mobileAppTestRelease(1, true);
+
+    $user = User::factory()->create();
+    Sanctum::actingAs($user, ['*']);
+
+    getJson('/api/mobile-app/download')->assertNotFound();
+});

@@ -195,13 +195,20 @@ export function MobileAppReleaseUploadDialog({
                                 onChange={(event) =>
                                     setVersionCode(event.target.value)
                                 }
+                                placeholder={t(
+                                    'mobileApp.version_code_placeholder',
+                                )}
                                 disabled={submitting}
                             />
                             {errors.version_code ? (
                                 <p className="text-xs text-destructive-foreground">
                                     {errors.version_code}
                                 </p>
-                            ) : null}
+                            ) : (
+                                <p className="text-xs text-muted-foreground">
+                                    {t('mobileApp.version_code_helper')}
+                                </p>
+                            )}
                         </div>
                     </div>
 
@@ -218,6 +225,9 @@ export function MobileAppReleaseUploadDialog({
                             onChange={(event) =>
                                 setMinVersionCode(event.target.value)
                             }
+                            placeholder={t(
+                                'mobileApp.min_version_code_placeholder',
+                            )}
                             disabled={submitting}
                         />
                         {errors.min_supported_version_code ? (

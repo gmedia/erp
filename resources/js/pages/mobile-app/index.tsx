@@ -1,6 +1,5 @@
 import { PageHeader } from '@/components/common/PageHeader';
 import { Sha256Field } from '@/components/mobile-app/Sha256Field';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTranslation } from '@/contexts/i18n-context';
@@ -110,15 +109,17 @@ export default function MobileAppDownloadPage() {
                                 </p>
                             </div>
                         </div>
-                        <Badge variant="success">
-                            {t('mobileApp.status_active')}
-                        </Badge>
                     </div>
 
-                    <div className="mt-4">
+                    <div className="mt-2">
                         <DetailRow label={t('mobileApp.size_label')}>
                             <span className="tabular-nums">
                                 {formatFileSize(release.file_size)}
+                            </span>
+                        </DetailRow>
+                        <DetailRow label={t('mobileApp.version_code_label')}>
+                            <span className="tabular-nums">
+                                {release.version_code}
                             </span>
                         </DetailRow>
                         <DetailRow label={t('mobileApp.released_label')}>
@@ -141,7 +142,7 @@ export default function MobileAppDownloadPage() {
                     </div>
 
                     {release.notes ? (
-                        <div className="mt-4 space-y-1">
+                        <div className="mt-2 space-y-1">
                             <p className="text-sm text-muted-foreground">
                                 {t('mobileApp.notes_label')}
                             </p>
@@ -153,7 +154,7 @@ export default function MobileAppDownloadPage() {
 
                     <Button
                         type="button"
-                        className="mt-6 w-full sm:w-auto"
+                        className="mt-4 w-full sm:w-auto"
                         onClick={() => void handleDownload()}
                         disabled={downloading}
                         data-testid="mobile-app-download-button"
@@ -172,7 +173,10 @@ export default function MobileAppDownloadPage() {
                     </Button>
                 </Card>
 
-                <Card className="bg-card p-6" data-testid="mobile-app-qr-card">
+                <Card
+                    className="hidden bg-card p-6 md:block"
+                    data-testid="mobile-app-qr-card"
+                >
                     <CardHeader className="p-0">
                         <CardTitle className="text-base font-semibold">
                             {t('mobileApp.qr_title')}
@@ -206,7 +210,10 @@ export default function MobileAppDownloadPage() {
                     <CardContent className="p-0 pt-3">
                         <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
                             <li>{t('mobileApp.install_step_1')}</li>
-                            <li>{t('mobileApp.install_step_2')}</li>
+                            <li>
+                                {t('mobileApp.install_step_2')}{' '}
+                                {t('mobileApp.install_step_2_settings')}
+                            </li>
                             <li>{t('mobileApp.install_step_3')}</li>
                         </ol>
                     </CardContent>

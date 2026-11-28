@@ -34,7 +34,7 @@ import { Navigate } from 'react-router-dom';
 
 const DEFAULT_META = {
     current_page: 1,
-    per_page: 20,
+    per_page: 15,
     total: 0,
     last_page: 1,
 };
@@ -44,7 +44,7 @@ export default function MobileAppReleasesPage() {
     const { can } = usePermissions();
     const canManage = can('mobile_app_release');
     const [page, setPage] = useState(1);
-    const [perPage, setPerPage] = useState(20);
+    const [perPage, setPerPage] = useState(15);
     const [uploadOpen, setUploadOpen] = useState(false);
 
     const releasesQuery = useMobileAppReleases({ page, perPage });
