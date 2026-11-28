@@ -6,6 +6,8 @@ use App\Services\FinancialReportService;
 
 class GetFinancialDashboardDataAction
 {
+    private const TOP_EXPENSE_LIMIT = 5;
+
     public function __construct(
         protected FinancialReportService $reportService,
     ) {}
@@ -93,8 +95,7 @@ class GetFinancialDashboardDataAction
     }
 
     /**
-     * Extract top-level expense categories for breakdown chart.
-     * Only takes root-level items (level 1, no parent).
+     * Rincian beban per akun daun (top N + Lainnya), bukan satu batang akar.
      *
      * @param  array<int, array<string, mixed>>  $expenseTree
      * @return array<int, array<string, mixed>>
@@ -102,18 +103,48 @@ class GetFinancialDashboardDataAction
     private function extractTopExpenses(array $expenseTree): array
     {
         $items = [];
-        foreach ($expenseTree as $node) {
-            if (($node['level'] ?? 1) === 1) {
-                $items[] = [
-                    'name' => $node['name'] ?? 'Unknown',
-                    'value' => abs($node['balance'] ?? 0),
-                ];
-            }
+        $this->collectLeafExpenses($expenseTree, $items);
+
+        usort($items, fn (array $a, array $b): int => $b['value'] <=> $a['value']);
+
+        if (count($items) <= self::TOP_EXPENSE_LIMIT) {
+            return $items;
         }
 
-        // Sort by value desc, take top 8
-        usort($items, fn ($a, $b) => $b['value'] <=> $a['value']);
+        $topItems = array_slice($items, 0, self::TOP_EXPENSE_LIMIT);
+        $otherItems = array_slice($items, self::TOP_EXPENSE_LIMIT);
+        $otherTotal = array_sum(array_column($otherItems, 'value'));
 
-        return array_slice($items, 0, 8);
+        if ($otherTotal > 0) {
+            $topItems[] = ['name' => 'Others', 'value' => round($otherTotal, 2)];
+        }
+
+        return $topItems;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $nodes
+     * @param  array<int, array<string, mixed>>  $items
+     */
+    private function collectLeafExpenses(array $nodes, array &$items): void
+    {
+        foreach ($nodes as $node) {
+            $children = $node['children'] ?? [];
+            if ($children !== []) {
+                $this->collectLeafExpenses($children, $items);
+
+                continue;
+            }
+
+            $value = abs((float) ($node['balance'] ?? 0));
+            if ($value <= 0) {
+                continue;
+            }
+
+            $items[] = [
+                'name' => $node['name'] ?? 'Unknown',
+                'value' => $value,
+            ];
+        }
     }
 }
