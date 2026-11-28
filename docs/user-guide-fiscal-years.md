@@ -22,8 +22,6 @@ Untuk mengakses modul ini, pengguna memerlukan permission `fiscal_year`. Sistem 
 2. Klik menu **Tahun Fiskal** di sidebar atau akses langsung melalui URL `/fiscal-years`.
 3. Halaman akan menampilkan tabel daftar tahun fiskal dengan kolom: Name, Start Date, End Date, Status, Created At.
 
-[Screenshot: Halaman daftar Fiscal Years dengan tabel data]
-
 ### Fitur pada Tabel:
 
 | Fitur | Deskripsi |
@@ -50,8 +48,6 @@ Untuk mengakses modul ini, pengguna memerlukan permission `fiscal_year`. Sistem 
 4. Klik tombol **Save** untuk menyimpan.
 5. Tahun fiskal baru akan muncul di tabel dengan status `open`.
 
-[Screenshot: Dialog form Add New Fiscal Year]
-
 ### Validasi:
 
 - Name tidak boleh kosong dan harus unique.
@@ -66,8 +62,6 @@ Untuk mengakses modul ini, pengguna memerlukan permission `fiscal_year`. Sistem 
 1. Temukan tahun fiskal yang ingin dilihat di tabel.
 2. Klik icon **View** (ikon mata) pada baris tersebut.
 3. Dialog detail akan muncul menampilkan informasi lengkap.
-
-[Screenshot: Dialog detail Fiscal Year]
 
 ### Informasi yang Ditampilkan:
 
@@ -88,8 +82,6 @@ Untuk mengakses modul ini, pengguna memerlukan permission `fiscal_year`. Sistem 
 4. Ubah field yang diperlukan.
 5. Klik tombol **Save** untuk menyimpan perubahan.
 
-[Screenshot: Dialog form Edit Fiscal Year]
-
 ### Catatan:
 
 - Start Date dan End Date hanya bisa diubah jika status masih `open`.
@@ -104,8 +96,6 @@ Untuk mengakses modul ini, pengguna memerlukan permission `fiscal_year`. Sistem 
 3. Buka tahun fiskal yang ingin ditutup.
 4. Edit status dari `open` menjadi `closed`.
 5. Simpan perubahan.
-
-[Screenshot: Form edit status Fiscal Year dari open ke closed]
 
 ### Dampak Penutupan:
 
@@ -126,8 +116,6 @@ Penutupan tahun fiskal adalah operasi irreversible. Pastikan semua data sudah be
 3. Konfirmasi penghapusan pada dialog yang muncul.
 4. Tahun fiskal akan dihapus dari sistem.
 
-[Screenshot: Dialog konfirmasi delete Fiscal Year]
-
 ### Catatan:
 
 - Tahun fiskal yang sudah memiliki journal entry tidak bisa dihapus.
@@ -141,8 +129,6 @@ Penutupan tahun fiskal adalah operasi irreversible. Pastikan semua data sudah be
 1. Buka halaman Fiscal Years.
 2. Klik tombol **Export** di bagian atas tabel.
 3. File Excel akan otomatis di-download.
-
-[Screenshot: Tombol Export dan hasil file Excel]
 
 ### Kolom dalam File Export:
 
@@ -165,8 +151,6 @@ Sistem menggunakan GetPreferredFiscalYearAction untuk otomatis memilih tahun fis
 1. Tahun fiskal dengan posted journal entry terbaru.
 2. Fallback: Tahun fiskal pertama dengan status `open`.
 3. Fallback: Tahun fiskal pertama dalam koleksi.
-
-[Screenshot: Form transaksi dengan tahun fiskal auto-selected]
 
 ### Modul yang Menggunakan Auto-Select:
 

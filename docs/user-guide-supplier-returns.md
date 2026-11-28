@@ -8,10 +8,8 @@ Fitur utama:
 - Pencatatan retur berdasarkan PO atau GR
 - Berbagai alasan retur (rusak, tidak sesuai, kadaluarsa, dll)
 - Otomatis mengurangi stok gudang
-- Tracking status retur
+- Pelacakan status retur
 - Export data ke Excel
-
-[Screenshot: Daftar Supplier Returns]
 
 ## Menu & Navigasi
 
@@ -43,8 +41,6 @@ Halaman `/supplier-returns` menampilkan tabel retur:
 
 **Sorting:** Semua kolom sortable.
 
-[Screenshot: Tabel Supplier Returns dengan filter]
-
 ## 2. Membuat Supplier Return Baru
 
 Klik tombol **Add** untuk membuka form retur.
@@ -58,19 +54,15 @@ Klik tombol **Add** untuk membuka form retur.
 - Reason: alasan retur (wajib)
 - Notes: catatan tambahan (opsional)
 
-[Screenshot: Form header Supplier Return]
-
 ### Item Retur
 
 Setelah PO dipilih, item yang sudah diterima akan muncul. Untuk setiap item:
 
-- Product: nama produk (read-only)
-- Received Qty: jumlah yang sudah diterima (read-only)
+- Product: nama produk (hanya baca)
+- Received Qty: jumlah yang sudah diterima (hanya baca)
 - Return Qty: jumlah yang diretur (isi manual)
-- Unit Price: harga satuan (read-only)
+- Unit Price: harga satuan (hanya baca)
 - Reason: alasan retur per item (opsional)
-
-[Screenshot: Form item Supplier Return]
 
 Klik **Save**. Retur dibuat dengan status **draft**.
 

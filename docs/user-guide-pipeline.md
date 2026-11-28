@@ -151,7 +151,7 @@ Transition mendefinisikan **perpindahan antar state** — tombol aksi apa yang m
 | **Confirmation** | Jika `Yes`, user harus konfirmasi melalui dialog sebelum transisi dijalankan |
 | **Comment** | Jika `Yes`, user **wajib** mengisi komentar saat menjalankan transisi |
 | **Approval** | Jika `Yes`, transisi akan men-trigger proses approval (persetujuan berjenjang) |
-| **Active** | Apakah transisi ini aktif atau tidak |
+| **Aktif** | Apakah transisi ini aktif atau tidak |
 
 4. Klik **Save Transition** untuk menyimpan.
 
@@ -209,7 +209,7 @@ Halaman **Settings → Pipeline** menampilkan tabel daftar semua pipeline yang s
 
 ### Aksi yang Tersedia
 
-- **View** — Melihat detail pipeline (read-only).
+- **View** — Melihat detail pipeline (hanya baca).
 - **Edit** — Mengedit pipeline beserta states dan transitions.
 - **Delete** — Menghapus pipeline. Hanya bisa dilakukan jika tidak ada entitas yang menggunakannya.
 - **Export** — Mengekspor daftar pipeline ke file Excel/CSV.

@@ -6,12 +6,10 @@ Modul Stock Transfers mencatat pemindahan stok barang antar gudang. Setiap trans
 
 Fitur utama:
 - Pemindahan stok antar gudang
-- Tracking status dari draft hingga received
+- Pelacakan status dari draf hingga diterima
 - Tanggal transfer dan estimasi tiba
 - Soft-cancel (status cancelled, bukan delete)
 - Export data ke Excel
-
-[Screenshot: Daftar Stock Transfers]
 
 ## Menu & Navigasi
 
@@ -41,8 +39,6 @@ Halaman `/stock-transfers` menampilkan tabel transfer:
 
 **Sorting:** Semua kolom sortable.
 
-[Screenshot: Tabel Stock Transfers dengan filter]
-
 ## 2. Membuat Stock Transfer Baru
 
 Klik tombol **Add** untuk membuka form transfer.
@@ -54,19 +50,15 @@ Klik tombol **Add** untuk membuka form transfer.
 - Expected Arrival: estimasi tanggal tiba (wajib)
 - Notes: catatan tambahan (opsional)
 
-[Screenshot: Form header Stock Transfer]
-
 ### Menambahkan Item Transfer
 
 Klik **Add Item** untuk menambahkan produk yang dipindahkan:
 
 - Product: pilih produk (wajib, hanya produk yang ada di gudang asal)
 - Unit: satuan produk (auto-terisi)
-- Available Qty: stok tersedia di gudang asal (read-only)
+- Available Qty: stok tersedia di gudang asal (hanya baca)
 - Transfer Qty: jumlah yang dipindahkan (wajib, maksimal available qty)
 - Notes: catatan per item (opsional)
-
-[Screenshot: Form item Stock Transfer]
 
 Klik **Save**. Transfer dibuat dengan status **draft**.
 
@@ -79,11 +71,9 @@ Klik **Save**. Transfer dibuat dengan status **draft**.
 | Received | Barang sudah diterima di gudang tujuan |
 | Cancelled | Transfer dibatalkan (soft-cancel) |
 
-[Screenshot: Transfer dengan status In Transit]
-
 ## 4. Menerima Barang di Gudang Tujuan
 
-Setelah transfer berstatus **In Transit**, barang dapat diterima di gudang tujuan:
+Setelah transfer berstatus **Dalam Perjalanan**, barang dapat diterima di gudang tujuan:
 1. Buka detail transfer
 2. Klik tombol **Receive**
 3. Stok di gudang asal berkurang, stok di gudang tujuan bertambah

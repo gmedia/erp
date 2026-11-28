@@ -3780,6 +3780,12 @@
         "install_step_2_settings": "(Pengaturan → Keamanan → Instal aplikasi yang tidak dikenal).",
         "install_step_3": "Konfirmasi pemasangan lalu buka aplikasinya.",
         "empty_download_title": "Belum ada rilis aplikasi",
-        "empty_download_description": "Administrator belum menerbitkan rilis Android. Periksa kembali nanti."
+        "empty_download_description": "Administrator belum menerbitkan rilis Android. Periksa kembali nanti.",
+        "update_available_title": "Versi baru {version} tersedia",
+        "update_available_description": "Perbarui aplikasi untuk perbaikan terbaru.",
+        "update_action": "Perbarui",
+        "update_required_title": "Pembaruan wajib",
+        "update_required_description": "Versi aplikasi ini tidak lagi didukung. Perbarui ke {version} untuk melanjutkan.",
+        "update_required_action": "Perbarui sekarang"
     }
 }

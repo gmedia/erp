@@ -12,8 +12,6 @@ Fitur utama:
 - Integrasi dengan Supplier Returns untuk retur
 - Export data ke Excel
 
-[Screenshot: Daftar Goods Receipts]
-
 ## Menu & Navigasi
 
 | Menu | Route | Fungsi |
@@ -42,8 +40,6 @@ Halaman `/goods-receipts` menampilkan tabel GR:
 
 **Sorting:** Semua kolom sortable.
 
-[Screenshot: Tabel GR dengan filter]
-
 ## 2. Membuat Goods Receipt Baru
 
 Klik tombol **Add** untuk membuka form GR.
@@ -55,20 +51,16 @@ Klik tombol **Add** untuk membuka form GR.
 - Supplier Delivery Note: nomor surat jalan supplier (opsional)
 - Notes: catatan tambahan (opsional)
 
-[Screenshot: Form header GR]
-
 ### Item Penerimaan
 
 Setelah PO dipilih, item akan otomatis terisi dari PO. Untuk setiap item:
 
-- Product: nama produk (read-only)
-- Ordered Qty: jumlah dipesan (read-only)
+- Product: nama produk (hanya baca)
+- Ordered Qty: jumlah dipesan (hanya baca)
 - Received Qty: jumlah diterima (isi manual)
 - Accepted Qty: jumlah diterima kondisi baik
 - Rejected Qty: jumlah ditolak
 - Notes: catatan per item (opsional)
-
-[Screenshot: Form item GR]
 
 Klik **Save**. GR dibuat dengan status **draft**.
 
@@ -82,8 +74,6 @@ Setelah GR di-save, klik tombol **Confirm** untuk mengkonfirmasi penerimaan. Sis
 ## 4. Melihat Detail GR
 
 Klik ikon **View** untuk melihat detail GR termasuk item yang diterima dan ditolak.
-
-[Screenshot: Detail GR dengan item diterima/ditolak]
 
 ## 5. Export Data
 

@@ -20,8 +20,6 @@ Untuk mengakses Depreciation Run, pengguna memerlukan permission `asset_deprecia
 2. Klik menu **Aset** di sidebar, kemudian pilih submenu **Penyusutan Aset** atau akses langsung melalui URL `/asset-depreciation-runs`.
 3. Halaman akan menampilkan daftar depreciation run yang sudah dilakukan.
 
-[Screenshot: Halaman Depreciation Runs dengan tabel history dan tombol Run Calculation]
-
 ### Komponen Halaman:
 
 - **Header**: Judul "Depreciation Runs" dengan breadcrumb navigasi
@@ -45,13 +43,11 @@ Setiap depreciation run memiliki status yang menunjukkan tahapan proses:
 | posted | Secondary (abu-abu) | Sudah diposting ke journal, nilai buku aset sudah diupdate | View Lines |
 | void | Destructive (merah) | Run sudah dibatalkan (tidak digunakan dalam proses normal) | View Lines |
 
-[Screenshot: Tabel dengan berbagai status badge dan action buttons]
-
 ### Interpretasi Status:
 
-- **Calculated**: Run baru selesai dihitung. Review detail lines sebelum posting. Pastikan nilai depresiasi sudah sesuai expected.
-- **Posted**: Run sudah diposting ke general ledger. Journal entry sudah terbuat dan nilai buku aset sudah terupdate. Status ini final dan tidak bisa di-reverse tanpa proses khusus.
-- **Void**: Run dibatalkan karena error atau double calculation. Tidak mempengaruhi nilai aset atau journal.
+- **Dihitung**: Run baru selesai dihitung. Tinjau baris detail sebelum posting. Pastikan nilai depresiasi sudah sesuai perkiraan.
+- **Diposting**: Run sudah diposting ke buku besar. Entri jurnal sudah dibuat dan nilai buku aset sudah diperbarui. Status ini final dan tidak dapat dibalik tanpa proses khusus.
+- **Batal**: Run dibatalkan karena kesalahan atau perhitungan ganda. Tidak mempengaruhi nilai aset atau journal.
 
 ## 3. Menjalankan Kalkulasi Depresiasi Baru
 
@@ -65,18 +61,16 @@ Setiap depreciation run memiliki status yang menunjukkan tahapan proses:
    - **Period End**: Pilih tanggal akhir periode (picker date)
 4. Klik tombol **Calculate** untuk memulai proses.
 
-[Screenshot: Dialog Calculate Depreciation dengan form fiscal year dan period dates]
-
 ### Validasi Input:
 
 - Fiscal Year harus dipilih sebelum calculate.
 - Period Start dan Period End harus diisi.
 - Period End harus setelah Period Start.
-- Sistem memvalidasi tidak ada run existing untuk period yang sama dengan status draft, calculated, atau posted.
+- Sistem memvalidasi tidak ada run yang sudah ada untuk periode yang sama dengan status draft, calculated, atau posted.
 
 ### Proses yang Terjadi di Backend:
 
-1. Sistem mencari aset eligible untuk depresiasi dengan criteria:
+1. Sistem mencari aset eligible untuk depresiasi dengan kriteria:
    - Status = active atau maintenance
    - Depreciation method sudah diset
    - Depreciation start date <= period end
@@ -105,8 +99,6 @@ Setiap depreciation run memiliki status yang menunjukkan tahapan proses:
 1. Dari tabel history, klik icon **Eye** (View Lines) pada baris run yang ingin di-review.
 2. Dialog "Depreciation Run Lines" akan muncul dengan tabel detail.
 3. Review setiap line item untuk memastikan kalkulasi sudah benar.
-
-[Screenshot: Dialog Run Lines dengan tabel detail per aset]
 
 ### Informasi per Line:
 
@@ -140,8 +132,6 @@ Setiap depreciation run memiliki status yang menunjukkan tahapan proses:
 2. Klik tombol **Post** pada baris run di tabel.
 3. Sistem akan memproses posting dan mengupdate status ke `posted`.
 4. Journal entry number akan muncul di kolom Journal setelah posting berhasil.
-
-[Screenshot: Tabel dengan tombol Post dan status transition dari calculated ke posted]
 
 ### Proses yang Terjadi di Backend:
 
@@ -190,7 +180,7 @@ Login dengan permission asset_depreciation_run
 Buka Depreciation Runs (/asset-depreciation-runs)
     |
     v
-Review Existing Runs (optional)
+Tinjau Run yang Sudah Ada (opsional)
     |
     v
 Klik Run Calculation
@@ -276,7 +266,7 @@ Post Journal Entry (separate process via Journal Entries module)
 
 1. Run Calculation gagal saat posting dengan error "Asset XXX is missing depreciation accounts."
 2. Investigasi asset yang error via Asset Profile.
-3. Check Asset Category atau Asset Profile untuk:
+3. Periksa Aset Category atau Asset Profile untuk:
    - Depreciation Expense Account ID
    - Accumulated Depreciation Account ID
 4. Set missing accounts di Asset Category (apply ke semua assets di category) atau Asset Profile (specific asset).
@@ -286,7 +276,7 @@ Post Journal Entry (separate process via Journal Entries module)
 ### Skenario 5: Monthly Monitoring via Asset Dashboard
 
 1. Sebelum run depreciation, buka Asset Dashboard.
-2. Review Book Value dan Accum. Depreciation summary cards untuk baseline.
+2. Tinjau Book Value dan Accum. Depreciation kartu ringkasan untuk baseline.
 3. Run Depreciation untuk period.
 4. Post ke journal.
 5. Refresh Asset Dashboard.
@@ -378,7 +368,7 @@ Book Value After = Salvage Value (fully depreciated)
 
 ### Apakah depreciation run bisa dijalankan lebih dari once untuk period yang sama?
 
-Tidak. Sistem memvalidasi jika sudah ada run untuk period dengan status draft, calculated, atau posted. Jika perlu re-run, void run existing terlebih dahulu (proses manual via database atau void endpoint).
+Tidak. Sistem memvalidasi jika sudah ada run untuk periode dengan status draft, calculated, atau posted. Jika perlu re-run, void run yang ada terlebih dahulu (proses manual via database atau void endpoint).
 
 ### Mengapa beberapa aset tidak muncul di depreciation lines?
 
@@ -439,13 +429,13 @@ Check:
 3. Book Value After = Purchase Cost - Accumulated After.
 4. Book Value After >= Salvage Value (tidak negatif atau below salvage).
 5. Compare dengan run sebelumnya untuk trending consistency.
-6. Test sample asset dengan manual calculation untuk cross-check.
+6. Uji aset contoh dengan perhitungan manual untuk cross-check.
 
 ### Apakah depreciation run affect Asset Dashboard?
 
 Ya. Setelah posting:
-- Book Value di Summary Cards berkurang.
-- Accum. Depreciation di Summary Cards bertambah.
+- Book Value di Kartu Ringkasan berkurang.
+- Accum. Depreciation di Kartu Ringkasan bertambah.
 - Status Distribution tidak berubah (kecuali ada asset status change terpisah).
 - Condition Overview tidak berubah (condition field separate dari depreciation).
 
@@ -507,7 +497,7 @@ Jangan post. Review lines untuk identify anomali. Check: aset yang tidak muncul 
 
 **Q: Bagaimana cara memastikan depreciation accounts sudah diset dengan benar untuk semua aset?**
 
-Check Asset Category terlebih dahulu karena menyediakan default depreciation accounts. Pastikan setiap category memiliki Depreciation Expense Account dan Accumulated Depreciation Account. Jika ada aset individual yang memerlukan accounts berbeda, set di Asset Profile. Gunakan Asset Dashboard atau report untuk identify aset dengan missing accounts sebelum run depreciation.
+Periksa Aset Category terlebih dahulu karena menyediakan default depreciation accounts. Pastikan setiap category memiliki Depreciation Expense Account dan Accumulated Depreciation Account. Jika ada aset individual yang memerlukan accounts berbeda, set di Asset Profile. Gunakan Asset Dashboard atau report untuk identify aset dengan missing accounts sebelum run depreciation.
 
 **Q: Bisakah depreciation run dijalankan untuk fiscal year yang sudah closed?**
 
