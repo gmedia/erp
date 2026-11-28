@@ -7,11 +7,9 @@ Modul Purchase Orders (PO) digunakan untuk membuat pesanan pembelian resmi ke su
 Fitur utama:
 - Pembuatan PO manual atau konversi dari PR
 - Detail item dengan kuantitas, harga, dan diskon
-- Tracking status dari draft hingga received
+- Pelacakan status dari draf hingga diterima
 - Integrasi dengan Goods Receipt dan Supplier Return
 - Export data ke Excel
-
-[Screenshot: Daftar Purchase Orders]
 
 ## Menu & Navigasi
 
@@ -43,8 +41,6 @@ Halaman `/purchase-orders` menampilkan tabel PO:
 
 **Sorting:** Semua kolom sortable.
 
-[Screenshot: Tabel PO dengan filter]
-
 ## 2. Membuat Purchase Order Baru
 
 Klik tombol **Add** untuk membuka form PO.
@@ -57,8 +53,6 @@ Klik tombol **Add** untuk membuka form PO.
 - Payment Terms: syarat pembayaran (opsional)
 - Shipping Address: alamat pengiriman (opsional)
 - Notes: catatan tambahan (opsional)
-
-[Screenshot: Form header PO]
 
 ### Menambahkan Item PO
 
@@ -74,15 +68,13 @@ Klik **Add Item** untuk menambahkan produk yang dipesan:
 
 Grand Total dihitung dari subtotal semua item setelah diskon dan pajak.
 
-[Screenshot: Form item PO]
-
 Klik **Save**. PO dibuat dengan status **draft**.
 
 ## 3. Konversi dari Purchase Request
 
 PO dapat dibuat otomatis dari PR yang sudah disetujui:
 
-1. Buka PR yang berstatus **Approved**
+1. Buka PR yang berstatus **Disetujui**
 2. Klik tombol **Convert to PO**
 3. Form PO akan terisi otomatis dengan data dari PR
 4. Sesuaikan jika diperlukan, lalu klik **Save**

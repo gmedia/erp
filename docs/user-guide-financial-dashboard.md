@@ -4,7 +4,7 @@
 
 ## Gambaran Umum
 
-Financial Dashboard adalah halaman khusus yang menampilkan Key Performance Indicator (KPI) keuangan perusahaan secara komprehensif. Halaman ini dirancang untuk memberikan gambaran mendalam mengenai kesehatan finansial bisnis melalui 7 KPI cards dengan perbandingan Year-over-Year (YoY), grafik pendapatan vs pengeluaran bulanan, ringkasan arus kas, dan breakdown pengeluaran teratas. Financial Dashboard bersifat read-only dan tidak memiliki operasi CRUD.
+Financial Dashboard adalah halaman khusus yang menampilkan Key Performance Indicator (KPI) keuangan perusahaan secara komprehensif. Halaman ini dirancang untuk memberikan gambaran mendalam mengenai kesehatan finansial bisnis melalui 7 kartu KPI dengan perbandingan Year-over-Year (YoY), grafik pendapatan vs pengeluaran bulanan, ringkasan arus kas, dan rincian pengeluaran teratas. Financial Dashboard bersifat hanya baca dan tidak memiliki operasi CRUD.
 
 Untuk mengakses Financial Dashboard, pengguna memerlukan permission `financial_dashboard`. Data yang ditampilkan berasal dari `GetFinancialDashboardDataAction` dan `FinancialReportService::getMonthlyTrends`, dengan kemampuan filter berdasarkan tahun fiskal dan perbandingan otomatis dengan tahun sebelumnya.
 
@@ -12,7 +12,7 @@ Untuk mengakses Financial Dashboard, pengguna memerlukan permission `financial_d
 
 | Menu | URL | Fungsi |
 |------|-----|--------|
-| Financial Dashboard | /financial-dashboard | Menampilkan KPI keuangan dengan perbandingan YoY, grafik pendapatan vs pengeluaran 12 bulan, ringkasan arus kas, dan breakdown pengeluaran teratas |
+| Financial Dashboard | /financial-dashboard | Menampilkan KPI keuangan dengan perbandingan YoY, grafik pendapatan vs pengeluaran 12 bulan, ringkasan arus kas, dan rincian pengeluaran teratas |
 
 ## 1. Mengakses Financial Dashboard
 
@@ -22,11 +22,9 @@ Untuk mengakses Financial Dashboard, pengguna memerlukan permission `financial_d
 2. Klik menu **Dasbor Keuangan** di sidebar pada grup menu Akuntansi atau akses langsung melalui URL `/financial-dashboard`.
 3. Halaman Financial Dashboard akan menampilkan data keuangan terkini.
 
-[Screenshot: Halaman Financial Dashboard utama dengan KPI cards dan grafik]
+## 2. Memahami Kartu KPI
 
-## 2. Memahami KPI Cards
-
-Financial Dashboard menampilkan 7 KPI cards di bagian atas yang menunjukkan kondisi keuangan utama:
+Financial Dashboard menampilkan 7 kartu KPI di bagian atas yang menunjukkan kondisi keuangan utama:
 
 ### KPI yang Tersedia:
 
@@ -41,8 +39,6 @@ Financial Dashboard menampilkan 7 KPI cards di bagian atas yang menunjukkan kond
 | Cash Balance | Saldo kas saat ini |
 
 Setiap KPI card dilengkapi dengan badge Year-over-Year (YoY) yang menunjukkan perubahan persentase dibandingkan tahun fiskal sebelumnya.
-
-[Screenshot: KPI cards dengan badge YoY]
 
 ### Interpretasi Badge YoY:
 
@@ -66,8 +62,6 @@ Financial Dashboard menyediakan selector tahun fiskal untuk memfilter data yang 
 3. Pilih tahun fiskal yang diinginkan.
 4. Data Financial Dashboard akan otomatis diperbarui sesuai tahun fiskal yang dipilih.
 
-[Screenshot: Dropdown selector tahun fiskal]
-
 ### Auto-Comparison Feature:
 
 Saat tahun fiskal dipilih, sistem secara otomatis memilih tahun fiskal sebelumnya sebagai perbandingan untuk badge YoY. Fitur ini memastikan perbandingan selalu tersedia tanpa perlu memilih manual.
@@ -79,7 +73,7 @@ Saat tahun fiskal dipilih, sistem secara otomatis memilih tahun fiskal sebelumny
 
 ## 4. Membaca Grafik Revenue vs Expenses
 
-Grafik bar chart menampilkan perbandingan pendapatan dan pengeluaran bulanan selama 12 bulan dalam tahun fiskal yang dipilih.
+Diagram batang menampilkan perbandingan pendapatan dan pengeluaran bulanan selama 12 bulan dalam tahun fiskal yang dipilih.
 
 ### Cara Membaca:
 
@@ -94,8 +88,6 @@ Grafik bar chart menampilkan perbandingan pendapatan dan pengeluaran bulanan sel
 2. Bandingkan tinggi bar Revenue dan Expenses untuk melihat profitabilitas per bulan.
 3. Identifikasi pola musiman dari fluktuasi grafik.
 4. Perhatikan bulan-bulan dengan selisih terbesar antara Revenue dan Expenses.
-
-[Screenshot: Grafik Revenue vs Expenses dengan tooltip]
 
 ### Analisis yang Bisa Dilakukan:
 
@@ -115,8 +107,6 @@ Bagian Cash Flow Summary menampilkan ringkasan arus kas perusahaan untuk tahun f
 | Cash Inflows | Total arus kas masuk selama periode |
 | Cash Outflows | Total arus kas keluar selama periode |
 | Closing Balance | Saldo kas akhir periode tahun fiskal |
-
-[Screenshot: Cash Flow Summary section]
 
 ### Cara Membaca:
 
@@ -145,7 +135,7 @@ Laporan arus kas membagi perubahan kas menjadi tiga aktivitas. Setiap jurnal ber
 
 ## 6. Menganalisis Top Expense Breakdown
 
-Bagian ini menampilkan breakdown pengeluaran berdasarkan kategori untuk tahun fiskal yang dipilih.
+Bagian ini menampilkan rincian pengeluaran berdasarkan kategori untuk tahun fiskal yang dipilih.
 
 ### Informasi yang Ditampilkan:
 
@@ -160,8 +150,6 @@ Bagian ini menampilkan breakdown pengeluaran berdasarkan kategori untuk tahun fi
 2. Identifikasi kategori dengan kontribusi terbesar terhadap total pengeluaran.
 3. Bandingkan proporsi antar kategori.
 4. Gunakan informasi ini untuk analisis dan perencanaan anggaran.
-
-[Screenshot: Top Expense Breakdown dengan kategori dan persentase]
 
 ### Tips Analisis:
 
@@ -181,7 +169,7 @@ Buka Financial Dashboard (/financial-dashboard)
 Pilih Tahun Fiskal <--|
    |                   |
    v                   |
-Lihat KPI Cards       |
+Lihat Kartu KPI       |
    |                   |
    v                   |
 Analisis Badge YoY ---|
@@ -205,7 +193,7 @@ Ambil Keputusan Bisnis
 
 1. Buka Financial Dashboard.
 2. Pilih tahun fiskal yang ingin dianalisis.
-3. Perhatikan KPI cards untuk melihat gambaran umum.
+3. Perhatikan kartu KPI untuk melihat gambaran umum.
 4. Analisis badge YoY untuk memahami tren perubahan.
 5. Telusuri grafik Revenue vs Expenses untuk mengidentifikasi pola bulanan.
 6. Catat bulan-bulan dengan performa terbaik dan terburuk.
@@ -240,7 +228,7 @@ Ambil Keputusan Bisnis
 
 ### Apakah data Financial Dashboard real-time?
 
-Data Financial Dashboard diambil dari database pada saat halaman dibuka atau filter diubah. Tidak ada auto-refresh otomatis. Untuk melihat data terbaru, refresh halaman atau ubah filter tahun fiskal.
+Data Financial Dashboard diambil dari database pada saat halaman dibuka atau filter diubah. Tidak ada penyegaran otomatis otomatis. Untuk melihat data terbaru, refresh halaman atau ubah filter tahun fiskal.
 
 ### Mengapa beberapa KPI menampilkan badge abu-abu?
 
@@ -264,7 +252,7 @@ Grafik Revenue vs Expenses menampilkan data 12 bulan dalam satu tampilan. Fitur 
 
 ### Apa perbedaan antara Dashboard utama dan Financial Dashboard?
 
-Dashboard utama (URL `/`) menampilkan ringkasan keuangan umum untuk overview cepat. Financial Dashboard (URL `/financial-dashboard`) menampilkan analisis keuangan yang lebih mendalam dengan 7 KPI cards, grafik 12 bulan, cash flow summary, dan expense breakdown. Financial Dashboard cocok untuk analisis dan pelaporan keuangan yang lebih detail.
+Dashboard utama (URL `/`) menampilkan ringkasan keuangan umum untuk tinjauan cepat. Financial Dashboard (URL `/financial-dashboard`) menampilkan analisis keuangan yang lebih mendalam dengan 7 kartu KPI, grafik 12 bulan, ringkasan arus kas, dan rincian pengeluaran. Financial Dashboard cocok untuk analisis dan pelaporan keuangan yang lebih detail.
 
 ### Bagaimana badge YoY dihitung?
 
@@ -285,7 +273,7 @@ KPI Revenue menampilkan total pendapatan untuk tahun fiskal yang dipilih. Nilai 
 
 **Q: Apa arti KPI Net Income dan bagaimana interpretasinya?**
 
-Net Income adalah selisih antara total Revenue dan total Expenses. Nilai positif menunjukkan laba bersih, sedangkan nilai negatif menunjukkan kerugian. Badge YoY pada Net Income perlu dibaca dengan hati-hati: badge hijau bisa berarti profit meningkat ATAU kerugian berkurang. Badge merah bisa berarti profit menurun ATAU kerugian membesar. Selalu cek nilai absolutnya untuk memahami kondisi riwal perusahaan.
+Net Income adalah selisih antara total Revenue dan total Expenses. Nilai positif menunjukkan laba bersih, sedangkan nilai negatif menunjukkan kerugian. Badge YoY pada Net Income perlu dibaca dengan hati-hati: badge hijau bisa berarti profit meningkat ATAU kerugian berkurang. Lencana merah bisa berarti profit menurun ATAU kerugian membesar. Selalu cek nilai absolutnya untuk memahami kondisi riwal perusahaan.
 
 **Q: Bagaimana cara membaca KPI Assets, Liabilities, dan Equity secara terpadu?**
 
@@ -301,7 +289,7 @@ Dropdown Fiscal Year di bagian atas memungkinkan pemilihan tahun fiskal. Sistem 
 
 **Q: Bagaimana cara membaca grafik Revenue vs Expenses yang efektif?**
 
-Grafik bar chart menampilkan 12 bulan dalam tahun fiskal. Bar biru adalah Revenue, bar oranye adalah Expenses. Arahkan kursor ke bar untuk melihat nilai detail. Perhatikan bulan-bulan dengan gap terlebar antara Revenue dan Expenses, ini menunjukkan profit tertinggi. Bulan dengan Expenses lebih tinggi dari Revenue menunjukkan kerugian. Identifikasi pola musiman seperti lonjakan revenue di akhir tahun atau peningkatan expenses di bulan tertentu.
+Diagram batang menampilkan 12 bulan dalam tahun fiskal. Bar biru adalah Revenue, bar oranye adalah Expenses. Arahkan kursor ke bar untuk melihat nilai detail. Perhatikan bulan-bulan dengan gap terlebar antara Revenue dan Expenses, ini menunjukkan profit tertinggi. Bulan dengan Expenses lebih tinggi dari Revenue menunjukkan kerugian. Identifikasi pola musiman seperti lonjakan revenue di akhir tahun atau peningkatan expenses di bulan tertentu.
 
 **Q: Apa yang harus dilakukan jika data di Financial Dashboard tidak muncul?**
 
@@ -309,7 +297,7 @@ Jika KPI menampilkan nol atau kosong, periksa beberapa hal berikut. Pastikan ada
 
 **Q: Bagaimana cara refresh data Financial Dashboard?**
 
-Financial Dashboard tidak memiliki auto-refresh. Untuk mendapatkan data terbaru, refresh halaman browser atau ubah filter tahun fiskal dan kembalikan ke semula. Data diambil dari database setiap kali halaman dibuka atau filter diubah. Jika ada journal entry baru yang baru saja diposting, refresh halaman untuk melihat perubahannya tercermin di KPI dan grafik.
+Financial Dashboard tidak memiliki penyegaran otomatis. Untuk mendapatkan data terbaru, refresh halaman browser atau ubah filter tahun fiskal dan kembalikan ke semula. Data diambil dari database setiap kali halaman dibuka atau filter diubah. Jika ada journal entry baru yang baru saja diposting, refresh halaman untuk melihat perubahannya tercermin di KPI dan grafik.
 
 **Q: Bagaimana cara menggunakan Cash Flow Summary untuk analisis likuiditas?**
 

@@ -6,8 +6,6 @@ Asset Models adalah modul yang digunakan untuk mendefinisikan model atau tipe st
 
 Modul ini merupakan bagian dari menu group **Asset** dan memiliki permission `asset_model`. Dengan menggunakan model aset, proses input aset baru menjadi lebih cepat dan konsisten karena data standar sudah tersedia.
 
-[Screenshot: Halaman daftar Asset Models dengan tabel dan filter]
-
 ---
 
 ## Menu & Navigasi
@@ -37,16 +35,12 @@ Halaman Asset Models menampilkan tabel semua model aset dengan kolom:
 | Specs | Spesifikasi teknis model (text field) | Tidak |
 | Actions | Tombol View, Edit, Delete | Tidak |
 
-[Screenshot: Tabel Asset Models dengan kolom-kolom di atas]
-
 ### Filter dan Pencarian
 
 Gunakan filter di bagian atas tabel untuk menyaring data:
 
 1. **Search** - ketik model name atau manufacturer untuk mencari model aset
 2. **Category** - pilih kategori aset tertentu dari dropdown
-
-[Screenshot: Panel filter Asset Models]
 
 ---
 
@@ -55,8 +49,6 @@ Gunakan filter di bagian atas tabel untuk menyaring data:
 1. Buka halaman **Asset Models** (`/asset-models`)
 2. Klik tombol **Add New** di bagian atas tabel
 3. Isi form dengan data model aset:
-
-[Screenshot: Form Add New Asset Model]
 
 | Field | Keterangan | Wajib |
 |-------|------------|-------|
@@ -81,8 +73,6 @@ Gunakan filter di bagian atas tabel untuk menyaring data:
 1. Klik tombol **View** (ikon mata) pada baris model aset
 2. Modal detail akan muncul menampilkan semua informasi:
 
-[Screenshot: Modal View Asset Model Details]
-
 Informasi yang ditampilkan:
 - Model Name
 - Manufacturer
@@ -99,8 +89,6 @@ Informasi yang ditampilkan:
 3. Ubah field yang diperlukan
 4. Klik **Save** untuk menyimpan perubahan
 
-[Screenshot: Form Edit Asset Model]
-
 ### Catatan Edit
 
 - Semua field bisa diubah kecuali ID
@@ -115,12 +103,10 @@ Informasi yang ditampilkan:
 2. Konfirmasi penghapusan pada dialog yang muncul
 3. Klik **Delete** untuk menghapus permanen
 
-[Screenshot: Dialog konfirmasi delete Asset Model]
-
 ### Peringatan Penghapusan
 
 Model aset **tidak bisa dihapus** jika:
-- Sudah digunakan oleh aset individual di modul Assets
+- Sudah digunakan oleh aset individual di modul Aset
 - Terdapat referensi dari modul lain
 
 Hapus atau ubah semua aset yang menggunakan model tersebut sebelum menghapus.
@@ -131,8 +117,6 @@ Hapus atau ubah semua aset yang menggunakan model tersebut sebelum menghapus.
 
 1. Klik tombol **Export** di bagian atas tabel
 2. File Excel akan diunduh dengan semua data model aset
-
-[Screenshot: Tombol Export Asset Models]
 
 ### Kolom dalam Export
 
@@ -146,7 +130,7 @@ Export menggunakan endpoint `/api/asset-models/export` dan mengikuti filter yang
 
 ---
 
-## 7. Integrasi dengan Modul Assets
+## 7. Integrasi dengan Modul Aset
 
 Data model aset digunakan saat membuat aset baru di modul **Assets**:
 
@@ -163,8 +147,6 @@ Data model aset digunakan saat membuat aset baru di modul **Assets**:
 - **Konsistensi** - semua aset dengan model yang sama memiliki spesifikasi seragam
 - **Efisiensi** - input aset baru lebih cepat karena data default sudah tersedia
 - **Akurasi** - mengurangi kesalahan input manual untuk field yang berulang
-
-[Screenshot: Form Add Asset dengan dropdown Asset Model]
 
 ---
 
@@ -220,7 +202,7 @@ Asset Model memiliki foreign key ke Asset Category. Setiap model harus memiliki 
 
 **Q:** Bagaimana cara memanfaatkan model aset untuk mempercepat input aset massal?
 
-**J:** Siapkan model aset selengkap mungkin (isi Specs dengan detail) sebelum input aset massal. Saat menambah aset baru di modul Assets, pilih model dari dropdown, dan sistem akan otomatis mengisi Category, Specs, dan default useful life dari model tersebut. Ini mengurangi input manual dan memastikan konsistensi data antar aset dengan model yang sama. Untuk efisiensi maksimal, buat semua model yang dibutuhkan terlebih dahulu sebelum mulai input aset.
+**J:** Siapkan model aset selengkap mungkin (isi Specs dengan detail) sebelum input aset massal. Saat menambah aset baru di modul Aset, pilih model dari dropdown, dan sistem akan otomatis mengisi Category, Specs, dan default useful life dari model tersebut. Ini mengurangi input manual dan memastikan konsistensi data antar aset dengan model yang sama. Untuk efisiensi maksimal, buat semua model yang dibutuhkan terlebih dahulu sebelum mulai input aset.
 
 **Q:** Apakah field Manufacturer wajib diisi? Apa dampaknya jika dikosongkan?
 
@@ -232,7 +214,7 @@ Asset Model memiliki foreign key ke Asset Category. Setiap model harus memiliki 
 
 **Q:** Bisakah saya mengubah Category model yang sudah digunakan oleh banyak aset?
 
-**J:** Bisa. Mengubah Category pada model tidak akan mengubah Category aset individual yang sudah ada. Aset yang sudah dibuat tetap mempertahankan Category saat aset tersebut dibuat. Perubahan Category model hanya akan mempengaruhi aset baru yang dibuat setelah perubahan. Jika Anda ingin mengubah Category aset existing, lakukan satu per satu di modul Assets.
+**J:** Bisa. Mengubah Category pada model tidak akan mengubah Category aset individual yang sudah ada. Aset yang sudah dibuat tetap mempertahankan Category saat aset tersebut dibuat. Perubahan Category model hanya akan mempengaruhi aset baru yang dibuat setelah perubahan. Jika Anda ingin mengubah Category aset yang ada, lakukan satu per satu di modul Aset.
 
 **Q:** Bagaimana cara ekspor data model aset dengan filter tertentu?
 
@@ -256,7 +238,7 @@ Category yang dipilih sudah dihapus atau tidak valid. Refresh halaman dan pilih 
 
 ### Tidak bisa menghapus model aset
 
-Model aset tidak bisa dihapus jika sudah digunakan oleh aset individual. Periksa aset yang menggunakan model tersebut di modul Assets, ubah ke model lain atau hapus aset tersebut terlebih dahulu.
+Model aset tidak bisa dihapus jika sudah digunakan oleh aset individual. Periksa aset yang menggunakan model tersebut di modul Aset, ubah ke model lain atau hapus aset tersebut terlebih dahulu.
 
 ### Export tidak menghasilkan file
 

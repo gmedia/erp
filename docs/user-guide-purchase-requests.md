@@ -8,10 +8,8 @@ Fitur utama:
 - Pengajuan permintaan pembelian dengan detail item
 - Prioritas permintaan (low, medium, high, urgent)
 - Workflow approval sebelum konversi ke PO
-- Tracking status dari draft hingga approved/rejected/converted
+- Pelacakan status dari draf hingga disetujui/ditolak/dikonversi
 - Export data ke Excel
-
-[Screenshot: Daftar Purchase Requests dengan tabel dan filter]
 
 ## Menu & Navigasi
 
@@ -44,8 +42,6 @@ Halaman `/purchase-requests` menampilkan tabel PR dengan fitur:
 
 **Sorting:** Semua kolom sortable. Klik header kolom untuk sort ascending/descending.
 
-[Screenshot: Tabel PR dengan kolom dan filter]
-
 ## 2. Membuat Purchase Request Baru
 
 Klik tombol **Add** di toolbar untuk membuka form PR baru.
@@ -59,8 +55,6 @@ Klik tombol **Add** di toolbar untuk membuka form PR baru.
 - Priority: pilih prioritas (wajib, default: medium)
 - Notes: catatan tambahan (opsional)
 
-[Screenshot: Form header PR]
-
 ### Menambahkan Item PR
 
 Klik **Add Item** untuk menambahkan barang/jasa yang diminta:
@@ -73,16 +67,12 @@ Klik **Add Item** untuk menambahkan barang/jasa yang diminta:
 
 Estimated Amount total dihitung dari jumlah item.
 
-[Screenshot: Form item PR]
-
 Klik **Save** untuk menyimpan. PR dibuat dengan status **draft**.
 
 ## 3. Melihat dan Mengedit PR
 
 Klik ikon **View** (mata) pada kolom Actions untuk melihat detail PR.
 Klik ikon **Edit** (pensil) untuk mengubah PR yang masih berstatus draft.
-
-[Screenshot: Detail PR dengan daftar item]
 
 ## 4. Workflow Status PR
 
@@ -108,7 +98,7 @@ Klik tombol **Export** untuk mengunduh data PR ke Excel. Filter yang aktif akan 
 A: Setelah PR berstatus Approved, buka detail PR dan klik tombol "Convert to PO". Sistem akan membuka form PO baru dengan data dari PR.
 
 **Q: Apakah PR yang sudah dikonversi masih bisa diedit?**
-A: Tidak. PR yang sudah dikonversi (status: converted) bersifat read-only.
+A: Tidak. PR yang sudah dikonversi (status: converted) bersifat hanya baca.
 
 **Q: Siapa yang bisa menyetujui PR?**
 A: Approval mengikuti workflow approval yang dikonfigurasi di modul Approval Flows untuk tipe PurchaseRequest.

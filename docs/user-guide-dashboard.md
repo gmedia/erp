@@ -9,7 +9,7 @@
 
 ## Gambaran Umum
 
-Dashboard adalah halaman beranda aplikasi setelah login. Halaman ini menampilkan **empat kartu total** master data (bukan KPI keuangan). Data diambil dari `GET /api/dashboard` dan bersifat read-only.
+Dashboard adalah halaman beranda aplikasi setelah login. Halaman ini menampilkan **empat kartu total** master data (bukan KPI keuangan). Data diambil dari `GET /api/dashboard` dan bersifat hanya baca.
 
 Permission: `dashboard`.
 
@@ -24,8 +24,6 @@ Permission: `dashboard`.
 1. Login dengan akun yang punya permission `dashboard`.
 2. Klik **Dashboard** di sidebar, atau buka `/dashboard`.
 3. Tunggu data total termuat (angka tampil menggantikan `—` saat loading).
-
-[Screenshot: Halaman Dashboard dengan 4 kartu total]
 
 ## 2. Kartu Total
 

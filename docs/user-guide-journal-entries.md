@@ -18,8 +18,6 @@ Setiap journal entry memiliki:
 - **Lines**: Daftar baris jurnal (akun, debit, kredit, memo)
 - **Status**: Draft atau Posted
 
-[Screenshot: Halaman daftar Journal Entries dengan tabel dan filter]
-
 ## Menu & Navigasi
 
 | Menu | Path | Deskripsi |
@@ -27,8 +25,8 @@ Setiap journal entry memiliki:
 | Journal Entries | `/journal-entries` | Daftar semua jurnal umum |
 | New Journal Entry | Tombol "Add New" di toolbar | Formulir tambah jurnal baru |
 | View Detail | Klik icon mata pada baris | Modal detail jurnal lengkap |
-| Edit | Klik icon pensil pada baris (hanya status Draft) | Formulir edit jurnal |
-| Delete | Klik icon sampah pada baris (hanya status Draft) | Hapus jurnal |
+| Edit | Klik icon pensil pada baris (hanya status Draf) | Formulir edit jurnal |
+| Delete | Klik icon sampah pada baris (hanya status Draf) | Hapus jurnal |
 | Export | Tombol "Export" di toolbar | Ekspor ke Excel |
 
 **Izin Akses**: Diperlukan permission `journal_entry` untuk mengakses modul ini.
@@ -48,8 +46,6 @@ Halaman utama menampilkan tabel semua jurnal dengan kolom:
 | Total Amount | Nilai total (debit/kredit) | Ya |
 | Status | Status jurnal (DRAFT/POSTED) | Ya |
 
-[Screenshot: Tabel Journal Entries dengan beberapa data]
-
 ### 1.1 Menggunakan Filter
 
 Tersedia beberapa filter untuk memudahkan pencarian:
@@ -57,8 +53,6 @@ Tersedia beberapa filter untuk memudahkan pencarian:
 - **Search**: Cari berdasarkan nomor jurnal, deskripsi, atau referensi
 - **Status**: Filter berdasarkan status (Draft atau Posted)
 - **Date Range**: Filter berdasarkan rentang tanggal
-
-[Screenshot: Panel filter Journal Entries]
 
 ### 1.2 Mengurutkan Data
 
@@ -79,8 +73,6 @@ Klik header kolom yang dapat diurutkan untuk mengurutkan data naik atau turun. K
 1. Klik tombol **Add New Journal Entry** di toolbar
 2. Formulir tambah jurnal akan muncul
 
-[Screenshot: Form tambah Journal Entry kosong]
-
 ### 2.2 Mengisi Header Jurnal
 
 Isi field berikut:
@@ -92,8 +84,6 @@ Isi field berikut:
 
 1. Klik tombol **Add Line** di bagian Journal Lines
 2. Dialog form baris akan muncul
-
-[Screenshot: Dialog form baris jurnal]
 
 Isi field pada dialog:
 - **Account**: Pilih akun dari Chart of Accounts (wajib)
@@ -111,15 +101,13 @@ Sistem akan otomatis menghitung total debit dan kredit. Indikator keseimbangan m
 - **Balanced (0)**: Total debit = total kredit, tombol Submit aktif
 - **Unbalanced (selisih)**: Total debit ≠ total kredit, tombol Submit nonaktif
 
-[Screenshot: Indikator keseimbangan di form jurnal]
-
 > **Penting**: Jurnal tidak dapat disimpan hingga total debit sama dengan total kredit.
 
 ### 2.5 Menyimpan Jurnal
 
 1. Pastikan jurnal sudah seimbang
 2. Klik tombol **Submit**
-3. Jurnal akan tersimpan dengan status **Draft**
+3. Jurnal akan tersimpan dengan status **Draf**
 
 ### 2.6 Mengelola Baris Jurnal
 
@@ -136,8 +124,6 @@ Setelah menambah baris, Anda dapat:
 
 1. Klik icon **mata** (View) pada baris jurnal yang ingin dilihat
 2. Modal detail akan menampilkan informasi lengkap
-
-[Screenshot: Modal detail Journal Entry]
 
 ### 3.2 Informasi yang Ditampilkan
 
@@ -156,17 +142,15 @@ Modal detail menampilkan:
 
 ### 4.1 Syarat Edit
 
-Jurnal hanya dapat diedit jika status masih **Draft**. Jurnal dengan status **Posted** tidak dapat diubah.
+Jurnal hanya dapat diedit jika status masih **Draf**. Jurnal dengan status **Diposting** tidak dapat diubah.
 
 ### 4.2 Langkah Edit
 
-1. Klik icon **pensil** (Edit) pada baris jurnal dengan status Draft
+1. Klik icon **pensil** (Edit) pada baris jurnal dengan status Draf
 2. Form edit akan muncul dengan data jurnal yang sudah terisi
 3. Ubah field atau baris jurnal sesuai kebutuhan
 4. Pastikan jurnal tetap seimbang
 5. Klik **Submit** untuk menyimpan perubahan
-
-[Screenshot: Form edit Journal Entry]
 
 ---
 
@@ -174,11 +158,11 @@ Jurnal hanya dapat diedit jika status masih **Draft**. Jurnal dengan status **Po
 
 ### 5.1 Syarat Hapus
 
-Jurnal hanya dapat dihapus jika status masih **Draft**. Jurnal dengan status **Posted** tidak dapat dihapus.
+Jurnal hanya dapat dihapus jika status masih **Draf**. Jurnal dengan status **Diposting** tidak dapat dihapus.
 
 ### 5.2 Langkah Hapus
 
-1. Klik icon **sampah** (Delete) pada baris jurnal dengan status Draft
+1. Klik icon **sampah** (Delete) pada baris jurnal dengan status Draf
 2. Konfirmasi penghapusan pada dialog yang muncul
 3. Jurnal akan dihapus permanen dari sistem
 
@@ -217,7 +201,7 @@ Setiap jurnal harus memenuhi prinsip double-entry:
 
 ### 7.2 Fiscal Year
 
-- Tanggal jurnal harus berada dalam periode fiscal year yang aktif (status Open)
+- Tanggal jurnal harus berada dalam periode fiscal year yang aktif (status Terbuka)
 - Jika tidak ada fiscal year untuk tanggal tersebut, sistem akan menolak penyimpanan
 - Fiscal year yang Closed atau Locked tidak dapat menerima jurnal baru
 

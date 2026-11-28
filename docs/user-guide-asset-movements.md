@@ -45,8 +45,6 @@ Modul ini berada dalam grup menu **Aset**.
 
 3. Klik **Save** — movement tersimpan dan muncul di tabel
 
-[Screenshot: Form Add Asset Movement menampilkan field Asset, Type, Date, Origin, Destination, Ref/Notes, PIC]
-
 ### Validasi Form
 
 | Field | Validasi |
@@ -67,8 +65,6 @@ Modul ini berada dalam grup menu **Aset**.
 2. Cari movement yang ingin dilihat menggunakan search atau filter
 3. Klik icon **View** (eye) pada baris movement tersebut
 4. Dialog detail akan menampilkan semua informasi movement
-
-[Screenshot: Dialog View Asset Movement menampilkan detail movement]
 
 ### Informasi yang Ditampilkan
 
@@ -91,8 +87,6 @@ Modul ini berada dalam grup menu **Aset**.
 4. Form edit akan terbuka dengan data movement yang sudah terisi
 5. Ubah field yang diperlukan
 6. Klik **Save** untuk menyimpan perubahan
-
-[Screenshot: Form Edit Asset Movement dengan data existing]
 
 ---
 
@@ -118,16 +112,12 @@ Ketik kata kunci pada field **Search movements...** untuk mencari berdasarkan:
 - Referensi atau catatan
 - Nama PIC
 
-[Screenshot: Search field dengan hasil pencarian]
-
 ### Filter Tersedia
 
 | Filter | Penjelasan |
 |--------|------------|
 | **Type** | Filter berdasarkan tipe movement: Transfer, Assignment, atau Return |
 | **Date Range** | Filter berdasarkan rentang tanggal perpindahan |
-
-[Screenshot: Panel filter Asset Movement dengan dropdown Type dan date range]
 
 ### Menggunakan Filter
 
@@ -162,8 +152,6 @@ Klik kolom sekali untuk ascending (A-Z, 0-9), klik lagi untuk descending (Z-A, 9
 2. Terapkan filter jika ingin export data tertentu
 3. Klik tombol **Export** pada toolbar
 4. File Excel (.xlsx) akan diunduh dengan semua kolom data
-
-[Screenshot: Tombol Export pada toolbar Asset Movement]
 
 ### Kolom dalam File Export
 
@@ -251,7 +239,7 @@ Kolom Origin dan Destination tidak mendukung sorting. Gunakan search atau filter
 
 **Q:** Bagaimana cara menemukan aset yang sedang berada di lokasi tertentu saat ini?
 
-**J:** Modul Asset Movements mencatat riwayat perpindahan, bukan lokasi terkini aset. Untuk melihat lokasi terkini aset, buka modul Assets dan gunakan filter berdasarkan Location. Anda juga bisa menggunakan modul Asset Locations untuk melihat daftar aset yang tercatat di suatu lokasi.
+**J:** Modul Asset Movements mencatat riwayat perpindahan, bukan lokasi terkini aset. Untuk melihat lokasi terkini aset, buka modul Aset dan gunakan filter berdasarkan Location. Anda juga bisa menggunakan modul Asset Locations untuk melihat daftar aset yang tercatat di suatu lokasi.
 
 **Q:** Apa yang harus diisi pada field Ref/Notes?
 
@@ -259,9 +247,9 @@ Kolom Origin dan Destination tidak mendukung sorting. Gunakan search atau filter
 
 **Q:** Apakah movement dengan tipe Assignment akan otomatis muncul di profil karyawan?
 
-**J:** Modul Asset Movements mencatat PIC (Person In Charge) sebagai referensi. Untuk melihat aset yang ditugaskan ke seorang karyawan, gunakan search dengan nama karyawan tersebut pada field search movements, atau buka modul Assets dan filter berdasarkan Employee. Data movement tidak otomatis muncul di modul Employees.
+**J:** Modul Asset Movements mencatat PIC (Person In Charge) sebagai referensi. Untuk melihat aset yang ditugaskan ke seorang karyawan, gunakan search dengan nama karyawan tersebut pada field search movements, atau buka modul Aset dan filter berdasarkan Employee. Data movement tidak otomatis muncul di modul Employees.
 
-**Q:** Bagaimana cara terbaik men-track pergerakan aset bernilai tinggi?
+**Q:** Bagaimana cara terbaik melacak pergerakan aset bernilai tinggi?
 
 **J:** Untuk aset bernilai tinggi, terapkan praktik berikut: (1) selalu isi Ref/Notes dengan nomor dokumen pendukung, (2) gunakan filter date range dan search secara berkala untuk memantau frekuensi perpindahan, (3) export data movement ke Excel setiap bulan sebagai arsip eksternal, (4) pastikan PIC yang ditunjuk adalah karyawan yang benar-benar bertanggung jawab, dan (5) koordinasikan dengan modul Asset Maintenances jika aset memerlukan pengecekan setelah perpindahan.
 
@@ -280,7 +268,6 @@ Kolom Origin dan Destination tidak mendukung sorting. Gunakan search atau filter
 **Q:** Bagaimana cara membedakan movement yang baru dibuat dengan yang sudah lama?
 
 **J:** Gunakan sorting pada kolom Date untuk mengurutkan dari yang terbaru (klik header Date dua kali untuk descending) atau dari yang terlama (sekali klik untuk ascending). Anda juga bisa menggunakan filter date range untuk menampilkan movement dalam periode tertentu, misalnya bulan ini atau tahun ini saja.
-
 
 **Q:** Bisakah saya melampirkan dokumen pendukung pada movement?
 

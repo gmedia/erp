@@ -31,21 +31,15 @@ Modul-modul transaksi yang menggunakan mata uang:
 
 1. Buka halaman **Admin Settings** dari menu sidebar atau navigasi ke `/admin-settings`.
 
-[Screenshot: Halaman Admin Settings dengan tab Regional terbuka]
-
 2. Pada tab **Regional**, temukan field **Currency**.
 
-[Screenshot: Field Currency pada tab Regional Admin Settings]
-
-3. Nilai saat ini adalah **IDR** (Indonesian Rupiah). Field ini bersifat read-only dan hanya menerima IDR sebagai nilai yang valid.
+3. Nilai saat ini adalah **IDR** (Indonesian Rupiah). Field ini bersifat hanya baca dan hanya menerima IDR sebagai nilai yang valid.
 
 4. Klik **Save** untuk menyimpan pengaturan. Jika Anda mencoba mengganti ke mata uang lain (misalnya USD), sistem akan menolak dengan pesan validasi.
 
 ## 2. Mata Uang pada Form Transaksi
 
 Saat membuat atau mengedit transaksi, field mata uang secara otomatis diisi dengan **IDR** dan disembunyikan dari tampilan form. Anda tidak perlu memilih mata uang secara manual.
-
-[Screenshot: Form tambah Purchase Order — field Currency disembunyikan, otomatis IDR]
 
 Berikut daftar form transaksi yang menerapkan aturan ini:
 
@@ -62,8 +56,6 @@ Semua form menggunakan validasi yang sama: mata uang harus IDR. Jika ada percoba
 
 Meskipun field mata uang disembunyikan di form, Anda tetap dapat melihat informasi mata uang pada halaman detail atau modal View setiap transaksi.
 
-[Screenshot: Modal detail Purchase Order menampilkan Currency: IDR]
-
 1. Buka halaman daftar transaksi (misalnya `/purchase-orders`).
 
 2. Klik ikon **View** (mata) pada salah satu baris transaksi.
@@ -76,8 +68,6 @@ Informasi ini disediakan untuk transparansi dan keperluan audit.
 
 Pada setiap modul transaksi, kolom **Currency** tersedia di DataTable dan dapat digunakan untuk sorting serta filtering.
 
-[Screenshot: DataTable Purchase Order dengan kolom Currency]
-
 1. Buka halaman daftar transaksi.
 
 2. Kolom **Currency** ditampilkan di tabel. Anda dapat mengklik header kolom untuk mengurutkan berdasarkan mata uang.
@@ -87,8 +77,6 @@ Pada setiap modul transaksi, kolom **Currency** tersedia di DataTable dan dapat 
 ## 5. Mata Uang pada Export Excel
 
 Saat melakukan export data ke Excel, kolom mata uang akan selalu disertakan dalam file hasil export.
-
-[Screenshot: File Excel hasil export Purchase Order dengan kolom Currency]
 
 1. Buka halaman daftar transaksi yang ingin di-export.
 
@@ -102,13 +90,9 @@ Kolom ini berguna untuk keperluan audit dan pelaporan.
 
 Saat mengimpor data melalui Excel (untuk modul yang mendukung import), sistem akan memeriksa kolom mata uang pada setiap baris data.
 
-[Screenshot: File Excel template import dengan kolom Currency berisi IDR]
-
 1. Siapkan file Excel dengan format yang sesuai. Pastikan kolom **Currency** (jika ada) diisi dengan **IDR**.
 
 2. Buka halaman daftar transaksi dan klik tombol **Import**.
-
-[Screenshot: Dialog import dengan preview data]
 
 3. Upload file Excel. Sistem akan memvalidasi setiap baris.
 

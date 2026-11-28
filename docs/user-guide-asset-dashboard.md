@@ -2,7 +2,7 @@
 
 ## Gambaran Umum
 
-Asset Dashboard adalah halaman khusus yang menampilkan overview visual seluruh aset perusahaan dalam satu tampilan terintegrasi. Halaman ini dirancang untuk membantu asset manager memantau kesehatan aset, maintenance yang akan datang, dan status warranty secara real-time melalui summary cards, grafik distribusi, dan alert sections. Asset Dashboard bersifat read-only dan tidak memiliki operasi CRUD.
+Asset Dashboard adalah halaman khusus yang menampilkan ringkasan visual seluruh aset perusahaan dalam satu tampilan terintegrasi. Halaman ini dirancang untuk membantu manajer aset memantau kesehatan aset, perawatan yang akan datang, dan status garansi secara waktu nyata melalui kartu ringkasan, grafik distribusi, dan bagian peringatan. Asset Dashboard bersifat hanya baca dan tidak memiliki operasi CRUD.
 
 Untuk mengakses Asset Dashboard, pengguna memerlukan permission `asset_dashboard`. Data yang ditampilkan berasal dari `GetAssetDashboardDataAction` dan dapat difilter berdasarkan branch scope melalui `ResolvesBranchScope` trait.
 
@@ -10,7 +10,7 @@ Untuk mengakses Asset Dashboard, pengguna memerlukan permission `asset_dashboard
 
 | Menu | URL | Fungsi |
 |------|-----|--------|
-| Asset Dashboard | /asset-dashboard | Menampilkan overview visual aset dengan summary cards, status distribution, category distribution, condition overview, upcoming maintenance, dan warranty alerts |
+| Asset Dashboard | /asset-dashboard | Menampilkan ringkasan visual aset dengan kartu ringkasan, status distribution, category distribution, condition overview, perawatan mendatang, dan peringatan garansi |
 
 ## 1. Mengakses Asset Dashboard
 
@@ -20,16 +20,14 @@ Untuk mengakses Asset Dashboard, pengguna memerlukan permission `asset_dashboard
 2. Klik menu **Dasbor Aset** di sidebar pada grup menu Aset atau akses langsung melalui URL `/asset-dashboard`.
 3. Halaman Asset Dashboard akan menampilkan data aset terkini.
 
-[Screenshot: Halaman Asset Dashboard utama dengan summary cards dan grafik]
-
 ### Catatan:
 
-- Halaman ini bersifat read-only. Untuk mengubah data aset, navigasi ke modul Assets atau Asset Maintenances.
+- Halaman ini bersifat hanya baca. Untuk mengubah data aset, navigasi ke modul Aset atau Asset Maintenances.
 - Tombol **Refresh Data** tersedia di bagian atas halaman untuk memperbarui data secara manual.
 
-## 2. Memahami Summary Cards
+## 2. Memahami Kartu Ringkasan
 
-Asset Dashboard menampilkan 4 summary cards di bagian atas yang menunjukkan statistik utama aset perusahaan:
+Asset Dashboard menampilkan 4 kartu ringkasan di bagian atas yang menunjukkan statistik utama aset perusahaan:
 
 ### KPI yang Tersedia:
 
@@ -39,8 +37,6 @@ Asset Dashboard menampilkan 4 summary cards di bagian atas yang menunjukkan stat
 | Purchase Cost | Total nilai perolehan seluruh aset (harga pembelian) | Emerald (hijau) |
 | Book Value | Total nilai buku saat ini (nilai setelah depresiasi) | Indigo |
 | Accum. Depreciation | Total akumulasi depresiasi seluruh aset | Rose (merah) |
-
-[Screenshot: Summary cards dengan nilai dan indikator warna]
 
 ### Interpretasi Nilai:
 
@@ -56,7 +52,7 @@ Asset Dashboard menampilkan 4 summary cards di bagian atas yang menunjukkan stat
 
 ## 3. Membaca Status Distribution Chart
 
-Grafik donut chart di bagian kiri menampilkan distribusi aset berdasarkan status.
+Diagram donat di bagian kiri menampilkan distribusi aset berdasarkan status.
 
 ### Status yang Ditampilkan:
 
@@ -67,8 +63,6 @@ Grafik donut chart di bagian kiri menampilkan distribusi aset berdasarkan status
 | Maintenance | Oranye (#F59E0B) | Aset sedang dalam proses perbaikan atau maintenance |
 | Disposed | Merah (#EF4444) | Aset sudah dihapus dari inventaris (dijual/dibuang) |
 | Lost | Merah tua (#DC2626) | Aset hilang atau tidak ditemukan |
-
-[Screenshot: Status Distribution donut chart dengan legend]
 
 ### Cara Membaca:
 
@@ -86,15 +80,13 @@ Grafik donut chart di bagian kiri menampilkan distribusi aset berdasarkan status
 
 ## 4. Membaca Top Asset Categories Chart
 
-Grafik bar chart di bagian kanan menampilkan 10 kategori aset teratas berdasarkan jumlah aset per kategori.
+Diagram batang di bagian kanan menampilkan 10 kategori aset teratas berdasarkan jumlah aset per kategori.
 
 ### Informasi yang Ditampilkan:
 
 - Nama kategori aset (misalnya: IT Equipment, Vehicles, Furniture)
 - Jumlah aset per kategori
 - Visualisasi bar horizontal untuk perbandingan
-
-[Screenshot: Top Asset Categories bar chart]
 
 ### Cara Membaca:
 
@@ -104,13 +96,13 @@ Grafik bar chart di bagian kanan menampilkan 10 kategori aset teratas berdasarka
 
 ### Tips Analisis:
 
-- Identifikasi kategori dengan jumlah aset tertinggi untuk prioritas monitoring.
-- Kategori dengan jumlah rendah bisa jadi underutilized atau belum terdata dengan baik.
-- Gunakan informasi ini untuk planning budget acquisition aset baru per kategori.
+- Identifikasi kategori dengan jumlah aset tertinggi untuk prioritas pemantauan.
+- Kategori dengan jumlah rendah bisa jadi kurang termanfaatkan atau belum terdata dengan baik.
+- Gunakan informasi ini untuk perencanaan anggaran perolehan aset baru per kategori.
 
 ## 5. Memahami Condition Overview
 
-Section di bagian bawah menampilkan breakdown kondisi fisik aset dalam 3 kategori:
+Bagian di bagian bawah menampilkan rincian kondisi fisik aset dalam 3 kategori:
 
 ### Kondisi yang Ditampilkan:
 
@@ -119,8 +111,6 @@ Section di bagian bawah menampilkan breakdown kondisi fisik aset dalam 3 kategor
 | Good | Hijau (#10B981) | Aset dalam kondisi prima, tidak ada masalah |
 | Needs Repair | Oranye (#F59E0B) | Aset butuh perbaikan, masih bisa digunakan dengan batasan |
 | Damaged | Merah (#EF4444) | Aset rusak, tidak bisa digunakan normal |
-
-[Screenshot: Condition Overview dengan progress bar]
 
 ### Cara Membaca:
 
@@ -137,12 +127,12 @@ Section di bagian bawah menampilkan breakdown kondisi fisik aset dalam 3 kategor
 ### Tips:
 
 - Proporsi Good yang tinggi menunjukkan maintenance program efektif.
-- Proporsi Needs Repair/Damaged yang tinggi menunjukkan butuh budget maintenance tambahan.
-- Investigasi aset dengan kondisi Damaged untuk decision disposal atau repair.
+- Proporsi Needs Repair/Damaged yang tinggi menunjukkan butuh anggaran perawatan tambahan.
+- Investigasi aset dengan kondisi Damaged untuk keputusan pembuangan atau perbaikan.
 
 ## 6. Melihat Upcoming Maintenance
 
-Section ini menampilkan daftar maintenance yang sedang scheduled atau in-progress. Data difilter dari `AssetMaintenance` dengan status `scheduled` atau `in_progress`.
+Bagian ini menampilkan daftar maintenance yang sedang scheduled atau in-progress. Data difilter dari `AssetMaintenance` dengan status `scheduled` atau `in_progress`.
 
 ### Informasi per Item:
 
@@ -151,49 +141,45 @@ Section ini menampilkan daftar maintenance yang sedang scheduled atau in-progres
 | Asset Name | Nama aset yang akan/sedang di-maintenance |
 | Asset Code | Kode aset (unique identifier) |
 | Maintenance Type | Jenis maintenance (preventive, corrective, upgrade, etc.) |
-| Status Badge | Status maintenance (Scheduled / In Progress) |
+| Lencana Status | Status maintenance (Scheduled / In Progress) |
 | Scheduled Date | Tanggal maintenance dijadwalkan |
-
-[Screenshot: Upcoming Maintenance list dengan badge status]
 
 ### Fitur:
 
 - Link **View All** di header navigasi ke halaman `/asset-maintenances` untuk daftar lengkap.
 - Scroll area untuk maksimal 5 item dengan scroll jika overflow.
-- Badge warna: Scheduled (default), In Progress (secondary).
+- Lencana warna: Scheduled (default), In Progress (secondary).
 
 ### Cara Menggunakan:
 
-1. Review daftar maintenance yang akan datang.
+1. Tinjau daftar perawatan yang akan datang.
 2. Prioritaskan maintenance dengan tanggal terdekat.
 3. Klik link asset untuk navigasi ke detail aset.
 4. Klik **View All** untuk ke halaman Asset Maintenances.
 
-## 7. Memahami Warranty Alerts
+## 7. Memahami Peringatan Garansi
 
-Section ini menampilkan daftar aset dengan warranty yang akan expire dalam 30 hari ke depan. Alert ini penting untuk planning renewal atau replacement aset.
+Bagian ini menampilkan daftar aset dengan garansi yang akan berakhir dalam 30 hari ke depan. Peringatan ini penting untuk perencanaan perpanjangan atau penggantian aset.
 
 ### Informasi per Item:
 
 | Kolom | Deskripsi |
 |-------|-----------|
-| Asset Name | Nama aset dengan warranty nearing expiry |
+| Asset Name | Nama aset dengan garansi yang mendekati kedaluwarsa |
 | Asset Code | Kode aset (link ke detail aset) |
 | Warranty End Date | Tanggal warranty berakhir |
 | Days Left Badge | Jumlah hari tersisa sebelum warranty expire |
 
-[Screenshot: Warranty Alerts dengan badge days remaining]
-
 ### Interpretasi Badge:
 
-- **Badge merah (destructive)**: 7 hari atau kurang tersisa (critical)
-- **Badge oranye (secondary)**: 8-30 hari tersisa (warning)
+- **Lencana merah (destructive)**: 7 hari atau kurang tersisa (kritis)
+- **Lencana oranye (secondary)**: 8-30 hari tersisa (peringatan)
 
 ### Cara Menggunakan:
 
-1. Review daftar aset dengan warranty nearing expiry.
-2. Prioritaskan aset dengan badge merah (critical).
-3. Klik nama aset untuk navigasi ke detail dan review warranty terms.
+1. Tinjau daftar aset dengan garansi yang mendekati kedaluwarsa.
+2. Prioritaskan aset dengan lencana merah (kritis).
+3. Klik nama aset untuk navigasi ke detail dan review ketentuan garansi.
 4. Koordinasi dengan vendor untuk renewal atau replacement planning.
 
 ### Tips:
@@ -214,22 +200,22 @@ Buka Asset Dashboard (/asset-dashboard)
 Refresh Data (optional)
    |
    v
-Review Summary Cards
+Tinjau Kartu Ringkasan
    |
    v
 Analisis Status Distribution
    |
    v
-Review Top Asset Categories
+Tinjau Top Asset Categories
    |                    |
    v                    v
-Check Condition Overview   |
+Periksa Condition Overview   |
    |                    |
    v                    v
-Review Upcoming Maintenance
+Tinjau Perawatan Mendatang
    |                    |
    v                    v
-Check Warranty Alerts
+Check Peringatan Garansi
    |
    v
 Navigasi ke modul terkait
@@ -244,9 +230,9 @@ Action Plan & Decision Making
 ### Skenario 1: Daily Monitoring Kondisi Aset
 
 1. Buka Asset Dashboard setiap pagi.
-2. Review Summary Cards untuk perubahan signifikan.
+2. Tinjau Kartu Ringkasan untuk perubahan signifikan.
 3. Cek Status Distribution untuk anomali (misalnya peningkatan Maintenance).
-4. Review Condition Overview untuk aset Needs Repair/Damaged baru.
+4. Tinjau Condition Overview untuk aset Needs Repair/Damaged baru.
 5. Catat aset yang butuh follow-up.
 
 ### Skenario 2: Weekly Maintenance Planning
@@ -260,7 +246,7 @@ Action Plan & Decision Making
 ### Skenario 3: Monthly Warranty Review
 
 1. Buka Asset Dashboard awal bulan.
-2. Review Warranty Alerts section.
+2. Tinjau bagian Peringatan Garansi.
 3. Identifikasi aset dengan warranty expiring bulan ini.
 4. List aset yang butuh renewal atau replacement.
 5. Koordinasi dengan vendor dan finance untuk budget approval.
@@ -268,45 +254,45 @@ Action Plan & Decision Making
 ### Skenario 4: Asset Health Assessment
 
 1. Buka Asset Dashboard.
-2. Review Condition Overview untuk breakdown kondisi.
+2. Tinjau Condition Overview untuk rincian kondisi.
 3. Jika proporsi Good rendah (< 70%), investigasi cause.
 4. Cek Status Distribution untuk proporsi Maintenance.
-5. Review Upcoming Maintenance untuk backlog maintenance.
+5. Tinjau Perawatan Mendatang untuk backlog maintenance.
 6. Buat action plan untuk improve asset health score.
 
 ### Skenario 5: Category-based Budget Planning
 
 1. Buka Asset Dashboard.
-2. Review Top Asset Categories untuk distribusi per kategori.
+2. Tinjau Top Asset Categories untuk distribusi per kategori.
 3. Identifikasi kategori dengan jumlah aset tertinggi (maintenance cost potential).
 4. Kombinasikan dengan Condition Overview per kategori (cross-reference via Assets list).
-5. Estimasi budget maintenance per kategori untuk periode berikutnya.
+5. Estimasi anggaran perawatan per kategori untuk periode berikutnya.
 
 ## FAQ & Tips
 
 ### Apakah data Asset Dashboard real-time?
 
-Data Asset Dashboard diambil dari database pada saat halaman dibuka. Tidak ada auto-refresh otomatis. Gunakan tombol **Refresh Data** untuk memperbarui data manual.
+Data Asset Dashboard diambil dari database pada saat halaman dibuka. Tidak ada penyegaran otomatis. Gunakan tombol **Refresh Data** untuk memperbarui data manual.
 
 ### Bagaimana cara mengubah branch scope yang ditampilkan?
 
 Branch scope ditentukan oleh permission user dan request parameter. Jika user memiliki akses multi-branch, data dapat difilter melalui branch selector jika tersedia. Hubungi administrator untuk konfigurasi branch access.
 
-### Mengapa beberapa aset tidak muncul di Warranty Alerts?
+### Mengapa beberapa aset tidak muncul di Peringatan Garansi?
 
-Warranty Alerts hanya menampilkan aset dengan criteria:
+Peringatan Garansi hanya menampilkan aset dengan kriteria:
 - Status = active
 - Warranty end date tidak null
 - Warranty end date dalam range 0-30 hari dari hari ini
 - Warranty belum expire (warranty end date >= hari ini)
 
-Aset dengan warranty sudah expire atau warranty end date null tidak muncul di alert.
+Aset dengan garansi sudah kedaluwarsa atau warranty end date null tidak muncul di alert.
 
 ### Apakah Asset Dashboard bisa di-export?
 
 Asset Dashboard tidak memiliki fitur export langsung. Untuk kebutuhan pelaporan, gunakan fitur export di modul:
 - Assets (export list aset)
-- Asset Maintenances (export maintenance records)
+- Asset Maintenances (ekspor catatan perawatan)
 - Asset Register Report (laporan detail aset)
 - Book Value & Depreciation Report (laporan nilai buku)
 
@@ -316,16 +302,16 @@ Pastikan akun Anda memiliki permission `asset_dashboard`. Hubungi administrator 
 
 ### Bagaimana cara menambah aset baru dari Asset Dashboard?
 
-Asset Dashboard bersifat read-only. Untuk menambah aset baru:
+Asset Dashboard bersifat hanya baca. Untuk menambah aset baru:
 1. Navigasi ke menu **Aset** di sidebar.
-2. Gunakan fitur Add New Asset di modul Assets.
+2. Gunakan fitur Add New Asset di modul Aset.
 3. Kembali ke Asset Dashboard untuk review hasil.
 
 ### Apakah depreciation run mempengaruhi data Asset Dashboard?
 
 Ya. Setelah depreciation run dijalankan:
-- Book Value di Summary Cards akan berubah (berkurang)
-- Accum. Depreciation di Summary Cards akan berubah (bertambah)
+- Book Value di Kartu Ringkasan akan berubah (berkurang)
+- Accum. Depreciation di Kartu Ringkasan akan berubah (bertambah)
 - Status Distribution bisa berubah jika aset status change
 
 Refresh Asset Dashboard setelah depreciation run untuk melihat data terbaru.
@@ -336,7 +322,7 @@ Kondisi hanya ditampilkan jika aset memiliki field `condition` yang terisi. Jika
 
 ### Bagaimana cara mengetahui maintenance history aset dari Asset Dashboard?
 
-Asset Dashboard hanya menampilkan upcoming maintenance. Untuk history maintenance:
+Asset Dashboard hanya menampilkan perawatan mendatang. Untuk riwayat perawatan:
 1. Klik nama aset di Upcoming Maintenance section.
 2. Navigasi ke Asset Profile.
 3. Review maintenance history di asset detail.
@@ -346,8 +332,8 @@ Atau navigasi langsung ke **Asset Maintenances** module untuk filter history per
 ### Tips Optimasi Penggunaan Asset Dashboard
 
 1. **Routine check**: Buka Asset Dashboard minimal 1x per hari untuk monitoring proaktif.
-2. **Prioritize alerts**: Badge merah di Warranty Alerts butuh immediate action.
-3. **Cross-reference**: Kombinasikan data dari dashboard dengan report detail untuk decision informed.
+2. **Prioritize alerts**: Lencana merah di Peringatan Garansi butuh tindakan segera.
+3. **Cross-reference**: Kombinasikan data dari dashboard dengan laporan detail untuk keputusan yang tepat.
 4. **Document anomalies**: Catat perubahan signifikan untuk trending analysis.
 5. **Integrate with workflow**: Gunakan dashboard sebagai starting point, lanjutkan ke module terkait untuk action.
 6. **Review before depreciation run**: Cek Asset Dashboard sebelum menjalankan depreciation run untuk baseline comparison.
@@ -355,7 +341,7 @@ Atau navigasi langsung ke **Asset Maintenances** module untuk filter history per
 
 ## FAQ & Tips
 
-**Q:** Bagaimana cara membaca grafik distribusi status aset (donut chart) dengan benar?
+**Q:** Bagaimana cara membaca grafik distribusi status aset (diagram donat) dengan benar?
 
 **J:** Donut chart menampilkan proporsi aset berdasarkan status (Draft, Active, Maintenance, Disposed, Lost). Angka di tengah donut adalah total aset. Setiap irisan berwarna mewakili satu status — semakin lebar irisan, semakin banyak aset dengan status tersebut. Legend di bawah chart menunjukkan persentase exact. Jika irisan Active dominan (di atas 70%), mayoritas aset dalam kondisi operasional baik. Jika irisan Maintenance melebar dari waktu ke waktu, ini sinyal peningkatan beban perbaikan yang perlu investigasi. Klik atau hover pada irisan untuk melihat jumlah exact.
 
@@ -365,23 +351,23 @@ Atau navigasi langsung ke **Asset Maintenances** module untuk filter history per
 
 **Q:** Bagaimana cara memfilter dashboard berdasarkan cabang atau kategori tertentu?
 
-**J:** Filter cabang ditentukan oleh permission user melalui `ResolvesBranchScope`. Jika user memiliki akses multi-branch, data yang ditampilkan sudah otomatis difilter berdasarkan branch scope yang berlaku. Untuk melihat data per kategori, dashboard menampilkan Top Asset Categories (10 kategori teratas) sebagai bar chart — ini adalah filter visual bawaan. Jika Anda membutuhkan filter lebih granular (kategori spesifik, rentang tanggal, lokasi), gunakan modul Asset Register Report yang memiliki advanced filter lengkap.
+**J:** Filter cabang ditentukan oleh permission user melalui `ResolvesBranchScope`. Jika user memiliki akses multi-branch, data yang ditampilkan sudah otomatis difilter berdasarkan branch scope yang berlaku. Untuk melihat data per kategori, dashboard menampilkan Top Asset Categories (10 kategori teratas) sebagai diagram batang — ini adalah filter visual bawaan. Jika Anda membutuhkan filter lebih rinci (kategori spesifik, rentang tanggal, lokasi), gunakan modul Asset Register Report yang memiliki filter lanjutan lengkap.
 
-**Q:** Kapan Warranty Alerts muncul dan bagaimana cara menindaklanjutinya?
+**Q:** Kapan Peringatan Garansi muncul dan bagaimana cara menindaklanjutinya?
 
-**J:** Warranty Alerts muncul otomatis untuk aset dengan kriteria: status Active, memiliki warranty end date yang valid, dan warranty akan berakhir dalam 0-30 hari ke depan. Badge merah (destructive) menandakan 7 hari atau kurang — ini prioritas kritis. Badge oranye menandakan 8-30 hari — ini warning. Langkah tindak lanjut: (1) klik nama aset untuk melihat detail warranty terms, (2) hubungi vendor untuk informasi renewal, (3) evaluasi apakah aset perlu diganti atau diperpanjang warranty-nya, (4) koordinasikan dengan finance untuk budget renewal atau procurement aset pengganti. Aset dengan warranty sudah expire TIDAK muncul di alert ini.
+**J:** Peringatan Garansi muncul otomatis untuk aset dengan kriteria: status Aktif, memiliki garansi end date yang valid, dan warranty akan berakhir dalam 0-30 hari ke depan. Lencana merah (destructive) menandakan 7 hari atau kurang — ini prioritas kritis. Lencana oranye menandakan 8-30 hari — ini peringatan. Langkah tindak lanjut: (1) klik nama aset untuk melihat detail ketentuan garansi, (2) hubungi vendor untuk informasi perpanjangan, (3) evaluasi apakah aset perlu diganti atau diperpanjang garansinya, (4) koordinasikan dengan bagian keuangan untuk anggaran perpanjangan atau pengadaan aset pengganti. Aset dengan garansi sudah kedaluwarsa TIDAK muncul di peringatan ini.
 
 **Q:** Bagaimana data dashboard diperbarui dan seberapa sering?
 
-**J:** Data Asset Dashboard diambil dari database secara real-time setiap kali halaman dibuka (on-demand). Tidak ada auto-refresh berkala — Anda harus klik tombol Refresh Data atau reload halaman (F5) untuk mendapatkan data terbaru. Data yang ditampilkan bersumber dari tabel assets, asset_maintenances, dan hasil kalkulasi depresiasi. Setelah menjalankan depreciation run, menambah aset baru, mengubah status aset, atau membuat maintenance record baru, selalu refresh dashboard untuk melihat perubahan.
+**J:** Data Asset Dashboard diambil dari database secara waktu nyata setiap kali halaman dibuka (on-demand). Tidak ada penyegaran otomatis berkala — Anda harus klik tombol Refresh Data atau muat ulang halaman (F5) untuk mendapatkan data terbaru. Data yang ditampilkan bersumber dari tabel assets, asset_maintenances, dan hasil kalkulasi depresiasi. Setelah menjalankan depreciation run, menambah aset baru, mengubah status aset, atau membuat catatan perawatan baru, selalu segarkan dashboard untuk melihat perubahan.
 
 **Q:** Apa perbedaan antara Asset Dashboard dengan Asset Register Report?
 
-**J:** Asset Dashboard adalah tampilan overview visual (high-level) dengan summary cards, grafik distribusi, dan alert section — dirancang untuk monitoring cepat dan identifikasi anomali. Asset Register Report (`/reports/assets/register`) adalah laporan tabular detail dengan advanced filter (kategori, cabang, status, rentang tanggal) dan fitur export ke Excel — dirancang untuk analisis mendalam dan pelaporan. Gunakan dashboard untuk daily check dan situational awareness. Gunakan Asset Register Report untuk audit, reconciliation, dan pelaporan ke manajemen.
+**J:** Asset Dashboard adalah tampilan ringkasan visual (tingkat tinggi) dengan kartu ringkasan, grafik distribusi, dan bagian peringatan — dirancang untuk pemantauan cepat dan identifikasi anomali. Asset Register Report (`/reports/assets/register`) adalah laporan tabel rinci dengan filter lanjutan (kategori, cabang, status, rentang tanggal) dan fitur ekspor ke Excel — dirancang untuk analisis mendalam dan pelaporan. Gunakan dashboard untuk pemeriksaan harian dan kesadaran situasi. Gunakan Asset Register Report untuk audit, rekonsiliasi, dan pelaporan ke manajemen.
 
 **Q:** Tips memanfaatkan Asset Dashboard untuk pengambilan keputusan manajemen?
 
-**J:** (1) Review Summary Cards setiap awal minggu — bandingkan Book Value vs Purchase Cost untuk menilai kesehatan portofolio aset. (2) Jika Accum. Depreciation mendekati Purchase Cost, siapkan budget untuk replacement aset. (3) Pantau Status Distribution bulanan — tren peningkatan Maintenance menandakan perlu evaluasi program preventive maintenance. (4) Gunakan Warranty Alerts sebagai trigger untuk review kontrak vendor dan negosiasi renewal. (5) Cross-reference Top Asset Categories dengan Condition Overview — kategori dengan jumlah besar dan kondisi Needs Repair tinggi adalah prioritas budget maintenance. (6) Sebelum mengajukan procurement aset baru, cek dashboard untuk memastikan tidak ada aset existing yang underutilized. (7) Dokumentasikan snapshot dashboard bulanan untuk analisis tren jangka panjang.
+**J:** (1) Tinjau Kartu Ringkasan setiap awal minggu — bandingkan Book Value vs Purchase Cost untuk menilai kesehatan portofolio aset. (2) Jika Accum. Depreciation mendekati Purchase Cost, siapkan anggaran untuk penggantian aset. (3) Pantau Status Distribution bulanan — tren peningkatan Maintenance menandakan perlu evaluasi program perawatan preventif. (4) Gunakan Peringatan Garansi sebagai pemicu untuk meninjau kontrak vendor dan negosiasi renewal. (5) Rujuk silang Top Asset Categories dengan Condition Overview — kategori dengan jumlah besar dan kondisi Needs Repair tinggi adalah prioritas anggaran perawatan. (6) Sebelum mengajukan pengadaan aset baru, cek dashboard untuk memastikan tidak ada aset yang ada yang kurang termanfaatkan. (7) Dokumentasikan cuplikan dashboard bulanan untuk analisis tren jangka panjang.
 
 **Q:** Apakah Asset Dashboard bisa menampilkan data historis atau perbandingan periode sebelumnya?
 
@@ -389,8 +375,8 @@ Atau navigasi langsung ke **Asset Maintenances** module untuk filter history per
 
 **Q:** Bagaimana jika grafik Top Asset Categories tidak menampilkan kategori yang saya harapkan?
 
-**J:** Top Asset Categories hanya menampilkan 10 kategori dengan jumlah aset terbanyak. Jika kategori Anda tidak muncul, kemungkinan: (1) jumlah aset di kategori tersebut lebih sedikit dibanding 10 kategori teratas, (2) aset di kategori tersebut belum terdaftar dengan benar (cek di modul Assets), atau (3) kategori tidak memiliki aset sama sekali. Untuk melihat SEMUA kategori termasuk yang jumlahnya kecil, navigasi ke modul Asset Categories (`/asset-categories`) untuk daftar lengkap, atau gunakan Asset Register Report yang menampilkan seluruh data tanpa batasan top-10.
+**J:** Top Asset Categories hanya menampilkan 10 kategori dengan jumlah aset terbanyak. Jika kategori Anda tidak muncul, kemungkinan: (1) jumlah aset di kategori tersebut lebih sedikit dibanding 10 kategori teratas, (2) aset di kategori tersebut belum terdaftar dengan benar (cek di modul Aset), atau (3) kategori tidak memiliki aset sama sekali. Untuk melihat SEMUA kategori termasuk yang jumlahnya kecil, navigasi ke modul Asset Categories (`/asset-categories`) untuk daftar lengkap, atau gunakan Asset Register Report yang menampilkan seluruh data tanpa batasan top-10.
 
 **Q:** Apakah ada batasan jumlah data yang ditampilkan di dashboard?
 
-**J:** Summary Cards dan grafik (Status Distribution, Top Asset Categories, Condition Overview) menampilkan SELURUH data aset tanpa batasan jumlah — data diagregasi dari semua aset yang accessible oleh user. Upcoming Maintenance menampilkan maksimal 5 item dengan scroll area jika lebih banyak. Warranty Alerts juga menampilkan maksimal 5 item. Jika Anda membutuhkan daftar lengkap (lebih dari 5 item), klik link View All pada section terkait untuk navigasi ke modul penuh (Asset Maintenances atau Assets).
+**J:** Kartu Ringkasan dan grafik (Status Distribution, Top Asset Categories, Condition Overview) menampilkan SELURUH data aset tanpa batasan jumlah — data diagregasi dari semua aset yang dapat diakses oleh pengguna. Perawatan Mendatang menampilkan maksimal 5 item dengan area gulir jika lebih banyak. Peringatan Garansi juga menampilkan maksimal 5 item. Jika Anda membutuhkan daftar lengkap (lebih dari 5 item), klik tautan View All pada bagian terkait untuk navigasi ke modul penuh (Asset Maintenances atau Aset).

@@ -41,8 +41,6 @@ Modul Employee mengelola **data karyawan** lengkap — NIK, nama, email, telepon
 
 3. Klik **Save** — karyawan tersimpan dengan data lengkap
 
-[Screenshot: Form Add Employee menampilkan semua field input]
-
 ### Validasi Form
 
 | Field | Validasi |
@@ -67,8 +65,6 @@ Modul Employee mengelola **data karyawan** lengkap — NIK, nama, email, telepon
 3. Klik icon **View** (eye) pada baris karyawan tersebut
 4. Dialog detail akan menampilkan semua informasi karyawan
 
-[Screenshot: Dialog View Employee menampilkan detail karyawan]
-
 ### Informasi yang Ditampilkan
 
 - NIK (Employee ID)
@@ -90,8 +86,6 @@ Modul Employee mengelola **data karyawan** lengkap — NIK, nama, email, telepon
 4. Form edit akan terbuka dengan data karyawan yang sudah terisi
 5. Ubah field yang diperlukan
 6. Klik **Save** untuk menyimpan perubahan
-
-[Screenshot: Form Edit Employee dengan data existing]
 
 ---
 
@@ -117,8 +111,6 @@ Ketik kata kunci pada field **Search employees...** untuk mencari berdasarkan:
 - Email
 - Phone
 
-[Screenshot: Search field dengan hasil pencarian]
-
 ### Filter Tersedia
 
 | Filter | Penjelasan |
@@ -127,8 +119,6 @@ Ketik kata kunci pada field **Search employees...** untuk mencari berdasarkan:
 | **Position** | Filter berdasarkan posisi/jabatan |
 | **Branch** | Filter berdasarkan cabang |
 | **Status** | Filter berdasarkan employment status: Regular atau Intern |
-
-[Screenshot: Panel filter employee dengan dropdown department, position, branch, status]
 
 ### Menggunakan Filter
 
@@ -167,8 +157,6 @@ Klik kolom sekali untuk ascending (A-Z, 0-9), klik lagi untuk descending (Z-A, 9
 3. Klik tombol **Export** pada toolbar
 4. File Excel (.xlsx) akan diunduh dengan semua kolom data
 
-[Screenshot: Tombol Export pada toolbar employee]
-
 ### Kolom dalam File Export
 
 | Kolom | Penjelasan |
@@ -195,8 +183,6 @@ Klik kolom sekali untuk ascending (A-Z, 0-9), klik lagi untuk descending (Z-A, 9
 
 1. Buka menu **Karyawan** → klik tombol **Import Employees**
 2. Dialog import akan muncul
-
-[Screenshot: Dialog Import Employees]
 
 3. Download template import jika diperlukan:
    - Klik **Download Template** untuk mendapatkan file Excel contoh
@@ -253,8 +239,6 @@ Klik kolom sekali untuk ascending (A-Z, 0-9), klik lagi untuk descending (Z-A, 9
 1. Klik checkbox pada baris karyawan untuk memilih satu record
 2. Checkbox header tidak tersedia untuk modul Employee (hanya row selection)
 
-[Screenshot: Checkbox selection pada row employee]
-
 ### Bulk Actions dengan Checkbox
 
 Checkbox digunakan untuk:
@@ -304,7 +288,7 @@ Siapkan master data referensi terlebih dahulu: Department, Position, dan Branch 
 
 **Q: Bagaimana cara menghubungkan asset dengan karyawan?**
 
-Di modul Assets, setiap asset bisa di-assign ke karyawan melalui field Employee. Pilih karyawan dari dropdown saat membuat atau mengedit asset. Asset yang sudah di-assign akan tampil di profil karyawan dan bisa dilacak movement history-nya melalui modul Asset Movements.
+Di modul Aset, setiap asset bisa di-assign ke karyawan melalui field Employee. Pilih karyawan dari dropdown saat membuat atau mengedit asset. Asset yang sudah di-assign akan tampil di profil karyawan dan bisa dilacak movement history-nya melalui modul Asset Movements.
 
 **Q: Apakah data gaji karyawan bisa dilihat semua user?**
 

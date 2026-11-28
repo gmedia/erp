@@ -22,8 +22,6 @@ Backend menggunakan `PostJournalAction` untuk validasi batch posting dan eksekus
 2. Klik menu **Jurnal Posting** di sidebar atau akses langsung melalui URL `/posting-journals`.
 3. Halaman akan menampilkan daftar jurnal dengan status `draft` yang siap untuk diposting.
 
-[Screenshot: Halaman Posting Journals dengan daftar jurnal draft]
-
 ### Catatan:
 
 Hanya jurnal dengan status `draft` yang akan ditampilkan di halaman ini. Jurnal yang sudah diposting atau void tidak akan muncul.
@@ -44,8 +42,6 @@ Halaman Posting Journals menampilkan tabel dengan informasi jurnal draft.
 | Status | Status jurnal (draft/posted/void) |
 | Actions | Tombol untuk melihat detail jurnal |
 
-[Screenshot: Tabel daftar jurnal dengan checkbox dan detail]
-
 ### Informasi Ringkasan:
 
 Di bagian atas tabel terdapat informasi ringkasan:
@@ -65,8 +61,6 @@ Gunakan fitur pencarian untuk menemukan jurnal spesifik.
 1. Temukan field pencarian di bagian kanan atas halaman.
 2. Ketik kata kunci pencarian (nomor jurnal, deskripsi, atau referensi).
 3. Tabel akan otomatis memfilter berdasarkan kata kunci yang dimasukkan.
-
-[Screenshot: Field pencarian dengan hasil filter]
 
 ### Tips Pencarian:
 
@@ -90,8 +84,6 @@ Pilih satu atau beberapa jurnal yang akan diposting.
 2. Semua jurnal di halaman saat ini akan terpilih.
 3. Klik lagi untuk membatalkan seleksi semua.
 
-[Screenshot: Beberapa jurnal tercentang dengan ringkasan selected totals]
-
 ### Membatalkan Seleksi:
 
 Klik tombol **Clear** untuk menghapus semua seleksi. Tombol ini hanya aktif jika ada jurnal yang dipilih.
@@ -107,8 +99,6 @@ Sebelum memposting, pastikan untuk mereview detail jurnal.
 3. Periksa baris-baris jurnal, akun, dan nominal debit/kredit.
 4. Pastikan total debit sama dengan total kredit (balanced).
 5. Klik tombol **Close** atau klik di luar modal untuk menutup.
-
-[Screenshot: Modal detail jurnal dengan daftar baris debit/kredit]
 
 ### Informasi dalam Modal Detail:
 
@@ -137,8 +127,6 @@ Setelah yakin dengan seleksi, lakukan posting.
 3. Klik tombol **Post Selected (X)** di bagian kanan atas.
 4. Sistem akan memvalidasi dan memposting semua jurnal terpilih.
 5. Notifikasi sukses akan muncul menampilkan jumlah jurnal yang berhasil diposting.
-
-[Screenshot: Tombol Post Selected dengan notifikasi sukses]
 
 ### Hasil Posting:
 
@@ -169,8 +157,6 @@ Jika ada jurnal yang gagal diposting, sistem akan menampilkan informasi kegagala
 4. Perbaiki masalah (misalnya menambah baris untuk menyeimbangkan).
 5. Kembali ke halaman Posting Journals dan posting ulang.
 
-[Screenshot: Notifikasi kegagalan posting dengan detail error]
-
 ## 8. Paginasi dan Navigasi Data
 
 Jika jumlah jurnal draft melebihi kapasitas halaman, gunakan fitur paginasi.
@@ -184,8 +170,6 @@ Jika jumlah jurnal draft melebihi kapasitas halaman, gunakan fitur paginasi.
 ### Catatan Penting:
 
 Seleksi checkbox bersifat per-halaman. Jika Anda memilih jurnal di halaman 1 lalu pindah ke halaman 2, seleksi di halaman 1 tidak akan terbawa. Posting hanya mempengaruhi jurnal yang saat ini tercentang di halaman yang sedang ditampilkan.
-
-[Screenshot: Kontrol paginasi di bagian bawah tabel]
 
 ## 9. Workflow Posting Journals
 

@@ -34,9 +34,7 @@ Stock opname dimulai dengan membuat dokumen perencanaan yang mendefinisikan ruan
 
 3. Klik **Save**
 
-Stocktake dibuat dengan status **Draft**. Pada tahap ini, item belum di-populate ke dalam dokumen.
-
-[Screenshot: Form pembuatan stock opname baru dengan field warehouse, product category, dan stocktake date]
+Stocktake dibuat dengan status **Draf**. Pada tahap ini, item belum di-populate ke dalam dokumen.
 
 ---
 
@@ -51,22 +49,20 @@ Setelah dokumen stock opname dibuat, langkah selanjutnya adalah memulai proses p
 3. Klik tombol **Start Opname**
 
 Saat tombol diklik:
-- Status berubah dari **Draft** menjadi **In Progress**
+- Status berubah dari **Draf** menjadi **Sedang Berjalan**
 - Sistem otomatis mengambil snapshot stok sistem dari `product_stocks` berdasarkan warehouse dan product category yang dipilih
 - Setiap item memiliki: Product, System Quantity (stok di sistem), dan Counted Quantity (kosong, menunggu input)
 
 ### Validasi
 
-- Hanya stocktake dengan status **Draft** yang bisa di-start
+- Hanya stocktake dengan status **Draf** yang bisa di-start
 - User memerlukan permission `inventory-stocktakes.manage`
-
-[Screenshot: Detail stock opname dengan tombol Start Opname dan daftar item yang sudah di-populate]
 
 ---
 
 ## 3. Melakukan Penghitungan Fisik (Counting)
 
-Setelah status **In Progress**, tim gudang dapat mulai menghitung stok fisik dan memasukkan hasilnya ke sistem.
+Setelah status **Sedang Berjalan**, tim gudang dapat mulai menghitung stok fisik dan memasukkan hasilnya ke sistem.
 
 ### Langkah-langkah
 
@@ -91,8 +87,6 @@ Setelah status **In Progress**, tim gudang dapat mulai menghitung stok fisik dan
 - Negative variance = stok fisik lebih sedikit dari sistem (deficit)
 - Positive variance = stok fisik lebih banyak dari sistem (surplus)
 
-[Screenshot: Tabel item stock opname dengan kolom System Qty, Counted Qty, dan Variance yang sudah terisi sebagian]
-
 ---
 
 ## 4. Menyelesaikan Stock Opname (Complete)
@@ -112,11 +106,9 @@ Setelah seluruh item selesai dihitung, stock opname dapat diselesaikan.
 
 ### Proses Saat Complete
 
-- Status berubah dari **In Progress** menjadi **Completed**
+- Status berubah dari **Sedang Berjalan** menjadi **Selesai**
 - Sistem menghitung total variance per item
 - Data siap untuk diproses lebih lanjut (posting adjustment)
-
-[Screenshot: Detail stock opname dengan status Completed dan ringkasan variance]
 
 ---
 
@@ -126,23 +118,21 @@ Stock opname dapat dibatalkan jika tidak jadi dilaksanakan atau terdapat kesalah
 
 ### Membatalkan dari Draft
 
-1. Buka stocktake dengan status **Draft**
-2. Klik **Edit** → ubah status ke **Cancelled**
+1. Buka stocktake dengan status **Draf**
+2. Klik **Edit** → ubah status ke **Dibatalkan**
 3. Klik **Save**
 
 ### Membatalkan dari In Progress
 
-1. Buka stocktake dengan status **In Progress**
+1. Buka stocktake dengan status **Sedang Berjalan**
 2. Klik **Cancel** (soft-cancel)
-3. Status berubah menjadi **Cancelled**
+3. Status berubah menjadi **Dibatalkan**
 
 ### Catatan Penting
 
-- Stock opname yang sudah **Completed** tidak bisa dibatalkan
+- Stock opname yang sudah **Selesai** tidak bisa dibatalkan
 - Pembatalan hanya mengubah status, tidak menghapus data
 - Data tetap tersimpan untuk keperluan audit
-
-[Screenshot: Dialog konfirmasi pembatalan stock opname]
 
 ---
 
@@ -177,13 +167,11 @@ Halaman detail menampilkan informasi lengkap stock opname dan daftar item.
 - **Merah** — Variance negatif (deficit)
 - **Abu-abu** — Variance nol (sesuai)
 
-[Screenshot: Modal detail stock opname dengan tabel item dan ringkasan variance]
-
 ---
 
 ## 7. Mengedit Stock Opname
 
-Perubahan hanya bisa dilakukan pada stock opname dengan status **Draft**.
+Perubahan hanya bisa dilakukan pada stock opname dengan status **Draf**.
 
 ### Langkah-langkah
 
@@ -195,10 +183,8 @@ Perubahan hanya bisa dilakukan pada stock opname dengan status **Draft**.
 
 ### Batasan
 
-- Tidak bisa mengedit stock opname dengan status **In Progress** atau **Completed**
+- Tidak bisa mengedit stock opname dengan status **Sedang Berjalan** atau **Selesai**
 - Stocktake Number tidak bisa diubah (auto-generated)
-
-[Screenshot: Form edit stock opname]
 
 ---
 
@@ -233,8 +219,6 @@ Pencarian mencakup:
 2. Pilih nilai atau rentang tanggal
 3. Tabel otomatis menyaring data sesuai filter
 
-[Screenshot: Halaman daftar stock opname dengan filter warehouse dan status aktif]
-
 ---
 
 ## 9. Pengurutan Kolom (Sorting)
@@ -257,8 +241,6 @@ Semua kolom utama dapat diurutkan untuk memudahkan analisis.
 2. Klik sekali untuk urutan ascending (A-Z, terlama-terbaru)
 3. Klik lagi untuk urutan descending (Z-A, terbaru-terlama)
 4. Icon panah menunjukkan arah pengurutan
-
-[Screenshot: Header kolom dengan icon sorting aktif]
 
 ---
 
@@ -287,8 +269,6 @@ Data stock opname dapat diekspor ke file Excel untuk pelaporan atau analisis leb
 
 Untuk export detail item stock opname, gunakan **Inventory Stocktake Variance Report** yang menyediakan breakdown per item.
 
-[Screenshot: Tombol Export di toolbar halaman stock opname]
-
 ---
 
 ## 11. Status Lifecycle
@@ -307,10 +287,10 @@ Draft → In Progress → Completed
 
 | Status | Keterangan | Aksi Tersedia |
 |--------|------------|---------------|
-| **Draft** | Dokumen baru dibuat, item belum di-populate | Edit, Start Opname, Cancel |
-| **In Progress** | Penghitungan sedang berlangsung, item sudah di-populate | Save Count, Complete, Cancel |
-| **Completed** | Penghitungan selesai, variance sudah dihitung | View, Export |
-| **Cancelled** | Dibatalkan, tidak bisa dilanjutkan | View, Export |
+| **Draf** | Dokumen baru dibuat, item belum di-populate | Edit, Start Opname, Cancel |
+| **Sedang Berjalan** | Penghitungan sedang berlangsung, item sudah di-populate | Save Count, Complete, Cancel |
+| **Selesai** | Penghitungan selesai, variance sudah dihitung | View, Export |
+| **Dibatalkan** | Dibatalkan, tidak bisa dilanjutkan | View, Export |
 
 ### Transisi Status
 
@@ -320,8 +300,6 @@ Draft → In Progress → Completed
 | Complete | In Progress | Completed | `inventory-stocktakes.manage` | Semua item sudah counted |
 | Cancel | Draft | Cancelled | `inventory-stocktakes.cancel` | - |
 | Cancel | In Progress | Cancelled | `inventory-stocktakes.cancel` | - |
-
-[Screenshot: Diagram lifecycle status stock opname]
 
 ---
 
@@ -349,8 +327,6 @@ Buka menu **Laporan → Selisih Stock Opname Persediaan** untuk melihat:
 
 Laporan variance dapat di-export ke Excel untuk dokumentasi dan tanda tangan.
 
-[Screenshot: Halaman laporan variance dengan filter dan tabel detail]
-
 ---
 
 ## 13. Permissions
@@ -361,8 +337,8 @@ Akses ke modul Inventory Stocktakes dikendalikan melalui permission berikut.
 |------------|-------|
 | `inventory_stocktake` | View & list inventory stocktakes |
 | `inventory_stocktake.create` | Membuat stock opname baru |
-| `inventory_stocktake.edit` | Mengedit stock opname (hanya status Draft) |
-| `inventory_stocktake.delete` | Menghapus stock opname (hanya status Draft) |
+| `inventory_stocktake.edit` | Mengedit stock opname (hanya status Draf) |
+| `inventory_stocktake.delete` | Menghapus stock opname (hanya status Draf) |
 | `inventory-stocktakes.manage` | Start Opname, Save Count, Complete |
 | `inventory-stocktakes.cancel` | Membatalkan stock opname |
 | `inventory_stocktake_variance_report` | Akses laporan variance |
@@ -403,7 +379,7 @@ Hubungi administrator sistem untuk mendapatkan permission yang sesuai dengan per
 
 **Q:** Mengapa tombol Start Opname tidak muncul?
 
-**J:** Pastikan stock opname masih dalam status Draft dan Anda memiliki permission `inventory-stocktakes.manage`. Tombol hanya muncul untuk status Draft.
+**J:** Pastikan stock opname masih dalam status Draf dan Anda memiliki permission `inventory-stocktakes.manage`. Tombol hanya muncul untuk status Draf.
 
 **Q:** Apakah bisa menghitung item secara bertahap?
 
