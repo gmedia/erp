@@ -2283,6 +2283,55 @@ invariant('W7-18 current fiscal year demo net profit is positive', function () {
         );
 });
 
+// #571 C9 — review host menemukan beban > pendapatan di 8 dari 11 bulan berjalan.
+// Kini laba FY berjalan harus positif di setiap bulan yang sudah berjalan, bukan hanya total.
+invariant('W7-18 current fiscal year demo net profit is positive every month', function () {
+    $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
+
+    expect($fiscalYear)->not->toBeNull('Demo data must leave the current fiscal year open');
+
+    $startYear = $fiscalYear->start_date->year;
+    $endYear = $fiscalYear->end_date->year;
+    $months = collect(DemoCalendar::months())
+        ->filter(fn ($month) => $month->year >= $startYear && $month->year <= $endYear)
+        ->values();
+
+    expect($months)->not->toBeEmpty('Jendela demo harus memuat bulan pada FY berjalan');
+
+    foreach ($months as $month) {
+        $start = $month->copy()->startOfMonth()->toDateString();
+        $end = $month->copy()->endOfMonth()->toDateString();
+
+        $totals = DB::table('journal_entry_lines')
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.status', 'posted')
+            ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+            ->where('journal_entries.journal_type', '!=', 'closing')
+            ->whereBetween('journal_entries.entry_date', [$start, $end])
+            ->whereIn('accounts.type', ['revenue', 'expense'])
+            ->selectRaw(
+                "COALESCE(SUM(CASE WHEN accounts.type = 'revenue' "
+                . 'THEN journal_entry_lines.credit - journal_entry_lines.debit ELSE 0 END), 0) as revenue',
+            )
+            ->selectRaw(
+                "COALESCE(SUM(CASE WHEN accounts.type = 'expense' "
+                . 'THEN journal_entry_lines.debit - journal_entry_lines.credit ELSE 0 END), 0) as expense',
+            )
+            ->first();
+
+        $revenue = (float) $totals->revenue;
+        $expense = (float) $totals->expense;
+        $label = $month->format('Y-m');
+
+        expect($revenue)->toBeGreaterThan(0.0, "Pendapatan {$label} harus terisi")
+            ->and($revenue - $expense)->toBeGreaterThan(
+                0.0,
+                "Laba bersih {$label} harus positif: pendapatan {$revenue} vs beban {$expense}",
+            );
+    }
+});
+
 // #571 C8 — FY2025 (Nov–Des 2025 di jendela demo) harus punya aktivitas nyata:
 // penjualan, beban, dan penyusutan di kedua bulan tersebut.
 invariant('W7-18 fiscal year 2025 has sales, expenses and depreciation in November and December', function () {
