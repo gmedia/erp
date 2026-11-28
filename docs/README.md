@@ -12,6 +12,7 @@ Index for agents and developers. Prefer these paths over inventing new status do
 | [refactor-sonar-progress.md](./refactor-sonar-progress.md) | **FROZEN** Sonar batch A–G history |
 | `user-guide-*.md` | End-user guides served via `/api/user-guide` |
 | [user-guide-mobile-install.md](./user-guide-mobile-install.md) | Pasang & perbarui APK Android |
+| [user-guide-mobile-app.md](./user-guide-mobile-app.md) | Rilis APK, unduh, verifikasi SHA-256, versi minimum |
 
 ## Dashboards (do not confuse)
 
