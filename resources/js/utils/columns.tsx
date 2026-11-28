@@ -24,32 +24,15 @@ import { ColumnDef } from '@tanstack/react-table';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import type { ReactNode } from 'react';
 
-function SortDirectionIcon({
-    sorted,
-    side = 'right',
-}: {
-    sorted: 'asc' | 'desc' | false;
-    side?: 'left' | 'right';
-}) {
-    const spacing = side === 'left' ? 'mr-2' : 'ml-2';
+function SortDirectionIcon({ sorted }: { sorted: 'asc' | 'desc' | false }) {
     if (sorted === 'asc') {
-        return (
-            <ArrowUp
-                className={`${spacing} h-4 w-4 shrink-0 text-foreground`}
-            />
-        );
+        return <ArrowUp className="ml-2 h-4 w-4 shrink-0 text-foreground" />;
     }
     if (sorted === 'desc') {
-        return (
-            <ArrowDown
-                className={`${spacing} h-4 w-4 shrink-0 text-foreground`}
-            />
-        );
+        return <ArrowDown className="ml-2 h-4 w-4 shrink-0 text-foreground" />;
     }
     return (
-        <ArrowUpDown
-            className={`${spacing} h-4 w-4 shrink-0 text-muted-foreground`}
-        />
+        <ArrowUpDown className="ml-2 h-4 w-4 shrink-0 text-muted-foreground" />
     );
 }
 
@@ -138,12 +121,6 @@ export function createSortingHeader(
                     data-testid={`sort-${testIdSource.toLowerCase().replaceAll(/\s+/g, '-')}`}
                     data-sort-state={column.getIsSorted() || 'none'}
                 >
-                    {isRight ? (
-                        <SortDirectionIcon
-                            sorted={column.getIsSorted()}
-                            side="left"
-                        />
-                    ) : null}
                     <span
                         className={cn(
                             isRight
@@ -153,9 +130,7 @@ export function createSortingHeader(
                     >
                         <LabelText label={label} />
                     </span>
-                    {isRight ? null : (
-                        <SortDirectionIcon sorted={column.getIsSorted()} />
-                    )}
+                    <SortDirectionIcon sorted={column.getIsSorted()} />
                 </Button>
             </div>
         ),

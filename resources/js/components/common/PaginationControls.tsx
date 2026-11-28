@@ -50,7 +50,7 @@ export function PaginationControls({
                     onValueChange={onPageSizeChange}
                     disabled={disabled}
                 >
-                    <SelectTrigger className="h-8 w-[70px] border-border bg-background">
+                    <SelectTrigger className="h-8 w-[70px]">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="border-border bg-background text-foreground">
