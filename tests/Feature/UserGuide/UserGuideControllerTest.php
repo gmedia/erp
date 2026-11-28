@@ -31,6 +31,7 @@ test('index returns list of available user guides', function () {
     expect($slugs)
         ->toContain('accounts-payable')
         ->toContain('accounts-receivable')
+        ->toContain('mobile-install')
         ->toContain('pipeline');
 });
 
