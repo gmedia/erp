@@ -1,4 +1,4 @@
-# User Guide: Asset Movements
+# Panduan: Mutasi Aset
 
 ## Gambaran Umum
 
@@ -20,7 +20,7 @@ Fitur utama:
 |------|-----|--------|
 | Asset Movements | `/asset-movements` | Kelola riwayat perpindahan aset |
 
-Modul ini berada dalam grup menu **Asset**.
+Modul ini berada dalam grup menu **Aset**.
 
 ---
 
@@ -28,7 +28,7 @@ Modul ini berada dalam grup menu **Asset**.
 
 ### Langkah-langkah
 
-1. Buka menu **Asset Movements** → klik **Add New**
+1. Buka menu **Mutasi Aset** → klik **Add New**
 2. Isi form dengan data perpindahan:
 
    **Informasi Perpindahan:**
@@ -63,7 +63,7 @@ Modul ini berada dalam grup menu **Asset**.
 
 ## 2. Melihat Detail Asset Movement
 
-1. Buka menu **Asset Movements**
+1. Buka menu **Mutasi Aset**
 2. Cari movement yang ingin dilihat menggunakan search atau filter
 3. Klik icon **View** (eye) pada baris movement tersebut
 4. Dialog detail akan menampilkan semua informasi movement
@@ -85,7 +85,7 @@ Modul ini berada dalam grup menu **Asset**.
 
 ## 3. Mengedit Asset Movement
 
-1. Buka menu **Asset Movements**
+1. Buka menu **Mutasi Aset**
 2. Cari movement yang ingin diedit
 3. Klik icon **Edit** (pencil) pada baris movement
 4. Form edit akan terbuka dengan data movement yang sudah terisi
@@ -98,7 +98,7 @@ Modul ini berada dalam grup menu **Asset**.
 
 ## 4. Menghapus Asset Movement
 
-1. Buka menu **Asset Movements**
+1. Buka menu **Mutasi Aset**
 2. Cari movement yang ingin dihapus
 3. Klik icon **Delete** (trash) pada baris movement
 4. Konfirmasi penghapusan pada dialog yang muncul
@@ -158,7 +158,7 @@ Klik kolom sekali untuk ascending (A-Z, 0-9), klik lagi untuk descending (Z-A, 9
 
 ## 7. Export ke Excel
 
-1. Buka menu **Asset Movements**
+1. Buka menu **Mutasi Aset**
 2. Terapkan filter jika ingin export data tertentu
 3. Klik tombol **Export** pada toolbar
 4. File Excel (.xlsx) akan diunduh dengan semua kolom data

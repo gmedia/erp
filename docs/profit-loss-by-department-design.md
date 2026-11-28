@@ -1,6 +1,6 @@
 # P&L by Department — Design & Keputusan
 
-**Status:** Fase 1 (#114) sedang diimplementasi. Keputusan pemilik tercatat di issue #114 (komentar `<!-- decision -->`, 2026-11-26).
+**Status:** Fase 1–2 sudah merged (PR #546 dimensi departemen, PR #549 filter Laba Rugi). Fase 3 (laporan pivot) **blocked** — menunggu data departemen terisi dan #563 merged; issue #114 tetap terbuka dengan label `status:blocked`. Keputusan pemilik tercatat di issue #114 (komentar `<!-- decision -->`, 2026-11-26 dan 2026-11-27).
 **Generated:** 2026-06-01 (riset awal); diperbarui 2026-11-26 (keputusan).
 
 ## Keputusan (#114, 2026-11-26)

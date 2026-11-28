@@ -1,4 +1,4 @@
-# Panduan Kesehatan Sistem
+# Panduan: Kesehatan Sistem
 
 Halaman **Kesehatan Sistem** (`/system-health`) membantu admin IT memantau kondisi ERP tanpa perlu membuka terminal. Halaman ini menampilkan status tiap komponen (sehat, peringatan, atau gagal), angka ringkas, riwayat masalah terakhir, dan informasi versi.
 

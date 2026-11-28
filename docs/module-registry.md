@@ -1,14 +1,14 @@
-<!-- scope-note: E2E: ~87 slug entries under Simple (5) + Complex YAML (includes many non-CRUD pages). Plus 1 legacy `- modul: Asset Dashboard` entry. Pest table rows (actual): Simple 5 + Complex 39 + Non-CRUD 30 = 74. Classification taxonomy "58 non-CRUD concepts" is conceptual, not Pest row count. Prefer table/YAML rows over header taxonomy when counting. -->
+<!-- scope-note: E2E: ~100 slug entries under Simple (5) + Complex YAML (includes many non-CRUD pages). Plus 1 legacy `- modul: Asset Dashboard` entry. Pest table rows (actual): Simple 5 + Complex 40 + Non-CRUD 38 = 83. Classification taxonomy "58 non-CRUD concepts" is conceptual, not Pest row count. Prefer table/YAML rows over header taxonomy when counting. -->
 <!-- scope-note: "Registry E2E — Complex CRUD" section includes non-CRUD modules (reports, dashboards, settings, workflows) using view_type: page/modal/embedded/component. These are NOT true CRUD but share DataTable/UI patterns. -->
 # Module Registry
 
-**Last updated:** 2026-08-04
+**Last updated:** 2026-11-28
 
 > Referensi metadata per-modul untuk testing (Pest + E2E).
 > Data ini digunakan oleh agent saat membuat atau refactoring test.
 >
 > **Counts = table/YAML rows**, not taxonomy bullets.
-> - Pest rows: **74** (5 simple + 39 complex + 30 non-CRUD)
+> - Pest rows: **83** (5 simple + 40 complex + 38 non-CRUD)
 > - Non-CRUD "58" below = conceptual taxonomy (reports/dashboards/workflows/…), not Pest rows
 >
 > Lihat juga: `docs/archive/refactor-style-consistency-plan.md` untuk matriks klasifikasi implementasi aktual dan hasil audit per tahap.
@@ -31,7 +31,7 @@ Modul dengan satu tabel utama, tanpa relasi FK kompleks. **5 modul**: department
 
 ### CRUD Complex
 
-Modul dengan relasi FK, filter multi-field, custom columns. **39 modul** termasuk master data, transaction/nested form, dan borderline-simple.
+Modul dengan relasi FK, filter multi-field, custom columns. **40 modul** termasuk master data, transaction/nested form, dan borderline-simple.
 
 - Frontend: `createComplexEntityConfig()` + `createEntityCrudPage()` + sibling files (`Columns.tsx`, `Filters.tsx`, `Form.tsx`, `ViewModal.tsx`)
 - Form: custom `{Module}Form.tsx` menggunakan `EntityForm`, `AsyncSelectField`, `zodResolver`
@@ -42,7 +42,7 @@ Modul dengan relasi FK, filter multi-field, custom columns. **39 modul** termasu
 
 ### Non-CRUD
 
-Modul tanpa operasi CRUD standar. **~58 konsep** (taxonomy di bawah) termasuk reports, dashboards, settings, workflows, embedded components, dan cross-cutting regression specs. **Pest Non-CRUD table: 30 rows** (bukan 58).
+Modul tanpa operasi CRUD standar. **~58 konsep** (taxonomy di bawah) termasuk reports, dashboards, settings, workflows, embedded components, dan cross-cutting regression specs. **Pest Non-CRUD table: 38 rows** (bukan 58).
 
 - Reports: `ReportDataTablePage` (19 modules) atau `FinancialReportPageShell` (5 modules)
 - Audit trails: `AuditTrailPage` (2 modules)
@@ -899,6 +899,94 @@ Semua modul simple CRUD memiliki konfigurasi E2E yang identik kecuali nama:
   tests:
     - tests/e2e/budget-variance-report/budget-variance-report.spec.ts
 
+- slug: vehicle-loans
+  route: /vehicle-loans/request, /vehicle-loans/pickup, /vehicle-loans/return, /vehicle-loans/security, /vehicle-loans/dashboard, /vehicle-loans/:id
+  api: /api/vehicle-loans
+  export_api: POST /api/vehicle-loans/export
+  view_type: page
+  note: "Modul peminjaman kendaraan: permintaan, approval, serah kunci security, pengembalian, dashboard, dan detail. Permission `vehicle_loan.*` (request/pickup/return/security/report/master). Endpoint bantu: assignment-options, mobile-config, security-queue, dan foto pickup/return."
+  tests:
+    - tests/e2e/vehicle-loans/vehicle-loans.spec.ts
+    - tests/e2e/vehicle-loans/action-permissions.spec.ts
+    - tests/e2e/vehicle-loans/awaiting-key-handover.spec.ts
+    - tests/e2e/vehicle-loans/locale-id-navigation.spec.ts
+    - tests/e2e/vehicle-loans/ui-polish-i569.spec.ts
+    - tests/e2e/vehicle-loans/ui-polish-i569-step2.spec.ts
+
+- slug: vehicle-units
+  route: (API master — dipakai form peminjaman kendaraan)
+  api: /api/vehicle-units
+  view_type: embedded
+  note: "Master data unit kendaraan (CRUD API) di bawah permission `vehicle_loan.master`. Tidak punya halaman SPA terpisah; dipakai modul vehicle-loans."
+  tests:
+    - tests/Feature/VehicleLoans/VehicleLoanApiTest.php
+
+- slug: vehicle-drivers
+  route: (API master — dipakai form peminjaman kendaraan)
+  api: /api/vehicle-drivers
+  view_type: embedded
+  note: "Master data pengemudi (CRUD API) di bawah permission `vehicle_loan.master`. Tidak punya halaman SPA terpisah; dipakai modul vehicle-loans."
+  tests:
+    - tests/Feature/VehicleLoans/VehicleLoanApiTest.php
+
+- slug: system-health
+  route: /system-health
+  api: /api/system-health
+  view_type: page
+  note: "Non-CRUD health check (database, object storage, backup, queue, dll.) + tombol run `POST /api/system-health/run`. Ada notifier dan pesan per kode/locale."
+  tests:
+    - tests/e2e/system-health/system-health.spec.ts
+
+- slug: security-logs
+  route: /security-logs
+  api: /api/security-logs
+  export_api: /api/security-logs/export
+  view_type: page
+  note: "Non-CRUD read-only log keamanan (recording, retensi, alert) dengan export."
+  tests:
+    - tests/e2e/security-logs/security-logs.spec.ts
+
+- slug: audit-logs
+  route: /audit-logs
+  api: /api/audit-logs
+  export_api: /api/audit-logs/export
+  view_type: page
+  note: "Non-CRUD read-only audit log perubahan entitas dengan export."
+  tests:
+    - tests/e2e/audit-logs/audit-logs.spec.ts
+
+- slug: notifications
+  route: (cross-cutting — NotificationBell di AppLayout)
+  api: /api/notifications
+  view_type: component
+  note: "Notifikasi in-app + push FCM. Endpoint: unread-count, read-all, {notification}/read. Device token didaftarkan via /api/device-tokens."
+  tests:
+    - tests/Feature/Notifications/PushChannelTest.php
+
+- slug: device-tokens
+  route: (cross-cutting — push notification)
+  api: /api/device-tokens
+  view_type: component
+  note: "Registrasi dan penghapusan token perangkat untuk push notification FCM."
+  tests:
+    - tests/Feature/DeviceTokens/DeviceTokenControllerTest.php
+
+- slug: user-guide
+  route: /user-guide
+  api: /api/user-guide
+  view_type: page
+  note: "Halaman Panduan Pengguna yang merender markdown dari `docs/user-guide-*.md` (judul diekstrak dari heading pertama)."
+  tests:
+    - tests/Feature/UserGuide/UserGuideControllerTest.php
+
+- slug: social-login
+  route: /auth/social/callback
+  api: (endpoint OAuth per provider)
+  view_type: page
+  note: "Social login/OAuth: state manager, account type detection, policy, 2FA, dan ticket cleanup. Test di `Feature/SocialAuth/`."
+  tests:
+    - tests/e2e/social-login/social-login.spec.ts
+
 ## Testing
 
 E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
@@ -962,6 +1050,7 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 37 | Bank Reconciliations | `bank-reconciliations` | `BankReconciliationControllerTest`, `BankReconciliationExportTest` | `BankReconciliationTest` | — |
 | 38 | Recurring Journals | `recurring-journals` | `RecurringJournalControllerTest`, `RecurringJournalExportTest` | `RecurringJournalTest` | — |
 | 39 | Warehouses | `warehouses` | `WarehouseControllerTest`, `WarehouseExportTest` | `WarehouseTest` | Memiliki FilterService, Resource, Collection tests |
+| 40 | Vehicle Loans | `vehicle-loans` | `VehicleLoanApiTest`, `VehicleLoanFlowTest`, `VehicleLoanMaintenanceTest`, `VehicleLoanDemoApprovalSeedTest` | `VehicleLoanFoundationTest` | Termasuk master `vehicle-units`/`vehicle-drivers`; approval + security handover |
 
 ---
 
@@ -1000,6 +1089,13 @@ E2E testing uses Playwright. Tests are organized by module in `tests/e2e/`.
 | 29 | Goods Receipt Report | `goods-receipt-report` | `Feature/Reports/GoodsReceiptReportTest.php` | Laporan penerimaan barang per periode/supplier/gudang + export |
 | 30 | Aging Dashboard | `aging-dashboard` | `Feature/AgingDashboard/AgingDashboardControllerTest.php` | AR/AP aging dashboard with 5 buckets + top 10 overdue customers/suppliers + branch filter |
 | 31 | Budget Variance Report | `budget-variance-report` | `Feature/Budgets/BudgetVarianceReportControllerTest.php` | Non-CRUD laporan variance budget; E2E di `tests/e2e/budget-variance-report/` (budget_id required) |
+| 32 | System Health | `system-health` | `Feature/SystemHealth/*.php` (9 files) + `Unit/SystemHealth/SystemHealthSanitizerTest.php` | Health check DB/object storage/backup/queue + notifier |
+| 33 | Security Logs | `security-logs` | `Feature/SecurityLogs/*.php` (2 files) | Read-only log keamanan + export; retensi & alert |
+| 34 | Audit Logs | `audit-logs` | `Feature/AuditLog/AuditLogIndexTest.php`, `Feature/AuditLog/AuditLogRecordingTest.php` | Read-only audit log + export |
+| 35 | Notifications | `notifications` | `Feature/Notifications/*.php` (3 files) | In-app + push FCM |
+| 36 | Device Tokens | `device-tokens` | `Feature/DeviceTokens/*.php` (2 files) | Registrasi token perangkat untuk push |
+| 37 | User Guide | `user-guide` | `Feature/UserGuide/UserGuideControllerTest.php` | API markdown untuk halaman Panduan Pengguna |
+| 38 | Social Login | `social-auth` | `Feature/SocialAuth/*.php` (10 files) | OAuth state, policy, 2FA, ticket cleanup; E2E di `tests/e2e/social-login/` |
 
 ---
 
@@ -1035,8 +1131,8 @@ tests/
 # Pest — semua test untuk satu modul
 ./vendor/bin/sail test --group {module-slug}
 
-# E2E — semua test untuk satu modul
-npx playwright test tests/e2e/{module-slug}/
+# E2E — hanya spec yang ditambah/diubah (folder penuh & suite besar menunggu CI)
+bash scripts/e2e-full.sh tests/e2e/{module-slug}/{spec-yang-disentuh}.spec.ts
 ````
 
 ---
@@ -1061,4 +1157,5 @@ npx playwright test tests/e2e/{module-slug}/
 ## Known Issues & Notes
 
 - `journal-entries`: Actions menggunakan icon buttons (Eye, Pencil, Trash) bukan dropdown menu
+- Direktori E2E cross-cutting (bukan modul tunggal): `tests/e2e/misc/`, `filter-dialog-i18n/`, `report-badge-contrast/`, `table-mobile-contrast/`, `table-mobile-ellipsis/`, `visual-363/`, `visual-440/`, `visual-audit/`. Spec ini menguji lintas modul dan tidak diberi slug tersendiri.
 - `assets`: `view_type: page` — navigasi ke `/assets/{ulid}` bukan dialog

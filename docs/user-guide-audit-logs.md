@@ -1,4 +1,4 @@
-# Panduan Audit Log
+# Panduan: Audit Log
 
 Halaman **Audit Log** (`/audit-logs`) menampilkan jejak perubahan data keuangan dan pengaturan:
 siapa mengubah apa, kapan, dan nilai lama → nilai baru. Halaman ini dipakai akuntan, auditor, dan

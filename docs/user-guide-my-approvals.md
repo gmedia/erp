@@ -1,4 +1,4 @@
-# User Guide: My Approvals
+# Panduan: Persetujuan Saya
 
 ## Gambaran Umum
 
@@ -25,7 +25,7 @@ Fitur ini terintegrasi dengan sistem **Approval Flow** yang mengatur alur perset
 ### Langkah-langkah
 
 1. Login ke sistem ERP dengan akun yang memiliki role approver.
-2. Buka menu **My Approvals** melalui sidebar atau navigasi utama.
+2. Buka menu **Persetujuan Saya** melalui sidebar atau navigasi utama.
 3. Halaman akan menampilkan inbox dengan 4 tab:
    - **Pending** — Request yang menunggu persetujuan Anda.
    - **Approved** — Request yang sudah Anda setujui.
@@ -187,7 +187,7 @@ Jika Anda tidak bisa memproses approval (cuti, sakit, travel), Anda bisa mendele
 
 ### Setup Delegation
 
-1. Buka menu **Approval Delegations** (`/approval-delegations`).
+1. Buka menu **Delegasi Persetujuan** (`/approval-delegations`).
 2. Klik **Add New**.
 3. Isi form:
    - **Delegator** — User Anda (auto-selected).

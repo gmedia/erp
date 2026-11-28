@@ -1,8 +1,8 @@
-# User Guide: Multi-Currency
+# Panduan: Multi-Mata Uang
 
 ## Gambaran Umum
 
-Multi-Currency adalah fitur lintas modul yang mengatur mata uang yang digunakan dalam transaksi keuangan di sistem ERP gmedia. Saat ini, sistem hanya mendukung satu mata uang yaitu **Indonesian Rupiah (IDR)**. Fitur ini bukan modul CRUD mandiri, melainkan constraint sistem yang diterapkan di seluruh modul transaksi: Purchase Order, Supplier Bill, Customer Invoice, AP Payment, AR Receipt, dan Asset.
+Multi-Currency adalah fitur lintas modul yang mengatur mata uang yang digunakan dalam transaksi keuangan di sistem ERP. Saat ini, sistem hanya mendukung satu mata uang yaitu **Indonesian Rupiah (IDR)**. Fitur ini bukan modul CRUD mandiri, melainkan constraint sistem yang diterapkan di seluruh modul transaksi: Purchase Order, Supplier Bill, Customer Invoice, AP Payment, AR Receipt, dan Asset.
 
 Setiap transaksi yang melibatkan nilai uang secara otomatis menggunakan IDR. Sistem akan menolak input dengan mata uang selain IDR, baik melalui form manual maupun import Excel. Pengaturan mata uang dapat dilihat di halaman Admin Settings, namun saat ini hanya IDR yang tersedia sebagai pilihan.
 
@@ -141,7 +141,7 @@ Fitur Multi-Currency menggunakan permission yang sudah ada di masing-masing modu
 
 **Q:** Mengapa sistem hanya mendukung mata uang IDR?
 
-**J:** Saat ini sistem gmedia masih dalam tahap pengembangan awal untuk fitur multi-currency. Dukungan penuh untuk berbagai mata uang asing beserta mekanisme foreign exchange (FX) direncanakan pada roadmap H3-Wave2. Sementara itu, seluruh transaksi menggunakan IDR sebagai mata uang tunggal.
+**J:** Saat ini sistem ini masih dalam tahap pengembangan awal untuk fitur multi-currency. Dukungan penuh untuk berbagai mata uang asing beserta mekanisme foreign exchange (FX) direncanakan pada roadmap H3-Wave2. Sementara itu, seluruh transaksi menggunakan IDR sebagai mata uang tunggal.
 
 **Q:** Apa yang terjadi jika saya mencoba menginput mata uang selain IDR melalui API?
 
@@ -153,7 +153,7 @@ Fitur Multi-Currency menggunakan permission yang sudah ada di masing-masing modu
 
 **Q:** Apakah multi-currency akan didukung di masa mendatang?
 
-**J:** Ya, dukungan multi-currency penuh (multiple currency dengan foreign exchange) ada dalam roadmap pengembangan sistem gmedia. Fitur ini akan memungkinkan transaksi dalam berbagai mata uang asing dengan konversi otomatis berdasarkan kurs yang berlaku.
+**J:** Ya, dukungan multi-currency penuh (multiple currency dengan foreign exchange) ada dalam roadmap pengembangan sistem ini. Fitur ini akan memungkinkan transaksi dalam berbagai mata uang asing dengan konversi otomatis berdasarkan kurs yang berlaku.
 
 **Q:** Mengapa field mata uang tidak muncul di form transaksi?
 

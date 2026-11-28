@@ -1,4 +1,4 @@
-# User Guide: Asset Dashboard
+# Panduan: Dasbor Aset
 
 ## Gambaran Umum
 
@@ -17,7 +17,7 @@ Untuk mengakses Asset Dashboard, pengguna memerlukan permission `asset_dashboard
 ### Langkah-langkah:
 
 1. Login ke aplikasi dengan akun yang memiliki permission `asset_dashboard`.
-2. Klik menu **Asset Dashboard** di sidebar pada grup menu Asset atau akses langsung melalui URL `/asset-dashboard`.
+2. Klik menu **Dasbor Aset** di sidebar pada grup menu Aset atau akses langsung melalui URL `/asset-dashboard`.
 3. Halaman Asset Dashboard akan menampilkan data aset terkini.
 
 [Screenshot: Halaman Asset Dashboard utama dengan summary cards dan grafik]
@@ -317,7 +317,7 @@ Pastikan akun Anda memiliki permission `asset_dashboard`. Hubungi administrator 
 ### Bagaimana cara menambah aset baru dari Asset Dashboard?
 
 Asset Dashboard bersifat read-only. Untuk menambah aset baru:
-1. Navigasi ke menu **Assets** di sidebar.
+1. Navigasi ke menu **Aset** di sidebar.
 2. Gunakan fitur Add New Asset di modul Assets.
 3. Kembali ke Asset Dashboard untuk review hasil.
 

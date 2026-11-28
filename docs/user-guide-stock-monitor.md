@@ -1,4 +1,4 @@
-# User Guide: Stock Monitor
+# Panduan: Pemantauan Stok
 
 ## Gambaran Umum
 

@@ -1,4 +1,4 @@
-# User Guide: Accounts Receivable (AR)
+# Panduan: Piutang Usaha
 
 ## Gambaran Umum
 
@@ -23,7 +23,7 @@ Modul Accounts Receivable mengelola **siklus piutang lengkap** — dari penerbit
 
 ### Membuat Invoice
 
-1. Buka menu **Customer Invoices** → klik **Add New**
+1. Buka menu **Faktur Pelanggan** → klik **Add New**
 2. Isi header:
    - **Customer** — pelanggan yang ditagih
    - **Branch** — cabang penerbit
@@ -72,7 +72,7 @@ Cancelled         Overdue (jika melewati due date)
 
 ### Membuat Penerimaan
 
-1. Buka menu **AR Receipts** → klik **Add New**
+1. Buka menu **Penerimaan Piutang** → klik **Add New**
 2. Isi header:
    - **Customer** — pelanggan yang membayar
    - **Branch** — cabang penerima
@@ -126,7 +126,7 @@ Saat receipt dihapus:
 
 ### Membuat Credit Note
 
-1. Buka menu **Credit Notes** → klik **Add New**
+1. Buka menu **Nota Kredit** → klik **Add New**
 2. Isi header:
    - **Customer** — pelanggan penerima CN
    - **Customer Invoice** — invoice yang dikurangi (opsional)
@@ -302,7 +302,7 @@ Pipeline memungkinkan:
 
 **Q:** Bagaimana cara mencatat penerimaan pembayaran dari pelanggan jika pelanggan membayar beberapa invoice sekaligus?
 
-**J:** Buka menu **AR Receipts**, klik **Add New**. Isi header: pilih Customer, Branch, Fiscal Year, Receipt Date, Payment Method, Bank Account, dan Total Amount sesuai jumlah yang diterima. Kemudian klik **Add Allocation** untuk setiap invoice yang dilunasi. Pilih Customer Invoice yang sesuai, masukkan Allocated Amount (tidak boleh melebihi sisa amount_due invoice tersebut), dan klik Save. Ulangi untuk setiap invoice yang termasuk dalam pembayaran tersebut. Pastikan total seluruh alokasi tidak melebihi Total Amount di header. Setelah semua alokasi ditambahkan, klik Save pada form utama. Sistem otomatis membuat nomor receipt (format RCV-YYYY-XXXXXX) dan memperbarui status invoice terkait.
+**J:** Buka menu **Penerimaan Piutang**, klik **Add New**. Isi header: pilih Customer, Branch, Fiscal Year, Receipt Date, Payment Method, Bank Account, dan Total Amount sesuai jumlah yang diterima. Kemudian klik **Add Allocation** untuk setiap invoice yang dilunasi. Pilih Customer Invoice yang sesuai, masukkan Allocated Amount (tidak boleh melebihi sisa amount_due invoice tersebut), dan klik Save. Ulangi untuk setiap invoice yang termasuk dalam pembayaran tersebut. Pastikan total seluruh alokasi tidak melebihi Total Amount di header. Setelah semua alokasi ditambahkan, klik Save pada form utama. Sistem otomatis membuat nomor receipt (format RCV-YYYY-XXXXXX) dan memperbarui status invoice terkait.
 
 **Q:** Apa perbedaan status Receipt "Draft", "Confirmed", dan "Cancelled"? Kapan masing-masing digunakan?
 

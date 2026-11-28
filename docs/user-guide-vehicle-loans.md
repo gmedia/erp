@@ -1,4 +1,4 @@
-# Peminjaman Kendaraan Perusahaan
+# Panduan: Peminjaman Kendaraan
 
 Modul ini mengelola permintaan, persetujuan, pengambilan, dan pengembalian kendaraan perusahaan. Semua formulir dapat diakses melalui QR yang tersedia di pos keamanan; halaman QR mensyaratkan login.
 

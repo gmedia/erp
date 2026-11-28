@@ -1,4 +1,4 @@
-# User Guide: Recurring Journals
+# Panduan: Jurnal Berulang
 
 ## Gambaran Umum
 

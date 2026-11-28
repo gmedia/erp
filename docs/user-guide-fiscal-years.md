@@ -1,4 +1,4 @@
-# User Guide: Fiscal Years
+# Panduan: Tahun Fiskal
 
 ## Gambaran Umum
 
@@ -19,7 +19,7 @@ Untuk mengakses modul ini, pengguna memerlukan permission `fiscal_year`. Sistem 
 ### Langkah-langkah:
 
 1. Login ke aplikasi dengan akun yang memiliki permission `fiscal_year`.
-2. Klik menu **Fiscal Years** di sidebar atau akses langsung melalui URL `/fiscal-years`.
+2. Klik menu **Tahun Fiskal** di sidebar atau akses langsung melalui URL `/fiscal-years`.
 3. Halaman akan menampilkan tabel daftar tahun fiskal dengan kolom: Name, Start Date, End Date, Status, Created At.
 
 [Screenshot: Halaman daftar Fiscal Years dengan tabel data]

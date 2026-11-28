@@ -1,4 +1,4 @@
-# User Guide: Customer
+# Panduan: Pelanggan
 
 ## Gambaran Umum
 
@@ -188,7 +188,7 @@ Tidak. Setiap pelanggan terdaftar di satu cabang. Jika pelanggan beroperasi di b
 
 ### Apakah kategori pelanggan wajib?
 
-Ya. Setiap pelanggan harus memiliki kategori. Buat kategori di menu **Customer Categories** (`/customer-categories`) sebelum menambah pelanggan baru.
+Ya. Setiap pelanggan harus memiliki kategori. Buat kategori di menu **Kategori Pelanggan** (`/customer-categories`) sebelum menambah pelanggan baru.
 
 ### Bagaimana cara mencari pelanggan dengan nama parsial?
 
