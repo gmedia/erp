@@ -331,6 +331,10 @@ jobs:
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run check:backend-lang-keys
 
+      - name: Check filter label i18n (*Filters.tsx)
+        if: steps.autofix.outputs.changed != 'true'
+        run: ./vendor/bin/sail npm run check:filter-labels
+
       - name: Build assets
         if: steps.autofix.outputs.changed != 'true'
         run: ./vendor/bin/sail npm run build

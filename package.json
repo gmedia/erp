@@ -13,6 +13,7 @@
     "check:permission-prefixes": "node scripts/check-permission-prefixes.mjs",
         "check:backend-lang-keys": "node scripts/check-backend-lang-keys.mjs",
         "check:formatters": "node scripts/check-formatters.mjs",
+        "check:filter-labels": "node scripts/check-filter-labels.mjs",
         "lint": "eslint . --fix",
         "lint:check": "eslint . --max-warnings=0",
         "types": "tsc --noEmit",

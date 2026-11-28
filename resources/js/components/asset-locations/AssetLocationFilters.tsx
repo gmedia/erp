@@ -18,13 +18,13 @@ export function createAssetLocationFilterFields(): FieldDescriptor[] {
             'branch_id',
             { key: 'column.branch', fallback: 'Branch' },
             '/api/branches',
-            'All Branches',
+            { key: 'filter.all_branches', fallback: 'All Branches' },
         ),
         createAsyncSelectFilterField(
             'parent_id',
             { key: 'column.parent_location', fallback: 'Parent Location' },
             '/api/asset-locations',
-            'All Locations',
+            { key: 'filter.all_locations', fallback: 'All Locations' },
         ),
     ];
 }

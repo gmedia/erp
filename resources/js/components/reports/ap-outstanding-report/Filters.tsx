@@ -1,51 +1,21 @@
-import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
-    createAsyncSelectFilterField,
-    createSelectFilterField,
-    createTextFilterField,
+    apBillStatusOptions,
+    createApReportCommonFilterFields,
+    createFilterFieldDateFields,
+    createFilterFieldStatusSelect,
     type FieldDescriptor,
 } from '@/components/common/filters';
 
 export function createApOutstandingReportFilterFields(): FieldDescriptor[] {
-    const statusOptions: Array<{ value: string; label: string }> = [
-        { value: 'confirmed', label: 'Confirmed' },
-        { value: 'partially_paid', label: 'Partially Paid' },
-        { value: 'overdue', label: 'Overdue' },
-    ];
-
     return [
-        createTextFilterField('search', 'Search', {
-            key: 'page.ap_outstanding.search_placeholder',
-            fallback:
-                'Search bill number, supplier invoice, supplier, branch, PO number, GR number, or notes...',
-        }),
-        createAsyncSelectFilterField(
-            'supplier_id',
-            'Supplier',
-            'Select supplier',
-            '/api/suppliers/select-options',
+        ...createApReportCommonFilterFields(
+            'page.ap_outstanding.search_placeholder',
+            'Search bill number, supplier invoice, supplier, branch, PO number, GR number, or notes...',
         ),
-        createAsyncSelectFilterField(
-            'branch_id',
-            'Branch',
-            'Select branch',
-            '/api/branches/select-options',
-        ),
-        createSelectFilterField(
-            'status',
-            'Status',
-            statusOptions,
-            'Select status',
-        ),
-        {
-            name: 'due_date_from',
-            label: 'Due Date From',
-            component: <FilterDatePicker placeholder="From" />,
-        },
-        {
-            name: 'due_date_to',
-            label: 'Due Date To',
-            component: <FilterDatePicker placeholder="To" />,
-        },
+        createFilterFieldStatusSelect(apBillStatusOptions),
+        ...createFilterFieldDateFields([
+            ['due_date_from', 'Due Date From', 'filter.from', 'From'],
+            ['due_date_to', 'Due Date To', 'filter.to', 'To'],
+        ]),
     ];
 }

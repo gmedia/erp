@@ -18,7 +18,7 @@ export function createWarehouseFilterFields(): FieldDescriptor[] {
             'branch_id',
             { key: 'column.branch', fallback: 'Branch' },
             '/api/branches',
-            'All Branches',
+            { key: 'filter.all_branches', fallback: 'All Branches' },
         ),
     ];
 }

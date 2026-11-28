@@ -9,16 +9,23 @@ import {
 
 export function createCustomerStatementReportFilterFields(): FieldDescriptor[] {
     return [
-        createTextFilterField('search', 'Search', {
-            key: 'page.customer_statement.search_placeholder',
-            fallback: 'Search invoice number...',
-        }),
+        createTextFilterField(
+            'search',
+            { key: 'column.search', fallback: 'Search' },
+            {
+                key: 'page.customer_statement.search_placeholder',
+                fallback: 'Search invoice number...',
+            },
+        ),
         createAsyncSelectFilterField(
             'customer_id',
-            'Customer',
+            { key: 'column.customer', fallback: 'Customer' },
             '/api/customers',
-            'Select customer',
+            { key: 'filter.select_customer', fallback: 'Select customer' },
         ),
-        ...createDateRangeFilterFields('Start Date', 'End Date'),
+        ...createDateRangeFilterFields(
+            { key: 'column.start_date', fallback: 'Start Date' },
+            { key: 'column.end_date', fallback: 'End Date' },
+        ),
     ];
 }

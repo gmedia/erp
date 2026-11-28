@@ -4,10 +4,38 @@ import {
     createTextFilterField,
     type FieldDescriptor,
 } from '@/components/common/filters';
+import {
+    type TranslatableLabel,
+    useTranslatableText,
+} from '@/components/common/TranslatedText';
+
+function AccountFilterSelect({
+    placeholder,
+}: Readonly<{ placeholder: TranslatableLabel }>) {
+    const translatedPlaceholder = useTranslatableText(placeholder);
+    return (
+        <AsyncSelect
+            url="/api/accounts?is_active=1&has_children=0"
+            placeholder={translatedPlaceholder}
+        />
+    );
+}
 
 const statusOptions = [
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'completed', label: 'Completed' },
+    {
+        value: 'in_progress',
+        label: {
+            key: 'filter.reconciliation_status_in_progress',
+            fallback: 'In Progress',
+        },
+    },
+    {
+        value: 'completed',
+        label: {
+            key: 'filter.reconciliation_status_completed',
+            fallback: 'Completed',
+        },
+    },
 ];
 
 export function createBankReconciliationFilterFields(): FieldDescriptor[] {
@@ -24,15 +52,17 @@ export function createBankReconciliationFilterFields(): FieldDescriptor[] {
             'status',
             { key: 'column.status', fallback: 'Status' },
             statusOptions,
-            'Select Status',
+            { key: 'filter.select_status', fallback: 'Select Status' },
         ),
         {
             name: 'account_id',
             label: { key: 'column.account', fallback: 'Account' },
             component: (
-                <AsyncSelect
-                    url="/api/accounts?is_active=1&has_children=0"
-                    placeholder="Select Account"
+                <AccountFilterSelect
+                    placeholder={{
+                        key: 'filter.select_account',
+                        fallback: 'Select Account',
+                    }}
                 />
             ),
         },

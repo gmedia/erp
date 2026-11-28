@@ -16,31 +16,46 @@ export const createAssetMaintenanceFilterFields = (): FieldDescriptor[] => [
             fallback: 'Search maintenances...',
         },
     ),
-    ...createAssetSupplierFilterFields('Filter by asset', 'Filter by supplier'),
+    ...createAssetSupplierFilterFields(
+        { key: 'filter.filter_by_asset', fallback: 'Filter by asset' },
+        { key: 'filter.filter_by_supplier', fallback: 'Filter by supplier' },
+    ),
     ...createMaintenanceTypeStatusFilterFields(
-        'Filter by type',
-        'Filter by status',
+        { key: 'filter.filter_by_type', fallback: 'Filter by type' },
+        { key: 'filter.filter_by_status', fallback: 'Filter by status' },
     ),
     ...createDateFilterFields([
         {
             name: 'scheduled_from',
             label: { key: 'column.scheduled_from', fallback: 'Scheduled From' },
-            placeholder: 'Scheduled From',
+            placeholder: {
+                key: 'column.scheduled_from',
+                fallback: 'Scheduled From',
+            },
         },
         {
             name: 'scheduled_to',
             label: { key: 'column.scheduled_to', fallback: 'Scheduled To' },
-            placeholder: 'Scheduled To',
+            placeholder: {
+                key: 'column.scheduled_to',
+                fallback: 'Scheduled To',
+            },
         },
         {
             name: 'performed_from',
             label: { key: 'column.performed_from', fallback: 'Performed From' },
-            placeholder: 'Performed From',
+            placeholder: {
+                key: 'column.performed_from',
+                fallback: 'Performed From',
+            },
         },
         {
             name: 'performed_to',
             label: { key: 'column.performed_to', fallback: 'Performed To' },
-            placeholder: 'Performed To',
+            placeholder: {
+                key: 'column.performed_to',
+                fallback: 'Performed To',
+            },
         },
     ]),
     ...createCostRangeFilterFields(),

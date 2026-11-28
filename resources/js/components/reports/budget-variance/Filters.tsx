@@ -1,43 +1,74 @@
-import { AsyncSelect } from '@/components/common/AsyncSelect';
 import {
     createSelectFilterField,
+    TranslatedAsyncSelect,
     type FieldDescriptor,
+    type SelectOption,
 } from '@/components/common/filters';
 
-const varianceStatusOptions = [
-    { value: 'within_budget', label: 'Within Budget' },
-    { value: 'warning', label: 'Warning' },
-    { value: 'over_budget', label: 'Over Budget' },
+const varianceStatusOptions: SelectOption[] = [
+    {
+        value: 'within_budget',
+        label: { key: 'filter.within_budget', fallback: 'Within Budget' },
+    },
+    {
+        value: 'warning',
+        label: { key: 'filter.warning', fallback: 'Warning' },
+    },
+    {
+        value: 'over_budget',
+        label: { key: 'filter.over_budget', fallback: 'Over Budget' },
+    },
 ];
 
-const accountTypeOptions = [
-    { value: 'asset', label: 'Asset' },
-    { value: 'liability', label: 'Liability' },
-    { value: 'equity', label: 'Equity' },
-    { value: 'revenue', label: 'Revenue' },
-    { value: 'expense', label: 'Expense' },
+const accountTypeOptions: SelectOption[] = [
+    {
+        value: 'asset',
+        label: { key: 'filter.account_type_asset', fallback: 'Asset' },
+    },
+    {
+        value: 'liability',
+        label: { key: 'filter.account_type_liability', fallback: 'Liability' },
+    },
+    {
+        value: 'equity',
+        label: { key: 'filter.account_type_equity', fallback: 'Equity' },
+    },
+    {
+        value: 'revenue',
+        label: { key: 'filter.account_type_revenue', fallback: 'Revenue' },
+    },
+    {
+        value: 'expense',
+        label: { key: 'filter.account_type_expense', fallback: 'Expense' },
+    },
 ];
 
 export function createBudgetVarianceFilterFields(): FieldDescriptor[] {
     return [
         {
             name: 'budget_id',
-            label: 'Budget',
+            label: { key: 'filter_field.budget', fallback: 'Budget' },
             component: (
-                <AsyncSelect url="/api/budgets" placeholder="Select budget" />
+                <TranslatedAsyncSelect
+                    url="/api/budgets"
+                    placeholder={{
+                        key: 'filter.select_budget',
+                        fallback: 'Select budget',
+                    }}
+                />
             ),
         },
         createSelectFilterField(
             'status',
-            'Status',
+            { key: 'filter_field.status', fallback: 'Status' },
             varianceStatusOptions,
-            'All statuses',
+            { key: 'filter.all_budget_statuses', fallback: 'All statuses' },
         ),
         createSelectFilterField(
             'account_type',
-            'Account Type',
+            { key: 'filter_field.account_type', fallback: 'Account Type' },
             accountTypeOptions,
-            'All types',
+            { key: 'filter.all_account_types', fallback: 'All types' },
         ),
     ];
 }

@@ -5,16 +5,37 @@ import {
 } from '@/components/common/filters';
 
 const frequencyOptions = [
-    { value: 'daily', label: 'Daily' },
-    { value: 'weekly', label: 'Weekly' },
-    { value: 'monthly', label: 'Monthly' },
-    { value: 'quarterly', label: 'Quarterly' },
-    { value: 'annual', label: 'Yearly' },
+    {
+        value: 'daily',
+        label: { key: 'filter.recurring_frequency_daily', fallback: 'Daily' },
+    },
+    {
+        value: 'weekly',
+        label: { key: 'filter.recurring_frequency_weekly', fallback: 'Weekly' },
+    },
+    {
+        value: 'monthly',
+        label: {
+            key: 'filter.recurring_frequency_monthly',
+            fallback: 'Monthly',
+        },
+    },
+    {
+        value: 'quarterly',
+        label: {
+            key: 'filter.recurring_frequency_quarterly',
+            fallback: 'Quarterly',
+        },
+    },
+    {
+        value: 'annual',
+        label: { key: 'filter.recurring_frequency_annual', fallback: 'Yearly' },
+    },
 ];
 
 const activeStatusOptions = [
-    { value: '1', label: 'Active' },
-    { value: '0', label: 'Inactive' },
+    { value: '1', label: { key: 'status.active', fallback: 'Active' } },
+    { value: '0', label: { key: 'status.inactive', fallback: 'Inactive' } },
 ];
 
 export function createRecurringJournalFilterFields(): FieldDescriptor[] {
@@ -31,13 +52,16 @@ export function createRecurringJournalFilterFields(): FieldDescriptor[] {
             'frequency',
             { key: 'column.frequency', fallback: 'Frequency' },
             frequencyOptions,
-            'Select Frequency',
+            {
+                key: 'filter.recurring_select_frequency',
+                fallback: 'Select Frequency',
+            },
         ),
         createSelectFilterField(
             'is_active',
             { key: 'column.status', fallback: 'Status' },
             activeStatusOptions,
-            'Select Status',
+            { key: 'filter.select_status', fallback: 'Select Status' },
         ),
     ];
 }

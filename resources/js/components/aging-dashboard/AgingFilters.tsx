@@ -1,4 +1,5 @@
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
+import { useTranslatableText } from '@/components/common/TranslatedText';
 import {
     Select,
     SelectContent,
@@ -24,10 +25,23 @@ export const AgingFilters = memo<AgingFiltersProps>(function AgingFilters({
     onAsOfDateChange,
     onBranchChange,
 }) {
+    const asOfLabel = useTranslatableText({
+        key: 'filter_field.as_of',
+        fallback: 'As of',
+    });
+    const branchLabel = useTranslatableText({
+        key: 'filter_field.branch',
+        fallback: 'Branch',
+    });
+    const allBranches = useTranslatableText({
+        key: 'filter.all_branches',
+        fallback: 'All Branches',
+    });
+
     return (
         <div className="flex flex-nowrap items-center gap-2">
             <FilterDatePicker
-                label="As of"
+                label={asOfLabel}
                 inlineLabel
                 className="w-auto shrink-0"
                 value={asOfDate}
@@ -36,7 +50,7 @@ export const AgingFilters = memo<AgingFiltersProps>(function AgingFilters({
 
             <div className="shrink-0">
                 <label htmlFor="branch-select" className="sr-only">
-                    Branch
+                    {branchLabel}
                 </label>
                 <Select
                     value={branchId?.toString() || 'all'}
@@ -45,10 +59,10 @@ export const AgingFilters = memo<AgingFiltersProps>(function AgingFilters({
                     }
                 >
                     <SelectTrigger id="branch-select" className="w-[180px]">
-                        <SelectValue placeholder="All Branches" />
+                        <SelectValue placeholder={allBranches} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">All Branches</SelectItem>
+                        <SelectItem value="all">{allBranches}</SelectItem>
                         {branches.map((branch) => (
                             <SelectItem
                                 key={branch.id}

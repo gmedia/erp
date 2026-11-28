@@ -82,7 +82,12 @@ export function FilterModal({
                                         ?.displayName === 'AsyncSelect');
 
                             const isDatePicker =
-                                element?.type === FilterDatePicker;
+                                element?.type === FilterDatePicker ||
+                                (
+                                    element?.type as {
+                                        displayName?: string;
+                                    }
+                                )?.displayName === 'FilterDatePicker';
 
                             const commonProps = {
                                 name: field.name,
