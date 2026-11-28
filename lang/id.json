@@ -754,7 +754,7 @@
         "expected_delivery": "Perkiraan Pengiriman",
         "currency": "Mata Uang",
         "status": "Status",
-        "grand_total": "Grand Total",
+        "grand_total": "Total Akhir",
         "pr_number": "No. PR",
         "branch": "Cabang",
         "department": "Departemen",
@@ -1112,7 +1112,7 @@
             "title": "Pesanan Pembelian",
             "description": "Pesanan yang dikirim ke pemasok beserta progres penerimaan dan penagihan.",
             "search_placeholder": "Cari pesanan pembelian...",
-            "filter_search_placeholder": "Cari no. PO, termin pembayaran, catatan, atau alamat pengiriman..."
+            "filter_search_placeholder": "Cari no. PO, catatan, alamat..."
         },
         "products": {
             "title": "Produk",
@@ -1486,7 +1486,7 @@
         },
         "ap_aging": {
             "description": "Utang dikelompokkan per umur untuk melihat saldo pemasok yang jatuh tempo.",
-            "search_placeholder": "Cari no. tagihan, faktur pemasok, pemasok, cabang, no. PO, no. GR, atau catatan..."
+            "search_placeholder": "Cari no. tagihan, faktur, pemasok..."
         },
         "ap_outstanding": {
             "title": "Laporan Utang Belum Lunas",
@@ -1684,7 +1684,9 @@
         "select_date": "Pilih tanggal",
         "all_budget_statuses": "Semua status",
         "all_account_types": "Semua jenis",
-        "select_aging_date": "Pilih tanggal perhitungan umur",
+        "select_aging_date": "Pilih tanggal",
+        "placeholder_order_date_from": "Pilih tanggal",
+        "placeholder_order_date_to": "Pilih tanggal",
         "from": "Dari",
         "to": "Sampai",
         "bank_transfer": "Transfer Bank",

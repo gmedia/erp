@@ -339,7 +339,7 @@ export function createSelectFilterField(
         label,
         component: (
             <Select>
-                <SelectTrigger className="border-border bg-background">
+                <SelectTrigger>
                     <SelectValue
                         placeholder={<LabelText label={placeholder} />}
                     />
@@ -1404,9 +1404,10 @@ export function createPaymentMethodFilterConfig(
 export function createColumnDateFilterConfig(
     name: string,
     fallback: string,
+    placeholder?: TranslatableLabel,
 ): DateFilterConfig {
     const label: TranslatableLabel = { key: `column.${name}`, fallback };
-    return { name, label, placeholder: label };
+    return { name, label, placeholder: placeholder ?? label };
 }
 
 export type FilterFieldDateTuple = readonly [

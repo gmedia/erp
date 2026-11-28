@@ -1682,6 +1682,8 @@
         "all_budget_statuses": "All statuses",
         "all_account_types": "All types",
         "select_aging_date": "Select aging calculation date",
+        "placeholder_order_date_from": "Order Date From",
+        "placeholder_order_date_to": "Order Date To",
         "from": "From",
         "to": "To",
         "bank_transfer": "Bank Transfer",
