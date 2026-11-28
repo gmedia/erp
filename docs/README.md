@@ -11,6 +11,7 @@ Index for agents and developers. Prefer these paths over inventing new status do
 | [database/IMPLEMENTATION_STATUS.md](./database/IMPLEMENTATION_STATUS.md) | Implementation status SSOT |
 | [refactor-sonar-progress.md](./refactor-sonar-progress.md) | **FROZEN** Sonar batch A–G history |
 | `user-guide-*.md` | End-user guides served via `/api/user-guide` |
+| [user-guide-mobile-install.md](./user-guide-mobile-install.md) | Pasang & perbarui APK Android |
 
 ## Dashboards (do not confuse)
 
