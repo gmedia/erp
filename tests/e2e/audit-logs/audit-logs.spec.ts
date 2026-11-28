@@ -113,6 +113,37 @@ test.describe('Audit Log', () => {
         );
         expect(updateResponse.ok(), await updateResponse.text()).toBeTruthy();
 
+        // Find a system-caused journal log through the API so the assertion
+        // below targets a known row instead of relying on first-page ordering.
+        const systemLogResponse = await api.get(
+            '/api/audit-logs?subject_type=JournalEntry' +
+                '&sort_by=causer_id&sort_direction=asc&per_page=100',
+            { headers },
+        );
+        expect(systemLogResponse.ok()).toBeTruthy();
+        const systemLogPayload = (await systemLogResponse.json()) as
+            | Array<{ causer_name: string | null; subject_id: number | null }>
+            | {
+                  data?: Array<{
+                      causer_name: string | null;
+                      subject_id: number | null;
+                  }>;
+              };
+        const systemLogs = Array.isArray(systemLogPayload)
+            ? systemLogPayload
+            : (systemLogPayload.data ?? []);
+        const systemLog = systemLogs
+            .filter(
+                (log) => log.causer_name === null && log.subject_id !== null,
+            )
+            .sort(
+                (left, right) =>
+                    (right.subject_id ?? 0) - (left.subject_id ?? 0),
+            )[0];
+        expect(systemLog).toBeTruthy();
+        const systemSubjectId = Number(systemLog?.subject_id ?? 0);
+        expect(systemSubjectId).toBeGreaterThan(0);
+
         await page.addInitScript(() =>
             localStorage.setItem('app_locale', 'id'),
         );
@@ -143,8 +174,25 @@ test.describe('Audit Log', () => {
         await expect(auditRow).toContainText('Mengubah');
         await expect(auditRow).toContainText('deskripsi');
 
+        await page.getByRole('button', { name: 'Filter' }).click();
+        const systemFilterDialog = page.getByRole('dialog', {
+            name: 'Filter',
+        });
+        await systemFilterDialog
+            .getByPlaceholder(/Cari ringkasan|Search summary/)
+            .fill(String(systemSubjectId));
+        await systemFilterDialog
+            .getByRole('button', { name: 'Terapkan filter' })
+            .click();
+
         const systemCauserRow = page
             .locator('tbody tr')
+            .filter({
+                has: page.getByRole('cell', {
+                    name: String(systemSubjectId),
+                    exact: true,
+                }),
+            })
             .filter({ hasText: 'Sistem' })
             .first();
         await expect(systemCauserRow).toBeVisible();
