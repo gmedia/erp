@@ -21,6 +21,8 @@ Route::post('social/exchange', [SocialAuthController::class, 'exchange'])
 Route::post('social/two-factor/verify', [SocialAuthController::class, 'verifyTwoFactor'])
     ->middleware('throttle:social-exchange');
 
+require __DIR__ . '/api/mobile-app.php';
+
 // === PROTECTED ===
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);

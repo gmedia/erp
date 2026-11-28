@@ -217,6 +217,12 @@ const TrialBalanceDetailed = lazy(
 );
 const UserGuide = lazy(() => import('./pages/user-guide/index'));
 
+// Mobile App
+const MobileAppReleases = lazy(
+    () => import('./pages/mobile-app-releases/index'),
+);
+const MobileAppDownload = lazy(() => import('./pages/mobile-app/index'));
+
 const Budgets = lazy(() => import('./pages/budgets/index'));
 const ReportBudgetVariance = lazy(
     () => import('./pages/reports/budget-variance/index'),
@@ -1115,6 +1121,24 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <UserGuide />
+                        </P>
+                    }
+                />
+
+                {/* Mobile App */}
+                <Route
+                    path="/mobile-app-releases"
+                    element={
+                        <P>
+                            <MobileAppReleases />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/mobile-app"
+                    element={
+                        <P>
+                            <MobileAppDownload />
                         </P>
                     }
                 />
