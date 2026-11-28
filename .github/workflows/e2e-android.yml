@@ -13,7 +13,13 @@ on:
       - 'tests/e2e-android/**'
       - 'scripts/e2e-android.sh'
       - 'scripts/ci/e2e-android-ci.sh'
+      - 'scripts/build-company-mobile.sh'
       - 'resources/js/lib/axios.ts'
+      - 'resources/js/hooks/useMobileUpdateCheck.ts'
+      - 'resources/js/components/mobile-app/**'
+      - 'resources/js/pages/mobile-app/**'
+      - 'routes/api/mobile-app.php'
+      - 'app/**/MobileApp*/**'
       - '.github/workflows/e2e-android.yml'
   schedule:
     - cron: '17 2 * * *'
