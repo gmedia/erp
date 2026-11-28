@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Employment;
+use App\Models\PeriodClosing;
 use App\Models\Permission;
 use App\Models\Position;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -190,13 +191,19 @@ class DatabaseSeeder extends Seeder
             ProductSampleDataSeeder::class,
             PurchasingSampleDataSeeder::class,
             ApSampleDataSeeder::class,
+            ApMonthlyDemoSeeder::class,
+            PurchasingMonthlyDemoSeeder::class,
             AssetSampleDataSeeder::class,
             VehicleLoanSampleDataSeeder::class,
             StockTransferSampleDataSeeder::class,
             InventoryStocktakeSampleDataSeeder::class,
             StockAdjustmentSampleDataSeeder::class,
+            StockAdjustmentMonthlyDemoSeeder::class,
             StockMovementSampleDataSeeder::class,
             ArSampleDataSeeder::class,
+            ArMonthlyDemoSeeder::class,
+            // Dokumen AR/AP terbuka yang tersebar di lima bucket aging (#571 C8).
+            DemoAgingSeeder::class,
             // Normalisasi depresiasi aset (semua aset, termasuk kendaraan, sudah
             // ada) sebelum rekonsiliasi GL (W7-05). Harus sebelum GlExtendedSampleDataSeeder,
             // karena periode bulan yang diposting di sini ditutup di seeder tersebut (#423).
@@ -210,6 +217,14 @@ class DatabaseSeeder extends Seeder
 
         $this->spreadIdenticalAuditTimestamps();
         $this->renumberDemoJournalEntries($journalIdBoundary);
+
+        // Penutupan tahun lalu paling akhir: jurnal penutup dibentuk setelah semua
+        // transaksi demo tercatat, karena penutupan annual mengunci seluruh FY (#571).
+        $this->call(DemoPeriodClosingSeeder::class);
+
+        // Jurnal penutup tahunan dibuat ACTION dengan prefix CL-; setelah ditutup, nomornya
+        // disamakan ke urutan JV demo agar tetap naik sesuai tanggal (#503 butir 3).
+        $this->renumberDemoJournalEntries($journalIdBoundary, includeClosingEntries: true);
 
         // Assign all permissions to sample users for easy testing. Cari karyawan lewat
         // user_id: email karyawan bisa berbeda dari email user di data demo lama (PR432).
@@ -242,12 +257,19 @@ class DatabaseSeeder extends Seeder
      * created_by (dibuat pengguna) yang sudah ada sebelum run ini, renumber dilewati seluruhnya.
      * Jurnal sistem/demo (created_by null) tidak dikunci.
      */
-    private function renumberDemoJournalEntries(int $journalIdBoundary): void
+    private function renumberDemoJournalEntries(int $journalIdBoundary, bool $includeClosingEntries = false): void
     {
+        // Jurnal demo juga punya created_by (admin) dan journal_type general untuk
+        // depresiasi. Kunci renumber hanya untuk jurnal yang benar-benar dibuat
+        // pengguna: selain tipe sistem/penutup dan selain jurnal DEPR- (#503).
         $hasUserJournal = DB::table('journal_entries')
             ->where('id', '<=', $journalIdBoundary)
             ->where('entry_number', 'like', 'JV-%')
             ->whereNotNull('created_by')
+            ->whereNotIn('journal_type', ['system', 'closing', 'st_dispatch', 'st_receive', 'st_shortage'])
+            ->where(fn ($query) => $query
+                ->whereNull('reference')
+                ->orWhere('reference', 'not like', 'DEPR-%'))
             ->exists();
 
         if ($hasUserJournal) {
@@ -255,11 +277,20 @@ class DatabaseSeeder extends Seeder
         }
 
         $entries = DB::table('journal_entries')
-            ->where('entry_number', 'like', 'JV-%')
+            ->where(function ($query) use ($includeClosingEntries): void {
+                $query->where('entry_number', 'like', 'JV-%');
+
+                if ($includeClosingEntries) {
+                    $query->orWhere(fn ($closing) => $closing
+                        ->where('entry_number', 'like', 'CL-%')
+                        ->where('journal_type', 'closing')
+                        ->where('source_type', PeriodClosing::class));
+                }
+            })
             ->orderBy('fiscal_year_id')
             ->orderBy('entry_date')
             ->orderBy('id')
-            ->get(['id', 'fiscal_year_id', 'entry_number']);
+            ->get(['id', 'fiscal_year_id', 'entry_number', 'entry_date']);
 
         // Pass 1: nomor sementara agar tidak bentrok dengan unique constraint.
         foreach ($entries as $entry) {
@@ -269,7 +300,7 @@ class DatabaseSeeder extends Seeder
         // Pass 2: nomor final per tahun fiskal, berurutan sesuai tanggal.
         $sequenceByYear = [];
         foreach ($entries as $entry) {
-            $year = substr($entry->entry_number, 3, 4);
+            $year = Carbon::parse($entry->entry_date)->format('Y');
             $key = $entry->fiscal_year_id . '|' . $year;
             $sequenceByYear[$key] = ($sequenceByYear[$key] ?? 0) + 1;
 

@@ -43,6 +43,10 @@ class ClosePeriodAction
                 'closing_journal_entry_id' => $entry?->id,
             ]);
 
+            if (! $periodClosing->isAnnual()) {
+                $periodClosing->update(['net_income' => $this->monthlyNetIncome($periodClosing)]);
+            }
+
             return $periodClosing->refresh()->load([
                 'fiscalYear',
                 'closingJournalEntry',
@@ -136,6 +140,27 @@ class ClosePeriodAction
         $periodClosing->update(['net_income' => $netIncomeCents / 100]);
 
         return $entry;
+    }
+
+    /**
+     * Laba bersih satu bulan dari jurnal posted (revenue - expense, bukan jurnal penutup).
+     * Revenue normal kredit dan expense normal debit, sehingga credit - debit = laba bersih.
+     */
+    private function monthlyNetIncome(PeriodClosing $periodClosing): float
+    {
+        $net = DB::table('journal_entry_lines')
+            ->join('journal_entries', 'journal_entry_lines.journal_entry_id', '=', 'journal_entries.id')
+            ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.fiscal_year_id', $periodClosing->fiscal_year_id)
+            ->where('journal_entries.status', 'posted')
+            ->where('journal_entries.journal_type', '<>', 'closing')
+            ->whereIn('accounts.type', ['revenue', 'expense'])
+            ->whereYear('journal_entries.entry_date', $periodClosing->period_year)
+            ->whereMonth('journal_entries.entry_date', $periodClosing->period_month)
+            ->selectRaw('COALESCE(SUM(journal_entry_lines.credit - journal_entry_lines.debit), 0) as net')
+            ->value('net');
+
+        return round((float) $net, 2);
     }
 
     private function toCents(mixed $value): int

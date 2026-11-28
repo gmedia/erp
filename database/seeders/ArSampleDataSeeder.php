@@ -4,12 +4,12 @@ namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostArReceiptJournalAction;
 use App\Actions\AccountingPosting\PostCustomerInvoiceJournalAction;
+use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Actions\CreditNotes\ApplyCreditNoteAction;
 use App\Models\Account;
 use App\Models\ArReceipt;
 use App\Models\ArReceiptAllocation;
 use App\Models\Branch;
-use App\Models\CoaVersion;
 use App\Models\CreditNote;
 use App\Models\CreditNoteItem;
 use App\Models\Customer;
@@ -21,6 +21,7 @@ use App\Models\FiscalYear;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\User;
+use App\Support\Demo\DemoCalendar;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
 use Illuminate\Database\Seeder;
 
@@ -53,10 +54,10 @@ class ArSampleDataSeeder extends Seeder
         }
 
         $branch = Branch::query()->first();
-        $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
+        $fiscalYear = DemoCalendar::currentFiscalYear();
         $products = Product::query()->take(5)->get();
         $units = Unit::query()->take(3)->get();
-        $activeCoaVersionId = CoaVersion::query()->where('status', 'active')->value('id');
+        $activeCoaVersionId = DemoCalendar::currentCoaVersionId();
         $revenueAccount = Account::query()
             ->where('coa_version_id', $activeCoaVersionId)
             ->where('type', 'revenue')
@@ -239,9 +240,7 @@ class ArSampleDataSeeder extends Seeder
             $customer = $customers[$index % $customers->count()];
             // Tanggal dokumen lebih tua untuk invoice overdue agar jatuh
             // tempo tetap setelah tanggal dokumen (W5-20).
-            $invoiceDate = now()->subDays(
-                $definition['invoice_date_days_ago'] ?? (60 - $index * 5),
-            );
+            $invoiceDate = now()->subDays($definition['invoice_date_days_ago']);
             $dueDate = $invoiceDate->copy()->addDays($definition['due_date_offset']);
 
             $subtotal = $definition['grand_total'] * 0.9;
@@ -347,13 +346,9 @@ class ArSampleDataSeeder extends Seeder
         $receipts = [];
         $postReceiptJournal = app(PostArReceiptJournalAction::class);
 
-        $bankAccount = Account::query()
-            ->where('coa_version_id', CoaVersion::query()->where('status', 'active')->value('id'))
-            ->where('code', '11110')
-            ->where('is_active', true)
-            ->first();
+        $resolveControlAccount = app(ResolveControlAccountAction::class);
 
-        if (! $bankAccount) {
+        if (! Account::query()->where('code', '11110')->exists()) {
             return [];
         }
 
@@ -394,6 +389,8 @@ class ArSampleDataSeeder extends Seeder
                 ? $customers->firstWhere('id', $allocatedInvoice->customer_id)
                 : $this->customerWithOpenInvoice($customers, $invoices);
             $receiptDate = now()->subDays(30 - $index * 3);
+            // Akun bank (11110) dari COA yang berlaku pada tanggal penerimaan (#571).
+            $bankAccount = $resolveControlAccount->execute('11110', $receiptDate->toDateString());
 
             $receipt = ArReceipt::updateOrCreate(
                 ['receipt_number' => $definition['number']],

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostAssetAcquisitionJournalAction;
-use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Models\ApprovalFlow;
 use App\Models\ApprovalFlowStep;
 use App\Models\ApprovalRequest;
@@ -593,9 +592,16 @@ class VehicleLoanSampleDataSeeder extends Seeder
             // Register awal = saldo opening dari jurnal ACQ (bukan selisih GL).
             // Kolom book_value default 0 akan membuat run depresiasi melewati
             // kendaraan ini (#357).
-            $accumulatedAccountId = app(ResolveControlAccountAction::class)
-                ->execute('12200', $asset->purchase_date->toDateString())
-                ->id;
+            // Akun akumulasi diambil dari baris jurnal ACQ itu sendiri. Jurnal opening dibuat
+            // pada tanggal FY terbuka (PostAssetAcquisitionJournalAction), bukan tanggal beli,
+            // jadi resolver dengan purchase_date (sebelum FY mana pun) tidak tepat (#571).
+            $accumulatedAccountId = JournalEntryLine::query()
+                ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+                ->where('journal_entries.reference', 'ACQ-' . $asset->asset_code)
+                ->where('journal_entries.status', 'posted')
+                ->where('journal_entry_lines.credit', '>', 0)
+                ->whereHas('account', fn ($query) => $query->where('code', '12200'))
+                ->value('journal_entry_lines.account_id');
             $openingAccumulated = (float) JournalEntryLine::query()
                 ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
                 ->where('journal_entries.reference', 'ACQ-' . $asset->asset_code)

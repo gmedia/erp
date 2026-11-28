@@ -28,8 +28,12 @@ beforeEach(function () {
         ->firstOrFail();
     $this->revenue = Account::where('coa_version_id', $coa->id)->where('type', 'revenue')->firstOrFail();
 
-    // Kosongkan jurnal demo tahun ini agar angka exact hanya berasal dari test ini.
-    $demoEntryIds = JournalEntry::where('fiscal_year_id', $this->fiscalYear->id)->pluck('id');
+    // Kosongkan jurnal demo agar angka exact hanya berasal dari test ini. Jurnal tahun lalu
+    // ikut dikosongkan: saldo neraca dibawa ke depan (opening), sehingga riwayat FY sebelumnya
+    // (#571) akan ikut masuk TOTAL bila tidak dibersihkan.
+    $demoEntryIds = JournalEntry::query()
+        ->whereIn('fiscal_year_id', FiscalYear::query()->pluck('id'))
+        ->pluck('id');
     JournalEntryLine::whereIn('journal_entry_id', $demoEntryIds)->delete();
     JournalEntry::whereIn('id', $demoEntryIds)->delete();
 });

@@ -3,6 +3,7 @@
 namespace App\Actions\AccountingPosting;
 
 use App\Models\Account;
+use App\Models\AccountMapping;
 use App\Models\CoaVersion;
 use Illuminate\Validation\ValidationException;
 
@@ -27,13 +28,19 @@ class ResolveControlAccountAction
             ->where('is_active', true)
             ->first();
 
-        if ($account === null) {
+        if ($account !== null) {
+            return $account;
+        }
+
+        $counterpart = $this->resolveThroughMapping($accountCode, $coaVersion);
+
+        if ($counterpart === null) {
             throw ValidationException::withMessages([
                 'account' => __('accounting_posting.control_account_missing', ['code' => $accountCode]),
             ]);
         }
 
-        return $account;
+        return $counterpart;
     }
 
     /**
@@ -70,6 +77,40 @@ class ResolveControlAccountAction
         }
 
         throw $this->ambiguous($entryDate);
+    }
+
+    /**
+     * Padanan kode $accountCode di COA version $coaVersion lewat account_mappings (#571).
+     *
+     * Kode kontrol di kode posting berasal dari versi COA terbaru. Bila kode itu tidak ada
+     * di versi yang berlaku untuk tanggal jurnal (mis. 11110 pada COA 2025 yang hanya punya
+     * 11100), telusuri mapping terbalik: akun $accountCode di versi lain sebagai target,
+     * lalu sumbernya di $coaVersion. Hanya padanan tunggal yang diterima; nol atau lebih
+     * dari satu padanan dianggap tidak ada (control_account_missing), agar tidak menebak.
+     */
+    private function resolveThroughMapping(string $accountCode, CoaVersion $coaVersion): ?Account
+    {
+        $targetIds = Account::query()
+            ->where('code', $accountCode)
+            ->where('is_active', true)
+            ->where('coa_version_id', '!=', $coaVersion->id)
+            ->pluck('id');
+
+        if ($targetIds->isEmpty()) {
+            return null;
+        }
+
+        $sourceIds = AccountMapping::query()
+            ->whereIn('target_account_id', $targetIds)
+            ->pluck('source_account_id');
+
+        $accounts = Account::query()
+            ->where('coa_version_id', $coaVersion->id)
+            ->whereIn('id', $sourceIds)
+            ->where('is_active', true)
+            ->get();
+
+        return $accounts->count() === 1 ? $accounts->first() : null;
     }
 
     private function ambiguous(string $entryDate): ValidationException

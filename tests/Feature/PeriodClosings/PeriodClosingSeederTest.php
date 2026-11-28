@@ -1,16 +1,16 @@
 <?php
 
+use App\Actions\PeriodClosings\ClosePeriodAction;
 use App\Models\Account;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
 use App\Models\PeriodClosing;
-use Database\Seeders\GlExtendedSampleDataSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class)->group('period-closings');
 
-test('seeded closed periods carry net income from posted journals', function () {
+test('closed monthly period carries net income from posted journals', function () {
     $fiscalYear = FiscalYear::factory()->create([
         'name' => 'FY 2026',
         'start_date' => '2026-01-01',
@@ -48,13 +48,19 @@ test('seeded closed periods carry net income from posted journals', function () 
         'credit' => 0,
     ]);
 
-    $this->seed(GlExtendedSampleDataSeeder::class);
+    $closing = PeriodClosing::factory()->create([
+        'fiscal_year_id' => $fiscalYear->id,
+        'period_year' => 2026,
+        'period_month' => 1,
+        'closing_type' => 'monthly',
+        'status' => 'draft',
+        'retained_earnings_account_id' => $revenue->id,
+    ]);
 
-    $closing = PeriodClosing::query()
-        ->where('fiscal_year_id', $fiscalYear->id)
-        ->where('period_month', 1)
-        ->first();
+    app(ClosePeriodAction::class)->execute($closing);
 
-    expect($closing)->not->toBeNull()
+    $closing->refresh();
+
+    expect($closing->status)->toBe('closed')
         ->and((float) $closing->net_income)->toBe(4500000.0);
 });

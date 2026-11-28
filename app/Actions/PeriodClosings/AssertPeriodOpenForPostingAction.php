@@ -19,7 +19,20 @@ class AssertPeriodOpenForPostingAction
     {
         $date = Carbon::parse($entryDate);
 
-        $locked = PeriodClosing::query()
+        if ($this->isLocked($fiscalYearId, $date)) {
+            throw ValidationException::withMessages([
+                'entry_date' => __('period_closings.posting_locked', ['date' => $date->toDateString()]),
+            ]);
+        }
+    }
+
+    /**
+     * Apakah tanggal $date terkunci penutupan (monthly bulan itu, atau annual seluruh FY).
+     * Dipakai juga oleh seeder demo agar dokumen di periode tertutup dilewati, bukan gagal (#571).
+     */
+    public function isLocked(int $fiscalYearId, Carbon $date): bool
+    {
+        return PeriodClosing::query()
             ->where('fiscal_year_id', $fiscalYearId)
             ->where('status', 'closed')
             ->where(function ($query) use ($date): void {
@@ -30,11 +43,5 @@ class AssertPeriodOpenForPostingAction
                 })->orWhere('closing_type', 'annual');
             })
             ->exists();
-
-        if ($locked) {
-            throw ValidationException::withMessages([
-                'entry_date' => __('period_closings.posting_locked', ['date' => $date->toDateString()]),
-            ]);
-        }
     }
 }

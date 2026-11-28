@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use App\Models\JournalEntry;
+use App\Support\Demo\DemoCalendar;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -12,13 +14,27 @@ uses(RefreshDatabase::class)->group('sample-data-seeders');
 
 function glBalance(string $code): float
 {
-    $fiscalYear = FiscalYear::query()->where('status', 'open')->firstOrFail();
+    // Jendela demo 13 bulan lintas tahun fiskal (#571): saldo GL = seluruh FY demo,
+    // sebanding dengan subledger yang juga tidak dibatasi FY. Hanya akun CoA aktif
+    // yang dihitung: CoA tahun lalu yang diarsipkan sudah dipindahkan ke CoA aktif
+    // lewat saldo awal saat penutupan tahun, sehingga menghitung keduanya membuat
+    // akun neraca terhitung dua kali.
+    $fiscalYearIds = FiscalYear::query()
+        ->whereIn('name', array_map('strval', DemoCalendar::fiscalYears()))
+        ->pluck('id');
+
+    $coaVersionId = CoaVersion::query()
+        ->where('status', 'active')
+        ->orderByDesc('fiscal_year_id')
+        ->firstOrFail()
+        ->id;
 
     $row = DB::table('journal_entry_lines')
         ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
         ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
-        ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+        ->whereIn('journal_entries.fiscal_year_id', $fiscalYearIds)
         ->where('journal_entries.status', 'posted')
+        ->where('accounts.coa_version_id', $coaVersionId)
         ->where('accounts.code', $code)
         ->selectRaw('COALESCE(SUM(journal_entry_lines.debit),0) as debit, COALESCE(SUM(journal_entry_lines.credit),0) as credit')
         ->first();

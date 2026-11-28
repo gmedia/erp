@@ -2,6 +2,7 @@
 
 use App\Actions\AccountingPosting\ResolveControlAccountAction;
 use App\Models\Account;
+use App\Models\AccountMapping;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
 use Database\Seeders\CoaSeeder;
@@ -94,6 +95,86 @@ test('resolver menolak 422 bila ada dua COA aktif untuk tahun fiskal yang sama',
         ->toThrow(ValidationException::class);
 });
 
+/**
+ * COA 2025 berisi Cash (11100) yang dipetakan split ke Cash in Banks (11110) di COA 2026.
+ * Mengembalikan [coa2025, coa2026, akun 11100 di COA 2025, akun 11110 di COA 2026].
+ */
+function makeSplitCoaPair(): array
+{
+    $coa2025 = makeCoaForYear('2025', 'active', 'Kas 2025');
+    Account::where('coa_version_id', $coa2025->id)->where('code', '11110')->delete();
+    $cash2025 = Account::factory()->create([
+        'coa_version_id' => $coa2025->id,
+        'code' => '11100',
+        'name' => 'Cash',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+
+    $coa2026 = makeCoaForYear('2026', 'active', 'Cash in Banks');
+    $bank2026 = Account::where('coa_version_id', $coa2026->id)->where('code', '11110')->firstOrFail();
+
+    AccountMapping::create([
+        'source_account_id' => $cash2025->id,
+        'target_account_id' => $bank2026->id,
+        'type' => 'split',
+        'notes' => 'Cash split into Cash in Banks',
+    ]);
+
+    return [$coa2025, $coa2026, $cash2025, $bank2026];
+}
+
+test('kode kontrol yang tidak ada di COA tahun jurnal diselesaikan lewat mapping terbalik (2025 -> 11100)', function () {
+    [$coa2025, , $cash2025] = makeSplitCoaPair();
+
+    $account = app(ResolveControlAccountAction::class)->execute('11110', '2025-06-15');
+
+    expect($account->id)->toBe($cash2025->id)
+        ->and($account->coa_version_id)->toBe($coa2025->id)
+        ->and($account->code)->toBe('11100');
+});
+
+test('kode kontrol yang ada langsung di COA tahun jurnal dipakai tanpa mapping (2026 -> 11110)', function () {
+    [, $coa2026, , $bank2026] = makeSplitCoaPair();
+
+    $account = app(ResolveControlAccountAction::class)->execute('11110', '2026-03-01');
+
+    expect($account->id)->toBe($bank2026->id)
+        ->and($account->coa_version_id)->toBe($coa2026->id);
+});
+
+test('resolver menolak 422 bila kode kontrol tidak punya padanan mapping di COA tahun jurnal', function () {
+    $coa2025 = makeCoaForYear('2025', 'active', 'Kas 2025');
+    Account::where('coa_version_id', $coa2025->id)->where('code', '11110')->delete();
+    makeCoaForYear('2026', 'active', 'Cash in Banks');
+
+    expect(fn () => app(ResolveControlAccountAction::class)->execute('11110', '2025-06-15'))
+        ->toThrow(ValidationException::class);
+});
+
+test('resolver menolak 422 bila padanan mapping ambigu (dua akun COA tahun jurnal terhubung)', function () {
+    [$coa2025, , , $bank2026] = makeSplitCoaPair();
+
+    $cashKecil2025 = Account::factory()->create([
+        'coa_version_id' => $coa2025->id,
+        'code' => '11105',
+        'name' => 'Petty Cash 2025',
+        'type' => 'asset',
+        'normal_balance' => 'debit',
+        'is_active' => true,
+    ]);
+    AccountMapping::create([
+        'source_account_id' => $cashKecil2025->id,
+        'target_account_id' => $bank2026->id,
+        'type' => 'split',
+        'notes' => 'uji ambigu',
+    ]);
+
+    expect(fn () => app(ResolveControlAccountAction::class)->execute('11110', '2025-06-15'))
+        ->toThrow(ValidationException::class);
+});
+
 test('db:seed kedua tidak menambah COA maupun tahun fiskal dan COA buatan pengguna tetap utuh', function () {
     $this->seed(CoaSeeder::class);
 
@@ -116,7 +197,7 @@ test('db:seed kedua tidak menambah COA maupun tahun fiskal dan COA buatan penggu
     expect(FiscalYear::count())->toBe($fiscalYears)
         ->and(CoaVersion::count())->toBe($coaVersions)
         ->and(Account::count())->toBe($accounts)
-        ->and(CoaVersion::where('status', 'active')->count())->toBe(1)
+        ->and(CoaVersion::where('status', 'active')->count())->toBe(2)
         ->and($userCoa->fresh()->status)->toBe('draft')
         ->and($userAccount->fresh()->name)->toBe('Akun pengguna');
 });

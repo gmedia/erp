@@ -7,6 +7,8 @@ use App\Actions\AccountingPosting\PostStockAdjustmentJournalAction;
 use App\Actions\AccountingPosting\PostStockTransferJournalAction;
 use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
 use App\Actions\InventoryStocktakes\CreateStocktakeAdjustmentDraftAction;
+use App\Actions\PeriodClosings\AssertPeriodOpenForPostingAction;
+use App\Models\FiscalYear;
 use App\Models\GoodsReceipt;
 use App\Models\InventoryStocktake;
 use App\Models\JournalEntry;
@@ -18,7 +20,9 @@ use App\Models\StockTransfer;
 use App\Models\SupplierReturn;
 use App\Services\StockPostingService;
 use Database\Seeders\Concerns\ReopensDemoPeriodClosings;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 
 /**
@@ -46,6 +50,9 @@ class StockMovementSampleDataSeeder extends Seeder
     // sudah di-rename oleh seeder masing-masing, jadi pola lama tidak dipakai lagi.
     private const SA_DEMO = 'SA-____-00000_';
 
+    /** Penyesuaian bulanan SA-YYYY-0001NN (StockAdjustmentMonthlyDemoSeeder). */
+    private const SA_MONTHLY_DEMO = 'SA-____-0001__';
+
     private const ST_DEMO = 'ST-____-00000_';
 
     protected function seedDemoData(): void
@@ -62,6 +69,8 @@ class StockMovementSampleDataSeeder extends Seeder
             ->with('items')
             ->orderBy('receipt_date')
             ->orderBy('id')
+            ->get()
+            ->reject(fn (GoodsReceipt $receipt) => $this->isPeriodLocked($receipt->receipt_date))
             ->each(fn (GoodsReceipt $receipt) => $stockPosting->postGoodsReceipt($receipt));
 
         SupplierReturn::query()
@@ -70,14 +79,17 @@ class StockMovementSampleDataSeeder extends Seeder
             ->with('items')
             ->orderBy('return_date')
             ->orderBy('id')
+            ->get()
+            ->reject(fn (SupplierReturn $return) => $this->isPeriodLocked($return->return_date))
             ->each(fn (SupplierReturn $return) => $stockPosting->postSupplierReturn($return));
 
-        StockAdjustment::query()
+        $this->demoAdjustmentsQuery()
             ->where('status', 'approved')
-            ->where('adjustment_number', 'like', self::SA_DEMO)
             ->with('items')
             ->orderBy('adjustment_date')
             ->orderBy('id')
+            ->get()
+            ->reject(fn (StockAdjustment $adjustment) => $this->isPeriodLocked($adjustment->adjustment_date))
             ->each(fn (StockAdjustment $adjustment) => $stockPosting->postStockAdjustment($adjustment));
 
         StockTransfer::query()
@@ -86,6 +98,8 @@ class StockMovementSampleDataSeeder extends Seeder
             ->with('items')
             ->orderBy('transfer_date')
             ->orderBy('id')
+            ->get()
+            ->reject(fn (StockTransfer $transfer) => $this->isPeriodLocked($transfer->transfer_date))
             ->each(function (StockTransfer $transfer) use ($stockPosting): void {
                 $stockPosting->postStockTransferDispatch($transfer);
                 $stockPosting->postStockTransferReceive($transfer);
@@ -125,6 +139,16 @@ class StockMovementSampleDataSeeder extends Seeder
                 }
             }
         }
+    }
+
+    /**
+     * Dokumen SA demo: pola nomor lama (SA-YYYY-00000N) dan penyesuaian bulanan.
+     */
+    private function demoAdjustmentsQuery(): Builder
+    {
+        return StockAdjustment::query()->where(fn ($query) => $query
+            ->where('adjustment_number', 'like', self::SA_DEMO)
+            ->orWhere('adjustment_number', 'like', self::SA_MONTHLY_DEMO));
     }
 
     /**
@@ -238,11 +262,32 @@ class StockMovementSampleDataSeeder extends Seeder
      */
     private function deleteDemoStockMovements(): void
     {
+        // Dokumen di periode tertutup tidak dibangun ulang: pergerakannya sudah sah dan
+        // sudah masuk penutupan, jadi tidak dihapus (#571).
         $demoIds = [
-            GoodsReceipt::class => $this->demoIds(GoodsReceipt::class, 'gr_number', self::GR_DEMO),
-            SupplierReturn::class => $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO),
-            StockAdjustment::class => $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO),
-            StockTransfer::class => $this->demoIds(StockTransfer::class, 'transfer_number', self::ST_DEMO),
+            GoodsReceipt::class => GoodsReceipt::query()
+                ->where('gr_number', 'like', self::GR_DEMO)
+                ->get()
+                ->reject(fn (GoodsReceipt $receipt) => $this->isPeriodLocked($receipt->receipt_date))
+                ->pluck('id')
+                ->all(),
+            SupplierReturn::class => SupplierReturn::query()
+                ->where('return_number', 'like', self::SR_DEMO)
+                ->get()
+                ->reject(fn (SupplierReturn $return) => $this->isPeriodLocked($return->return_date))
+                ->pluck('id')
+                ->all(),
+            StockAdjustment::class => $this->demoAdjustmentsQuery()
+                ->get()
+                ->reject(fn (StockAdjustment $adjustment) => $this->isPeriodLocked($adjustment->adjustment_date))
+                ->pluck('id')
+                ->all(),
+            StockTransfer::class => StockTransfer::query()
+                ->where('transfer_number', 'like', self::ST_DEMO)
+                ->get()
+                ->reject(fn (StockTransfer $transfer) => $this->isPeriodLocked($transfer->transfer_date))
+                ->pluck('id')
+                ->all(),
         ];
 
         StockMovement::query()
@@ -261,15 +306,19 @@ class StockMovementSampleDataSeeder extends Seeder
     }
 
     /**
-     * @param  class-string  $modelClass
-     * @return list<int>
+     * Tanggal dokumen jatuh di periode yang sudah ditutup (monthly atau annual) (#571).
+     * Tanggal di luar FY mana pun tidak terkunci: tidak ada periode yang bisa ditutup.
      */
-    private function demoIds(string $modelClass, string $numberColumn, string $demoPattern): array
+    private function isPeriodLocked(mixed $documentDate): bool
     {
-        return $modelClass::query()
-            ->where($numberColumn, 'like', $demoPattern)
-            ->pluck('id')
-            ->all();
+        $date = Carbon::parse($documentDate)->startOfDay();
+        $fiscalYear = FiscalYear::query()
+            ->where('start_date', '<=', $date->toDateString())
+            ->where('end_date', '>=', $date->toDateString())
+            ->first();
+
+        return $fiscalYear !== null
+            && app(AssertPeriodOpenForPostingAction::class)->isLocked($fiscalYear->id, $date);
     }
 
     /**
@@ -280,20 +329,21 @@ class StockMovementSampleDataSeeder extends Seeder
      */
     private function postInventoryJournals(): void
     {
+        // Jurnal dokumen di periode tertutup tidak dilepas maupun diposting ulang (#571).
         $demoEntryIds = JournalEntry::query()
             ->where(fn ($query) => $query
                 ->where(fn ($q) => $q
                     ->where('source_type', GoodsReceipt::class)
-                    ->whereIn('source_id', $this->demoIds(GoodsReceipt::class, 'gr_number', self::GR_DEMO)))
+                    ->whereIn('source_id', $this->unlockedIds(GoodsReceipt::class, 'gr_number', self::GR_DEMO, 'receipt_date')))
                 ->orWhere(fn ($q) => $q
                     ->where('source_type', SupplierReturn::class)
-                    ->whereIn('source_id', $this->demoIds(SupplierReturn::class, 'return_number', self::SR_DEMO)))
+                    ->whereIn('source_id', $this->unlockedIds(SupplierReturn::class, 'return_number', self::SR_DEMO, 'return_date')))
                 ->orWhere(fn ($q) => $q
                     ->where('source_type', StockAdjustment::class)
-                    ->whereIn('source_id', $this->demoIds(StockAdjustment::class, 'adjustment_number', self::SA_DEMO)))
+                    ->whereIn('source_id', $this->unlockedAdjustmentIds()))
                 ->orWhere(fn ($q) => $q
                     ->where('source_type', StockTransfer::class)
-                    ->whereIn('source_id', $this->demoIds(StockTransfer::class, 'transfer_number', self::ST_DEMO))))
+                    ->whereIn('source_id', $this->unlockedIds(StockTransfer::class, 'transfer_number', self::ST_DEMO, 'transfer_date'))))
             ->pluck('id');
 
         if ($demoEntryIds->isNotEmpty()) {
@@ -314,6 +364,7 @@ class StockMovementSampleDataSeeder extends Seeder
             ->where('gr_number', 'like', self::GR_DEMO)
             ->orderBy('id')
             ->get()
+            ->reject(fn (GoodsReceipt $receipt) => $this->isPeriodLocked($receipt->receipt_date))
             ->each(fn (GoodsReceipt $receipt) => $postGoodsReceipt->execute($receipt->refresh()));
 
         SupplierReturn::query()
@@ -321,16 +372,45 @@ class StockMovementSampleDataSeeder extends Seeder
             ->where('return_number', 'like', self::SR_DEMO)
             ->orderBy('id')
             ->get()
+            ->reject(fn (SupplierReturn $return) => $this->isPeriodLocked($return->return_date))
             ->each(fn (SupplierReturn $return) => $postSupplierReturn->execute($return->refresh()));
 
-        StockAdjustment::query()
+        $this->demoAdjustmentsQuery()
             ->where('status', 'approved')
-            ->where('adjustment_number', 'like', self::SA_DEMO)
             ->orderBy('id')
             ->get()
+            ->reject(fn (StockAdjustment $adjustment) => $this->isPeriodLocked($adjustment->adjustment_date))
             ->each(fn (StockAdjustment $adjustment) => $postStockAdjustment->execute($adjustment->refresh()));
 
         $this->postTransferJournals();
+    }
+
+    /**
+     * Id dokumen demo (berpola nomor) yang tanggalnya belum terkunci penutupan.
+     *
+     * @param  class-string  $modelClass
+     * @return list<int>
+     */
+    private function unlockedIds(string $modelClass, string $numberColumn, string $demoPattern, string $dateColumn): array
+    {
+        return $modelClass::query()
+            ->where($numberColumn, 'like', $demoPattern)
+            ->get()
+            ->reject(fn ($document) => $this->isPeriodLocked($document->{$dateColumn}))
+            ->pluck('id')
+            ->all();
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function unlockedAdjustmentIds(): array
+    {
+        return $this->demoAdjustmentsQuery()
+            ->get()
+            ->reject(fn (StockAdjustment $adjustment) => $this->isPeriodLocked($adjustment->adjustment_date))
+            ->pluck('id')
+            ->all();
     }
 
     /**
@@ -351,6 +431,7 @@ class StockMovementSampleDataSeeder extends Seeder
             ->orderBy('transfer_date')
             ->orderBy('id')
             ->get()
+            ->reject(fn (StockTransfer $transfer) => $this->isPeriodLocked($transfer->transfer_date))
             ->each(function (StockTransfer $transfer) use ($journals): void {
                 $journals->executeDispatch($transfer->refresh());
 

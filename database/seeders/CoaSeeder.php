@@ -18,8 +18,11 @@ class CoaSeeder extends Seeder
     public function run(): void
     {
         // ==========================================
-        // 2025 Data (Tahun Lalu - Closed)
+        // 2025 Data (Tahun Lalu - dibuat open, ditutup DemoPeriodClosingSeeder)
         // ==========================================
+        // FY tahun lalu dibuat open agar transaksi demo bisa diposting lewat validasi
+        // yang ada. Penutupannya dilakukan sekali di akhir seed oleh alur penutupan periode
+        // aplikasi (ClosePeriodAction), bukan dengan membuka-tutup FY per seeder (#571).
         // Idempoten (#357): db:seed kedua tidak menambah FY/COA/akun, dan COA
         // buatan pengguna dengan nama lain tidak tersentuh.
         $fiscalYear2025 = FiscalYear::firstOrCreate(
@@ -27,15 +30,18 @@ class CoaSeeder extends Seeder
             [
                 'start_date' => '2025-01-01',
                 'end_date' => '2025-12-31',
-                'status' => 'closed',
+                'status' => 'open',
             ],
         );
 
+        // COA tahun lalu dibuat active (#571): posting demo tahun lalu memakai resolver
+        // yang sama dengan produksi. Diarsipkan sekali oleh DemoPeriodClosingSeeder setelah
+        // seluruh transaksinya tercatat, sehingga siklus hidup COA tetap tunggal.
         $coaVersion2025 = CoaVersion::firstOrCreate(
             ['name' => 'COA 2025 Standard'],
             [
                 'fiscal_year_id' => $fiscalYear2025->id,
-                'status' => 'archived',
+                'status' => 'active',
             ],
         );
 
@@ -97,8 +103,13 @@ class CoaSeeder extends Seeder
         // ==========================================
         // Saldo awal modal (nilai tetap, diposting lewat action aplikasi).
         // Transaksi dokumen demo diposting oleh seeder dokumen masing-masing.
+        //
+        // Modal FY lalu menutup perolehan aset tunai dan beban awal tahun, sehingga saldo
+        // kas bank tidak negatif dan saldo awalnya terbawa ke FY berjalan lewat jurnal
+        // OPENING-FY (DemoPeriodClosingSeeder). Modal FY berjalan menambah kas operasional.
         // ==========================================
-        $this->seedOpeningCapital($fiscalYear2026);
+        $this->seedOpeningCapital($fiscalYear2025, 1000000000);
+        $this->seedOpeningCapital($fiscalYear2026, 500000000);
     }
 
     /**
@@ -222,14 +233,14 @@ class CoaSeeder extends Seeder
     }
 
     /**
-     * Saldo awal modal disetor Rp 500.000.000 ke bank (nilai tetap).
-     * Idempoten lewat PostOpeningCapitalJournalAction.
+     * Saldo awal modal disetor ke bank (nilai tetap per tahun fiskal).
+     * Idempoten lewat PostOpeningCapitalJournalAction (referensi OPEN-CAP-{tahun}).
      */
-    private function seedOpeningCapital(FiscalYear $fiscalYear): void
+    private function seedOpeningCapital(FiscalYear $fiscalYear, float $amount): void
     {
         app(PostOpeningCapitalJournalAction::class)->execute(
             $fiscalYear->start_date->format('Y-m-d'),
-            500000000,
+            $amount,
             'OPEN-CAP-' . $fiscalYear->name,
             'Saldo awal modal disetor pemilik',
         );
