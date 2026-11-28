@@ -29,22 +29,14 @@ export function createPurchaseOrderFilterFields(): FieldDescriptor[] {
             createCurrencyFilterConfig(),
         ]),
         ...createDateFilterFields([
-            createColumnDateFilterConfig(
-                'order_date_from',
-                'Order Date From',
-                {
-                    key: 'filter.placeholder_order_date_from',
-                    fallback: 'Order Date From',
-                },
-            ),
-            createColumnDateFilterConfig(
-                'order_date_to',
-                'Order Date To',
-                {
-                    key: 'filter.placeholder_order_date_to',
-                    fallback: 'Order Date To',
-                },
-            ),
+            createColumnDateFilterConfig('order_date_from', 'Order Date From', {
+                key: 'filter.placeholder_order_date_from',
+                fallback: 'Order Date From',
+            }),
+            createColumnDateFilterConfig('order_date_to', 'Order Date To', {
+                key: 'filter.placeholder_order_date_to',
+                fallback: 'Order Date To',
+            }),
         ]),
     ];
 }
