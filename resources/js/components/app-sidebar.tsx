@@ -33,7 +33,14 @@ export function AppSidebar() {
         );
         if (!el) return;
         restoreSidebarScroll(el);
-        const onScroll = () => rememberSidebarScroll(el);
+        const syncScrolledTop = () => {
+            el.dataset.scrolledTop = String(el.scrollTop > 0);
+        };
+        const onScroll = () => {
+            rememberSidebarScroll(el);
+            syncScrolledTop();
+        };
+        syncScrolledTop();
         el.addEventListener('scroll', onScroll, { passive: true });
         return () => el.removeEventListener('scroll', onScroll);
     }, [menus]);

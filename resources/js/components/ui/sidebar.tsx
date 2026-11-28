@@ -386,6 +386,13 @@ function SidebarSeparator({
   )
 }
 
+// Fade atas hanya aktif saat sudah tergulir (data-scrolled-top, diset di app-sidebar.tsx).
+const SIDEBAR_CONTENT_MASK = [
+  "linear-gradient(to bottom, transparent 0,",
+  "black var(--sidebar-fade-top, 0px),",
+  "black calc(100% - 0.75rem), transparent)",
+].join(" ")
+
 function SidebarContent({
   className,
   ...props
@@ -394,12 +401,13 @@ function SidebarContent({
     <div
       data-slot="sidebar-content"
       data-sidebar="content"
+      style={{ maskImage: SIDEBAR_CONTENT_MASK, WebkitMaskImage: SIDEBAR_CONTENT_MASK }}
       className={cn(
         // pb-8 memberi ruang agar item terakhir grup tidak tertutup footer;
         // mask fade bawah menandakan konten masih bisa di-scroll (W4-16).
         "flex min-h-0 flex-1 flex-col gap-2 overflow-auto pt-2 pb-8",
+        "[--sidebar-fade-top:0px] data-[scrolled-top=true]:[--sidebar-fade-top:1.5rem]",
         "group-data-[collapsible=icon]:overflow-hidden group-data-[collapsible=icon]:pb-2",
-        "[mask-image:linear-gradient(to_bottom,black_calc(100%-0.75rem),transparent)]",
         className
       )}
       {...props}
