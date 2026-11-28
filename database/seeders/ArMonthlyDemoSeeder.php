@@ -44,10 +44,11 @@ class ArMonthlyDemoSeeder extends Seeder
      * Nilai dasar invoice rata-rata (IDR) sebelum faktor nilai bulan.
      *
      * Nilai ini menentukan pendapatan demo. Agar perusahaan demo sehat, pendapatan harus
-     * menutup beban tetap (penyusutan dari register aset + beban umum) di hampir semua
-     * bulan, bukan hanya di bulan puncak (#571 review host C7).
+     * menutup beban tetap (penyusutan dari register aset + gaji/sewa/utilitas) dan tetap
+     * memberi marjin bersih 10-20% (#571 review host C7, #603 review host 2026-11-28).
+     * Skala ini dipilih bersama beban operasional di OperatingExpenseDemoSeeder.
      */
-    private const BASE_INVOICE_VALUE = 20000000;
+    private const BASE_INVOICE_VALUE = 40000000;
 
     public function run(): void
     {

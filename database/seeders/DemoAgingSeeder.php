@@ -54,6 +54,43 @@ class DemoAgingSeeder extends Seeder
         'over_90' => [-106, -126],
     ];
 
+    /**
+     * Nominal invoice terbuka per offset jatuh tempo (hari).
+     *
+     * Nilai sengaja berbeda antar dokumen dan antar bucket agar laporan aging tidak
+     * menampilkan bucket 31–60, 61–90, dan >90 dengan nominal seragam (#603 review
+     * host 2026-11-28). Total overdue tetap di rentang wajar 15–30% dari seluruh
+     * piutang terbuka.
+     *
+     * @var array<int, float>
+     */
+    private const INVOICE_AMOUNTS = [
+        10 => 96000000.0,
+        24 => 104000000.0,
+        -42 => 1850000.0,
+        -56 => 2400000.0,
+        -72 => 2150000.0,
+        -86 => 1700000.0,
+        -102 => 2950000.0,
+        -124 => 1600000.0,
+    ];
+
+    /**
+     * Nominal bill terbuka per offset jatuh tempo (hari). Sama seperti piutang:
+     * tiap dokumen dan bucket punya nominal berbeda, bukan seragam.
+     *
+     * @var array<int, float>
+     */
+    private const BILL_AMOUNTS = [
+        14 => 90000000.0,
+        -45 => 1350000.0,
+        -58 => 1800000.0,
+        -74 => 1650000.0,
+        -88 => 1250000.0,
+        -106 => 2100000.0,
+        -126 => 1400000.0,
+    ];
+
     public function run(): void
     {
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id')
@@ -98,7 +135,7 @@ class DemoAgingSeeder extends Seeder
                 $customer = $customers[$sequence % $customers->count()];
                 $product = $products[$sequence % $products->count()];
                 $unit = $units[$sequence % $units->count()];
-                $grandTotal = $this->invoiceAmount($sequence);
+                $grandTotal = $this->invoiceAmount($offset);
                 $subtotal = round($grandTotal / 1.1, 2);
                 $taxAmount = round($grandTotal - $subtotal, 2);
                 $status = $offset < 0 ? 'overdue' : 'sent';
@@ -167,7 +204,7 @@ class DemoAgingSeeder extends Seeder
 
                 $supplier = $suppliers[$sequence % $suppliers->count()];
                 $product = $products[$sequence % $products->count()];
-                $grandTotal = $this->billAmount($sequence);
+                $grandTotal = $this->billAmount($offset);
                 $subtotal = round($grandTotal / 1.11, 2);
                 $taxAmount = round($grandTotal - $subtotal, 2);
                 $status = $offset < 0 ? 'overdue' : 'confirmed';
@@ -221,18 +258,27 @@ class DemoAgingSeeder extends Seeder
             ->first();
     }
 
-    private function invoiceAmount(int $sequence): float
+    /**
+     * Nilai invoice terbuka per bucket aging.
+     *
+     * Sebagian besar piutang demo harus belum jatuh tempo (current) dan hanya sebagian
+     * kecil yang menunggak, sehingga rasio overdue AR berada di rentang wajar 15-30%
+     * (#603 review host 2026-11-28). Nilai lama membuat hampir seluruh piutang overdue
+     * dan nominal tiap bucket seragam.
+     */
+    private function invoiceAmount(int $offset): float
     {
-        $amounts = [12500000, 18400000, 9600000, 22750000, 14300000, 17200000, 26800000, 11000000];
-
-        return (float) $amounts[($sequence - 8) % count($amounts)];
+        return self::INVOICE_AMOUNTS[$offset];
     }
 
-    private function billAmount(int $sequence): float
+    /**
+     * Nilai tagihan terbuka per bucket aging. Sama seperti piutang: tagihan lancar
+     * mendominasi, tagihan menunggak kecil tetapi tetap mengisi semua bucket dengan
+     * nominal yang bervariasi.
+     */
+    private function billAmount(int $offset): float
     {
-        $amounts = [5400000, 8750000, 12300000, 6900000, 10450000, 7800000, 9600000];
-
-        return (float) $amounts[($sequence - 8) % count($amounts)];
+        return self::BILL_AMOUNTS[$offset];
     }
 
     private function seedInvoiceItem(

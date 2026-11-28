@@ -114,6 +114,16 @@ $this->assertTrue($validator->fails());
 
 **Selectors**: Gunakan `getByRole()`, `getByLabel()`, `getByPlaceholder()` — bukan `data-testid`
 
+### Seed penuh untuk test baca-saja
+
+Untuk test yang butuh seluruh data demo (mis. invariant integritas), gunakan trait `Tests\Concerns\RefreshDatabaseSeededOnce`:
+
+```php
+uses(RefreshDatabaseSeededOnce::class)->group('demo-integrity');
+```
+
+Trait ini men-seed `DatabaseSeeder` **sekali per proses** (bukan per test) di luar transaksi test, lalu membungkus tiap test dengan transaksi rollback. Jangan memakai `RefreshDatabase` + `$this->seed()` di `beforeEach` untuk suite baca-saja karena seed penuh akan diulang di setiap test.
+
 ---
 
 ## ✅ Verification

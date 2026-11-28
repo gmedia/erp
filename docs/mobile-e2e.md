@@ -63,7 +63,14 @@ Batas sumber daya mesin pengembangan: 4 CPU, sekitar 8 GB RAM. Hentikan Vite dev
 ## Workflow CI `e2e-android`
 
 - File: `.github/workflows/e2e-android.yml` (terpisah dari `tests.yml`, tidak masuk job `ci`, tidak memblokir merge). Issue: #550.
-- Pemicu: PR yang menyentuh path mobile (lihat `paths` di workflow), jadwal harian, dan `workflow_dispatch`.
+- Pemicu: PR yang menyentuh path mobile, jadwal harian, dan `workflow_dispatch`.
+  Daftar `paths` di `on.pull_request` (semua harus ada di repo):
+  - Build & platform: `android/**`, `capacitor.config.ts`, `vite.mobile.config.ts`, `playwright.android.config.ts`, `scripts/build-company-mobile.sh`
+  - Test & skrip: `tests/e2e-android/**`, `scripts/e2e-android.sh`, `scripts/ci/e2e-android-ci.sh`
+  - Fitur mobile di aplikasi: `resources/js/lib/axios.ts`, `resources/js/hooks/useMobileUpdateCheck.ts`, `resources/js/components/mobile-app/**`, `resources/js/pages/mobile-app/**`
+  - Backend pendukung: `routes/api/mobile-app.php`, `app/**/MobileApp*/**` (endpoint `/api/mobile-app/latest`)
+  - Workflow itu sendiri: `.github/workflows/e2e-android.yml`
+  - `package.json` sengaja **tidak** dipakai sebagai pemicu karena terlalu sering berubah; perubahan dependensi `@capacitor/*` baru ikut teruji pada jadwal harian atau `workflow_dispatch`. Catatan ini bagian dari keputusan issue #635.
 - Alur: aktifkan KVM via udev, Sail + `migrate:fresh --seed`, lalu `android-emulator-runner` (API 34, `-no-window`) yang memanggil `scripts/e2e-android.sh` dengan `E2E_ANDROID_SKIP_EMULATOR=1`. Backend untuk emulator = `http://10.0.2.2:82`.
 - Artefak saat gagal: laporan Playwright (`e2e/test-results-android`), logcat, screenshot, dan log Laravel.
 - `E2E_ANDROID_SKIP_EMULATOR=1` memakai emulator yang sudah berjalan (tidak boot dan tidak dimatikan oleh script). Default lokal tidak berubah.

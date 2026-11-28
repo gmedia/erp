@@ -38,8 +38,14 @@ class ApMonthlyDemoSeeder extends Seeder
     /** Dasar jumlah tagihan per bulan sebelum faktor volume. */
     private const BILLS_PER_MONTH = 3;
 
-    /** Nilai dasar tagihan (IDR) sebelum faktor nilai bulan. */
-    private const BASE_BILL_VALUE = 6000000;
+    /**
+     * Nilai dasar tagihan (IDR) sebelum faktor nilai bulan.
+     *
+     * Harga pokok penjualan harus proporsional dengan pendapatan AR yang diskalakan
+     * (#603 review host 2026-11-28): keduanya memakai pengali yang sama agar marjin
+     * kotor demo tetap wajar.
+     */
+    private const BASE_BILL_VALUE = 12000000;
 
     public function run(): void
     {

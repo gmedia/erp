@@ -517,4 +517,111 @@ describe('Financial Dashboard API', function () {
             ])
             ->and($values)->toBe([600000.0, 500000.0, 400000.0, 300000.0, 200000.0, 100000.0]);
     });
+
+    test('cash balance includes opening balance while net cash flow excludes opening entries', function () {
+        $priorYear = FiscalYear::factory()->create([
+            'name' => '2024',
+            'start_date' => '2024-01-01',
+            'end_date' => '2024-12-31',
+            'status' => 'closed',
+        ]);
+        $fiscalYear = FiscalYear::factory()->create([
+            'name' => '2025',
+            'start_date' => '2025-01-01',
+            'end_date' => '2025-12-31',
+            'status' => 'open',
+        ]);
+        $coaVersion = CoaVersion::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'active',
+        ]);
+        $cash = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'asset',
+            'sub_type' => 'current_asset',
+            'normal_balance' => 'debit',
+            'is_cash_flow' => true,
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+        $equity = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'equity',
+            'normal_balance' => 'credit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+        $revenue = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'type' => 'revenue',
+            'normal_balance' => 'credit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+
+        $priorCash = JournalEntry::factory()->create([
+            'fiscal_year_id' => $priorYear->id,
+            'status' => 'posted',
+            'entry_date' => '2024-12-31',
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $priorCash->id,
+            'account_id' => $cash->id,
+            'debit' => 1000000,
+            'credit' => 0,
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $priorCash->id,
+            'account_id' => $equity->id,
+            'debit' => 0,
+            'credit' => 1000000,
+        ]);
+
+        // Saldo awal dipindahkan ke COA aktif: bukan arus kas tahun berjalan.
+        $opening = JournalEntry::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'posted',
+            'entry_date' => '2025-01-01',
+            'reference' => 'OPENING-FY-' . $fiscalYear->id,
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $opening->id,
+            'account_id' => $cash->id,
+            'debit' => 1000000,
+            'credit' => 0,
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $opening->id,
+            'account_id' => $equity->id,
+            'debit' => 0,
+            'credit' => 1000000,
+        ]);
+
+        $flow = JournalEntry::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'posted',
+            'entry_date' => '2025-03-10',
+            'reference' => 'RCV-202503-0001',
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $flow->id,
+            'account_id' => $cash->id,
+            'debit' => 200000,
+            'credit' => 0,
+        ]);
+        JournalEntryLine::factory()->create([
+            'journal_entry_id' => $flow->id,
+            'account_id' => $revenue->id,
+            'debit' => 0,
+            'credit' => 200000,
+        ]);
+
+        $response = getJson("/api/financial-dashboard?fiscal_year_id={$fiscalYear->id}");
+
+        $response->assertOk();
+        expect((float) $response->json('kpis.cash_balance.value'))->toBe(1200000.0)
+            ->and((float) $response->json('cash_flow_summary.inflow'))->toBe(200000.0)
+            ->and((float) $response->json('cash_flow_summary.outflow'))->toBe(0.0)
+            ->and((float) $response->json('cash_flow_summary.net'))->toBe(200000.0);
+    });
 });

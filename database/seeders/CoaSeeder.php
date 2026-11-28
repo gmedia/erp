@@ -105,11 +105,12 @@ class CoaSeeder extends Seeder
         // Transaksi dokumen demo diposting oleh seeder dokumen masing-masing.
         //
         // Modal FY lalu menutup perolehan aset tunai dan beban awal tahun, sehingga saldo
-        // kas bank tidak negatif dan saldo awalnya terbawa ke FY berjalan lewat jurnal
-        // OPENING-FY (DemoPeriodClosingSeeder). Modal FY berjalan menambah kas operasional.
+        // kas bank tidak negatif. Saldo tersebut terbawa ke FY berjalan sebagai saldo awal
+        // lewat jurnal OPENING-FY (DemoPeriodClosingSeeder), bukan sebagai arus kas tahun
+        // berjalan (#603 review host 2026-11-28). Karena itu FY berjalan tidak lagi
+        // menerima setoran modal baru.
         // ==========================================
         $this->seedOpeningCapital($fiscalYear2025, 1000000000);
-        $this->seedOpeningCapital($fiscalYear2026, 500000000);
     }
 
     /**

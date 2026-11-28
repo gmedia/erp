@@ -57,11 +57,35 @@ class GlExtendedSampleDataSeeder extends Seeder
 
     private function seedRecurringJournals(FiscalYear $fiscalYear, Collection $accounts, User $user): void
     {
+        // Beban operasional tetap memakai akun G&A (52000) dan bank (11110) dari COA aktif,
+        // bukan akun daun pertama (yang bisa berupa aset) seperti versi lama (#603 review host).
+        $coaVersionId = DemoCalendar::currentCoaVersionId();
+
+        $expenseAccount = $coaVersionId === null
+            ? null
+            : Account::query()
+                ->where('coa_version_id', $coaVersionId)
+                ->where('code', '52000')
+                ->where('is_active', true)
+                ->first();
+
+        $bankAccount = $coaVersionId === null
+            ? null
+            : Account::query()
+                ->where('coa_version_id', $coaVersionId)
+                ->where('code', '11110')
+                ->where('is_active', true)
+                ->first();
+
+        $expenseAccount ??= $accounts->first();
+        $bankAccount ??= $accounts->get(1) ?? $accounts->first();
+
         $definitions = [
-            ['name' => 'Sewa Kantor Bulanan', 'amount' => 15000000, 'frequency' => 'monthly'],
-            ['name' => 'Listrik dan Air', 'amount' => 1250000, 'frequency' => 'monthly'],
-            ['name' => 'Internet dan Telepon', 'amount' => 2500000, 'frequency' => 'monthly'],
-            ['name' => 'Jasa Kebersihan', 'amount' => 3750000, 'frequency' => 'monthly'],
+            ['name' => 'Sewa Kantor Bulanan', 'amount' => 5000000, 'frequency' => 'monthly'],
+            ['name' => 'Gaji Karyawan Bulanan', 'amount' => 10000000, 'frequency' => 'monthly'],
+            ['name' => 'Listrik dan Air', 'amount' => 2000000, 'frequency' => 'monthly'],
+            ['name' => 'Internet dan Telepon', 'amount' => 1000000, 'frequency' => 'monthly'],
+            ['name' => 'Jasa Kebersihan', 'amount' => 2000000, 'frequency' => 'monthly'],
         ];
 
         foreach ($definitions as $index => $definition) {
@@ -100,14 +124,27 @@ class GlExtendedSampleDataSeeder extends Seeder
                     // Semua jurnal bulanan berbagi satu bulan jadwal (W7-15).
                     'next_run_date' => now()->startOfMonth()->addMonth(),
                     'total_amount' => $definition['amount'],
+                    // Template demo diposting otomatis agar riwayat run bulanan mengisi GL
+                    // lewat ExecuteRecurringJournalAction (#603 butir 1).
+                    'auto_post' => true,
                     'created_by' => $user->id,
                 ],
             );
 
             $journal->lines()->delete();
             $journal->lines()->createMany([
-                ['account_id' => $accounts[0]->id, 'debit' => $definition['amount'], 'credit' => 0, 'memo' => 'Beban operasional bulanan'],
-                ['account_id' => $accounts[1]->id, 'debit' => 0, 'credit' => $definition['amount'], 'memo' => 'Kas keluar untuk beban operasional'],
+                [
+                    'account_id' => $expenseAccount->id,
+                    'debit' => $definition['amount'],
+                    'credit' => 0,
+                    'memo' => 'Beban operasional bulanan',
+                ],
+                [
+                    'account_id' => $bankAccount->id,
+                    'debit' => 0,
+                    'credit' => $definition['amount'],
+                    'memo' => 'Kas keluar untuk beban operasional',
+                ],
             ]);
         }
     }
