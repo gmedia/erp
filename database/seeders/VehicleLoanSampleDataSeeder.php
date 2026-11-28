@@ -73,20 +73,94 @@ class VehicleLoanSampleDataSeeder extends Seeder
         $departmentId = Department::query()->orderBy('id')->value('id');
 
         $scenarios = [
-            ['code' => 'VL-2026-0001', 'status' => 'draft', 'unit' => 0, 'purpose' => 'Perjalanan dinas ke Kantor Cabang Bandung'],
-            ['code' => 'VL-2026-0002', 'status' => 'pending', 'unit' => 1, 'purpose' => 'Antar dokumen kontrak ke kantor notaris'],
-            ['code' => 'VL-2026-0003', 'status' => 'in_progress', 'unit' => 2, 'purpose' => 'Kunjungan koordinasi proyek di Gedung Menara Kuningan'],
-            ['code' => 'VL-2026-0004', 'status' => 'approved', 'unit' => 0, 'purpose' => 'Penjemputan tamu dari Bandara Soekarno-Hatta'],
-            ['code' => 'VL-2026-0005', 'status' => 'rejected', 'unit' => 1, 'purpose' => 'Survey lokasi gudang di Cikarang'],
-            ['code' => 'VL-2026-0006', 'status' => 'pickup_done', 'unit' => 0, 'purpose' => 'Pengiriman suku cadang ke pemasok di Tangerang', 'ready' => true],
-            ['code' => 'VL-2026-0007', 'status' => 'returned', 'unit' => 1, 'purpose' => 'Rapat koordinasi bulanan di kantor pusat'],
-            ['code' => 'VL-2026-0008', 'status' => 'cancelled', 'unit' => 2, 'purpose' => 'Kunjungan supplier ke pabrik Karawang'],
-            ['code' => 'VL-2026-0009', 'status' => 'pickup_done', 'unit' => 2, 'purpose' => 'Perjalanan dinas ke Surabaya', 'overdue' => true],
+            [
+                'code' => 'VL-2026-0001',
+                'status' => 'draft',
+                'unit' => 0,
+                'purpose' => 'Perjalanan dinas ke Kantor Cabang Bandung',
+                'months_ago' => 0,
+                'start_time' => [9, 0],
+                'end_time' => [16, 0],
+            ],
+            [
+                'code' => 'VL-2026-0002',
+                'status' => 'pending',
+                'unit' => 1,
+                'purpose' => 'Antar dokumen kontrak ke kantor notaris',
+                'months_ago' => 0,
+                'start_time' => [10, 30],
+                'end_time' => [12, 0],
+            ],
+            [
+                'code' => 'VL-2026-0003',
+                'status' => 'in_progress',
+                'unit' => 2,
+                'purpose' => 'Kunjungan koordinasi proyek di Gedung Menara Kuningan',
+                'months_ago' => 0,
+                'start_time' => [13, 0],
+                'end_time' => [17, 30],
+            ],
+            [
+                'code' => 'VL-2026-0004',
+                'status' => 'approved',
+                'unit' => 0,
+                'purpose' => 'Penjemputan tamu dari Bandara Soekarno-Hatta',
+                'months_ago' => 1,
+                'start_time' => [7, 30],
+                'end_time' => [12, 0],
+            ],
+            [
+                'code' => 'VL-2026-0005',
+                'status' => 'rejected',
+                'unit' => 1,
+                'purpose' => 'Survey lokasi gudang di Cikarang',
+                'months_ago' => 10,
+                'start_time' => [11, 0],
+                'end_time' => [15, 0],
+            ],
+            [
+                'code' => 'VL-2026-0006',
+                'status' => 'pickup_done',
+                'unit' => 0,
+                'purpose' => 'Pengiriman suku cadang ke pemasok di Tangerang',
+                'ready' => true,
+                'months_ago' => 2,
+                'start_time' => [8, 30],
+                'end_time' => [12, 0],
+            ],
+            [
+                'code' => 'VL-2026-0007',
+                'status' => 'returned',
+                'unit' => 1,
+                'purpose' => 'Rapat koordinasi bulanan di kantor pusat',
+                'months_ago' => 6,
+                'start_time' => [7, 0],
+                'end_time' => [16, 30],
+            ],
+            [
+                'code' => 'VL-2026-0008',
+                'status' => 'cancelled',
+                'unit' => 2,
+                'purpose' => 'Kunjungan supplier ke pabrik Karawang',
+                'months_ago' => 3,
+                'start_time' => [14, 0],
+                'end_time' => [16, 0],
+            ],
+            [
+                'code' => 'VL-2026-0009',
+                'status' => 'pickup_done',
+                'unit' => 2,
+                'purpose' => 'Perjalanan dinas ke Surabaya',
+                'overdue' => true,
+                'months_ago' => 0,
+                'start_time' => [9, 30],
+                'end_time' => [17, 0],
+            ],
         ];
 
         foreach ($scenarios as $index => $scenario) {
             $driver = $drivers[$index % count($drivers)];
-            $unit = $units[(int) ($scenario['unit'] ?? $index % count($units)) % count($units)];
+            $unit = $units[(int) $scenario['unit'] % count($units)];
 
             $loan = $this->seedLoan($scenario, $index, $requesters, $driver, $unit, [
                 'branch_id' => $branchId,
@@ -95,7 +169,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
             ]);
 
             $this->seedApproval($loan, $scenario['status'], $flow, $flowStep, $admin, $requesters, $driver, $unit);
-            $this->seedPickupAndReturn($loan, $scenario['status'], $requesters, $admin, $driver, $unit, (bool) ($scenario['overdue'] ?? false), (bool) ($scenario['ready'] ?? false));
+            $this->seedPickupAndReturn($loan, $scenario['status'], $requesters, $admin, $driver, $unit, (bool) ($scenario['ready'] ?? false));
             $this->seedActivityLog($loan, $scenario['status'], $admin);
         }
     }
@@ -109,19 +183,29 @@ class VehicleLoanSampleDataSeeder extends Seeder
     {
         $status = $scenario['status'];
         $overdue = (bool) ($scenario['overdue'] ?? false);
+        $monthsAgo = (int) ($scenario['months_ago'] ?? 0);
+        $monthStart = now()->startOfMonth()->subMonths($monthsAgo);
+        // Jam permintaan bervariasi agar data demo tidak terlihat seragam (#603 review host).
+        [$startHour, $startMinute] = $scenario['start_time'];
+        [$endHour, $endMinute] = $scenario['end_time'];
 
         if ($overdue) {
-            $start = now()->subDays(3)->setTime(8, 0);
-            $end = now()->subDay()->setTime(17, 0);
+            $start = now()->subDays(3)->setTime($startHour, $startMinute);
+            $end = now()->subDay()->setTime($endHour, $endMinute);
         } elseif ($status === 'returned') {
-            $start = now()->subDays(6)->setTime(8, 0);
-            $end = now()->subDays(5)->setTime(17, 0);
+            $start = $monthStart->copy()->day(8)->setTime($startHour, $startMinute);
+            $end = $monthStart->copy()->day(9)->setTime($endHour, $endMinute);
+        } elseif (in_array($status, ['rejected', 'cancelled'], true)) {
+            $start = $monthStart->copy()->day(12)->setTime($startHour, $startMinute);
+            $end = $start->copy()->setTime($endHour, $endMinute);
         } elseif ($status === 'pickup_done') {
-            $start = now()->subDay()->setTime(8, 0);
-            $end = now()->setTime(17, 0);
+            $start = $monthStart->copy()->day(5)->setTime($startHour, $startMinute);
+            $end = $start->copy()->setTime($endHour, $endMinute);
         } else {
-            $start = now()->addDays($index + 1)->setTime(8, 0);
-            $end = (clone $start)->setTime(17, 0);
+            // Draft/pending/in_progress/approved berada di bulan berjalan agar status
+            // aktif tetap masuk akal, sementara status historis tersebar di jendela demo.
+            $start = $monthStart->copy()->day(20)->setTime($startHour, $startMinute);
+            $end = $start->copy()->setTime($endHour, $endMinute);
         }
 
         if (in_array($status, ['draft'], true)) {
@@ -266,16 +350,13 @@ class VehicleLoanSampleDataSeeder extends Seeder
         User $admin,
         VehicleDriver $driver,
         VehicleUnit $unit,
-        bool $overdue,
         bool $ready,
     ): void {
         if (! in_array($status, ['pickup_done', 'returned'], true)) {
             return;
         }
 
-        $pickedAt = $overdue
-            ? now()->subDays(3)->setTime(8, 0)
-            : (clone $loan->start_at);
+        $pickedAt = clone $loan->start_at;
 
         $pickup = VehicleLoanPickup::updateOrCreate(
             ['vehicle_loan_id' => $loan->id],
@@ -296,7 +377,7 @@ class VehicleLoanSampleDataSeeder extends Seeder
             return;
         }
 
-        $returnedAt = (clone $loan->end_at)->setTime(16, 30);
+        $returnedAt = clone $loan->end_at;
 
         VehicleLoanReturn::updateOrCreate(
             ['pickup_id' => $pickup->id],

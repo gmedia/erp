@@ -23,10 +23,12 @@ class GetFinancialDashboardDataAction
         $bsTotals = $balanceSheet['totals'] ?? [];
         $isTotals = $incomeStatement['totals'] ?? [];
 
-        // Cash balance = sum inflow - sum outflow from cash flow accounts
+        // Cash balance = opening cash + net flow. Opening balance entries (OPENING-FY)
+        // are not current-year cash flow; getCashFlow() already excludes them.
         $cashInflow = collect($cashFlow)->sum('inflow');
         $cashOutflow = collect($cashFlow)->sum('outflow');
-        $cashBalance = $cashInflow - $cashOutflow;
+        $netCashFlow = $cashInflow - $cashOutflow;
+        $cashBalance = $this->reportService->getOpeningCashBalance($fiscalYearId) + $netCashFlow;
 
         $isBranchScoped = $branchId !== null;
         $segmentScope = $isBranchScoped ? 'branch' : 'company';
@@ -79,7 +81,7 @@ class GetFinancialDashboardDataAction
             'cash_flow_summary' => [
                 'inflow' => $cashInflow,
                 'outflow' => $cashOutflow,
-                'net' => $cashBalance,
+                'net' => $netCashFlow,
                 'scope' => 'company',
             ],
             'expense_breakdown' => $this->extractTopExpenses($incomeStatement['expenses'] ?? []),

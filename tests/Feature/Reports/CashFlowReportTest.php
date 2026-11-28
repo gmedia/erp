@@ -382,6 +382,92 @@ test('it reports opening and closing cash balance around the period net change',
         ->and((float) $response->json('closing_cash_balance'))->toBe(500000.0);
 });
 
+test('it excludes current-year opening balance entries from net cash flow', function () {
+    $this->seed(ReportConfigurationSeeder::class);
+    Sanctum::actingAs($this->user, ['*']);
+
+    $coaVersion = CoaVersion::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'active',
+    ]);
+    $cash = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11110',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+        'is_cash_flow' => true,
+    ]);
+    $equity = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '31100',
+        'type' => 'equity',
+        'normal_balance' => 'credit',
+    ]);
+    $receivable = Account::factory()->create([
+        'coa_version_id' => $coaVersion->id,
+        'code' => '11200',
+        'type' => 'asset',
+        'sub_type' => 'current_asset',
+        'normal_balance' => 'debit',
+    ]);
+
+    $previousYear = FiscalYear::create([
+        'name' => '2024',
+        'start_date' => '2024-01-01',
+        'end_date' => '2024-12-31',
+        'status' => 'closed',
+    ]);
+    $priorCash = JournalEntry::factory()->create([
+        'fiscal_year_id' => $previousYear->id,
+        'status' => 'posted',
+        'entry_date' => '2024-12-31',
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $priorCash->id,
+        'account_id' => $cash->id,
+        'debit' => 400000,
+        'credit' => 0,
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $priorCash->id,
+        'account_id' => $equity->id,
+        'debit' => 0,
+        'credit' => 400000,
+    ]);
+
+    // Saldo awal tahun berjalan: dipindahkan ke COA aktif, bukan arus kas.
+    $opening = JournalEntry::factory()->create([
+        'fiscal_year_id' => $this->fiscalYear->id,
+        'status' => 'posted',
+        'entry_date' => '2025-01-01',
+        'reference' => 'OPENING-FY-' . $this->fiscalYear->id,
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $opening->id,
+        'account_id' => $cash->id,
+        'debit' => 400000,
+        'credit' => 0,
+    ]);
+    JournalEntryLine::factory()->create([
+        'journal_entry_id' => $opening->id,
+        'account_id' => $equity->id,
+        'debit' => 0,
+        'credit' => 400000,
+    ]);
+
+    postCashFlowJournal($this->fiscalYear, $coaVersion, $cash, 100000, 0, [
+        ['account' => $receivable, 'debit' => 0, 'credit' => 100000],
+    ], 'posted', '2025-03-15');
+
+    $response = $this->getJson('/api/reports/cash-flow?fiscal_year_id=' . $this->fiscalYear->id)
+        ->assertOk();
+
+    expect((float) $response->json('opening_cash_balance'))->toBe(400000.0)
+        ->and((float) $response->json('net_change'))->toBe(100000.0)
+        ->and((float) $response->json('closing_cash_balance'))->toBe(500000.0);
+});
+
 test('it reconciles activity totals to the opening to closing cash change', function () {
     $this->seed(ReportConfigurationSeeder::class);
     Sanctum::actingAs($this->user, ['*']);

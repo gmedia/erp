@@ -209,7 +209,13 @@ class DatabaseSeeder extends Seeder
             // karena periode bulan yang diposting di sini ditutup di seeder tersebut (#423).
             AssetDepreciationNormalizationSeeder::class,
             GlExtendedSampleDataSeeder::class,
+            // Beban operasional: komponen variabel per bulan, lalu riwayat run jurnal
+            // berulang 13 bulan lewat alur aplikasi (#603 butir 1 & review host).
+            OperatingExpenseVariableSeeder::class,
+            RecurringJournalRunHistorySeeder::class,
             ReportConfigurationSeeder::class,
+            // Anggaran disusun setelah seluruh realisasi terposting agar variance
+            // within/warning/over terisi (#603 butir 2).
             BudgetSampleDataSeeder::class,
             SecurityLogSampleDataSeeder::class,
             AuditLogSampleDataSeeder::class,

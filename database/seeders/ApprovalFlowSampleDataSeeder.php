@@ -95,7 +95,7 @@ class ApprovalFlowSampleDataSeeder extends Seeder
                     'is_active' => true,
                     'conditions' => $flowDefinition['conditions'],
                     'created_by' => $admin->id,
-                ] + ($existing ? [] : ['created_at' => now()->subDays(60)])
+                ] + ($existing ? [] : ['created_at' => now()->subMonths(14)])
             );
 
             foreach ($steps as $stepDefinition) {

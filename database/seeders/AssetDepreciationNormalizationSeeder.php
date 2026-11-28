@@ -71,9 +71,15 @@ class AssetDepreciationNormalizationSeeder extends Seeder
 
         $fiscalStart = Carbon::parse($fiscalYear->start_date)->startOfMonth();
         $fiscalEnd = Carbon::parse($fiscalYear->end_date)->startOfMonth();
-        $lastClosedMonth = now()->subMonth()->startOfMonth();
+        // Demo mencakup bulan berjalan: tanpa run bulan berjalan, beban November anjlok
+        // karena hanya berisi HPP (#603 review host 2026-11-28).
+        $lastDepreciatedMonth = now()->startOfMonth();
 
-        for ($cursor = $fiscalStart->copy(); $cursor->lessThanOrEqualTo($fiscalEnd) && $cursor->lessThanOrEqualTo($lastClosedMonth); $cursor->addMonth()) {
+        for (
+            $cursor = $fiscalStart->copy();
+            $cursor->lessThanOrEqualTo($fiscalEnd) && $cursor->lessThanOrEqualTo($lastDepreciatedMonth);
+            $cursor->addMonth()
+        ) {
             $this->postMonthlyRun($fiscalYear, $cursor->copy(), $adminUserId);
         }
     }

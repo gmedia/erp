@@ -30,7 +30,7 @@ tests/
 - **E2E standard** — 9-10 test cases per module (Search, Filters, Add, View, Edit, Export, Checkbox, Sorting, Delete, Import)
 - **Factories** — 96 factories
 - **Coverage map** — 158 unique Pest groups; 80 Feature dirs, 13 Unit dirs
-- **Pest serial & ber-timeout** — never run two Pest processes at once (DB `testing` locks); wrap with `timeout`. Tests needing seed call the specific seeder (`$this->seed(CoaSeeder::class)`); there is no shared `RefreshDatabaseSeededOnce` trait.
+- **Pest serial & ber-timeout** — never run two Pest processes at once (DB `testing` locks); wrap with `timeout`. Tests needing seed call the specific seeder (`$this->seed(CoaSeeder::class)`). Read-only tests that need the full demo dataset use `Tests\Concerns\RefreshDatabaseSeededOnce`, which seeds `DatabaseSeeder` once per process (not per test) and wraps each test in a rollback.
 - **E2E lokal ramping** — only specs you changed/added (+ max one affected spec), once + `--last-failed`; full folders/suite run in CI.
 - **Run by module** — `sail test --group {slug}` or `npx playwright test <changed-spec>`
 
