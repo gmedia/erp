@@ -1,4 +1,4 @@
-# User Guide: Asset Stocktakes
+# Panduan: Stock Opname Aset
 
 ## Gambaran Umum
 

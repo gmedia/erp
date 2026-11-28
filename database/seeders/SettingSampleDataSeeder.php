@@ -77,6 +77,12 @@ class SettingSampleDataSeeder extends Seeder
                 'value' => '0',
                 'type' => 'boolean',
             ],
+            [
+                'group' => 'mobile_app',
+                'key' => 'mobile_app_max_upload_mb',
+                'value' => '150',
+                'type' => 'integer',
+            ],
         ];
 
         foreach ($settings as $setting) {

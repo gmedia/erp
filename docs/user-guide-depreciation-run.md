@@ -1,4 +1,4 @@
-# User Guide: Depreciation Run
+# Panduan: Penyusutan Aset
 
 ## Gambaran Umum
 
@@ -17,7 +17,7 @@ Untuk mengakses Depreciation Run, pengguna memerlukan permission `asset_deprecia
 ### Langkah-langkah:
 
 1. Login ke aplikasi dengan akun yang memiliki permission `asset_depreciation_run`.
-2. Klik menu **Asset Management** di sidebar, kemudian pilih submenu **Depreciation Runs** atau akses langsung melalui URL `/asset-depreciation-runs`.
+2. Klik menu **Aset** di sidebar, kemudian pilih submenu **Penyusutan Aset** atau akses langsung melalui URL `/asset-depreciation-runs`.
 3. Halaman akan menampilkan daftar depreciation run yang sudah dilakukan.
 
 [Screenshot: Halaman Depreciation Runs dengan tabel history dan tombol Run Calculation]

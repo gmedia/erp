@@ -1,6 +1,6 @@
 # Rancangan Fitur: Peminjaman Kendaraan Perusahaan
 
-> **Status:** Draft reviewed by deep agent — koreksi BLOCKER/HIGH telah diintegrasikan.
+> **Status:** Implemented — modul `vehicle-loans` sudah berjalan (API, halaman request/pickup/return/security/dashboard/detail, approval, dan notifikasi). Penyempurnaan tampilan & alur tercatat di #568 dan #569 (keduanya CLOSED).
 > **Scope modul:** `vehicle-loans` (slug API & route FE)
 > **Stack:** Laravel 12 JSON API + React 19 SPA (Sanctum), mengikuti `AGENTS.md`, `docs/development-patterns.md`, `docs/ui-design-rules.md`.
 > **Prinsip multi-perusahaan:** tidak ada hardcode identitas/brand. Identitas diambil dari source of truth yang sudah ada (`Setting` + `/api/me` + `companies`/`company_id`), bukan env baru.

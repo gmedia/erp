@@ -1,4 +1,4 @@
-# User Guide: Goods Receipts
+# Panduan: Penerimaan Barang
 
 ## Gambaran Umum
 

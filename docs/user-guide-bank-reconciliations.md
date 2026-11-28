@@ -1,4 +1,4 @@
-# User Guide: Bank Reconciliations
+# Panduan: Rekonsiliasi Bank
 
 ## Gambaran Umum
 

@@ -27,7 +27,7 @@ Instruksi:
    - E2E menggunakan `generateModuleTests()` dari `shared-test-factories.ts`
 5. Verifikasi:
    - `./vendor/bin/sail test --group {modul-names}`
-   - `./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/`
+   - `bash scripts/e2e-full.sh tests/e2e/{modul-names}/{spec-yang-disentuh}.spec.ts` (E2E ramping: hanya spec yang ditambah/diubah; folder penuh menunggu CI)
 ```
 
 ### 2. CRUD Complex
@@ -60,7 +60,7 @@ Instruksi:
    - E2E helper di file terpisah: `tests/e2e/{modul-names}/helpers.ts`
 5. Verifikasi:
    - `./vendor/bin/sail test --group {modul-names}`
-   - `./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/`
+   - `bash scripts/e2e-full.sh tests/e2e/{modul-names}/{spec-yang-disentuh}.spec.ts` (E2E ramping: hanya spec yang ditambah/diubah; folder penuh menunggu CI)
 ```
 
 ### 3. Non-CRUD
@@ -87,7 +87,7 @@ Instruksi:
    - E2E helper (jika ada interaksi CRUD) di `tests/e2e/{modul-names}/helpers.ts`
 5. Verifikasi:
    - `./vendor/bin/sail test --group {modul-names}`
-   - `./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/`
+   - `bash scripts/e2e-full.sh tests/e2e/{modul-names}/{spec-yang-disentuh}.spec.ts` (E2E ramping: hanya spec yang ditambah/diubah; folder penuh menunggu CI)
 ```
 
 ### 4. Import Feature (untuk modul CRUD existing)

@@ -1243,6 +1243,8 @@ Gunakan `./vendor/bin/sail artisan route:list --path=api/{slug}` untuk verify ro
 - [ ] Error handling
 - [ ] Loading states
 - [ ] Conditional UI
+- [ ] Teks UI memakai `useTranslation` + kunci di `lang/en.json` & `lang/id.json` (English default tidak berubah)
+- [ ] Pesan validasi Zod memakai `validation.<form>.<rule>` (diterjemahkan `FormMessage`); data seeder Bahasa Indonesia
 
 ### Testing
 

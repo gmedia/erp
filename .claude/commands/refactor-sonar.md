@@ -118,7 +118,7 @@ Gunakan Sail:
 
 ```bash
 ./vendor/bin/sail test --group {modul-names}
-./vendor/bin/sail npx playwright test tests/e2e/{modul-names}/
+bash scripts/e2e-full.sh tests/e2e/{modul-names}
 ```
 
 Catatan environment (penting):
@@ -133,7 +133,7 @@ Contoh:
 
 ```bash
 ./vendor/bin/sail test --group purchase-requests --group purchase-orders --group goods-receipts --group supplier-returns --group stock-adjustments --group stock-movements
-./vendor/bin/sail npx playwright test tests/e2e/purchase-requests/ tests/e2e/purchase-orders/ tests/e2e/goods-receipts/ tests/e2e/supplier-returns/ tests/e2e/stock-adjustments/ tests/e2e/stock-movements/
+bash scripts/e2e-full.sh tests/e2e/purchase-requests tests/e2e/purchase-orders tests/e2e/goods-receipts tests/e2e/supplier-returns tests/e2e/stock-adjustments tests/e2e/stock-movements
 
 # fallback bila parser group gagal
 ./vendor/bin/sail artisan test --group=purchase-requests --group=purchase-orders --group=goods-receipts --group=supplier-returns --group=stock-adjustments --group=stock-movements

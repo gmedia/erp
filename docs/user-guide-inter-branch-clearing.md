@@ -1,4 +1,4 @@
-# User Guide: Inter-Branch Clearing (Transaksi Antar Cabang)
+# Panduan: Kliring Antar Cabang
 
 ## Gambaran Umum
 
@@ -65,7 +65,7 @@ Sekarang:
 
 ### Journal Entries
 
-1. Buka menu **Journal Entries** → klik **Add New**.
+1. Buka menu **Jurnal Umum** → klik **Add New**.
 2. Isi header seperti biasa (Date, Description, Fiscal Year, dll).
 3. Klik **Add Line** untuk membuka dialog baris.
 4. Di dialog baris terdapat **dua pilihan penting**:

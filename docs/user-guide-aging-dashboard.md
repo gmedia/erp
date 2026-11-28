@@ -1,4 +1,4 @@
-# User Guide: Aging Dashboard
+# Panduan: Dasbor Umur Piutang
 
 ## Gambaran Umum
 

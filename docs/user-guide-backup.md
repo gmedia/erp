@@ -1,4 +1,4 @@
-# Backup & Restore (Kesehatan Sistem)
+# Panduan: Backup & Restore
 
 Panduan ini menjelaskan backup otomatis database dan object storage, cara memeriksa statusnya di halaman **Kesehatan Sistem**, dan langkah restore. Konfigurasi ada di `config/backup.php` dan `routes/console.php`.
 

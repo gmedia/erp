@@ -1,4 +1,4 @@
-# User Guide: Journal Entries
+# Panduan: Jurnal Umum
 
 ## Gambaran Umum
 

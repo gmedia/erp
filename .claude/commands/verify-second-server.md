@@ -4,7 +4,7 @@ description: "Use when: menguji koordinasi multi-server dari host kedua — veri
 
 # Verifikasi Server Kedua (Multi-Host)
 
-Prompt di bawah dipakai dari **host/server kedua** (bukan `dest-2`) untuk membuktikan koordinasi GitHub Issues bekerja lintas host. File ini ikut ter-`pull` lewat `git pull` di `main`.
+Prompt di bawah dipakai dari **host/server kedua** (bukan `<host>`) untuk membuktikan koordinasi GitHub Issues bekerja lintas host. File ini ikut ter-`pull` lewat `git pull` di `main`.
 
 Sumber checklist: komentar dengan marker `<!-- multi-server-checklist -->` di https://github.com/gmedia/erp/issues/119
 

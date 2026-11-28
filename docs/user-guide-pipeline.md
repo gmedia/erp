@@ -1,4 +1,4 @@
-# User Guide: Pipeline Management
+# Panduan: Pipeline
 
 ## Gambaran Umum
 
@@ -41,9 +41,9 @@ Pipeline adalah **alur kerja (workflow)** yang mengatur urutan status suatu enti
 
 ## 2. Akses Menu Pipeline
 
-Pipeline Management berada di bawah menu **Settings**:
+Pipeline Management berada di bawah menu **Admin**:
 
-> **Settings** → **Pipeline**
+> **Admin** → **Pipeline**
 
 Untuk mengakses menu ini, user harus memiliki permission `pipeline`.
 

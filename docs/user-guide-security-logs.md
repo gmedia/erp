@@ -1,4 +1,4 @@
-# Panduan Log Keamanan
+# Panduan: Log Keamanan
 
 Halaman **Log Keamanan** (`/security-logs`) membantu admin IT mengaudit akses ke ERP: siapa yang login dan logout, kapan, dari alamat IP dan perangkat apa, serta perubahan hak akses dan akun. Halaman ini juga dipakai untuk mendeteksi kemungkinan akun dibobol, misalnya rangkaian login gagal yang tidak wajar.
 

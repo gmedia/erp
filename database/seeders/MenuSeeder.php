@@ -28,6 +28,14 @@ class MenuSeeder extends Seeder
                 'child' => [],
             ],
             [
+                'name' => 'mobile_app_download',
+                'display_name' => 'Download App',
+                'permissions' => [],
+                'icon' => 'Download',
+                'url' => 'mobile-app',
+                'child' => [],
+            ],
+            [
                 'name' => 'employee',
                 'display_name' => 'Employee',
                 'permissions' => [
@@ -1054,6 +1062,7 @@ class MenuSeeder extends Seeder
                     'security_log',
                     'audit_log',
                     'system_health',
+                    'mobile_app_release',
                 ],
                 'icon' => 'Shield',
                 'url' => null,
@@ -1077,6 +1086,16 @@ class MenuSeeder extends Seeder
                         ],
                         'icon' => 'HeartPulse',
                         'url' => 'system-health',
+                        'child' => [],
+                    ],
+                    [
+                        'name' => 'mobile_app_release',
+                        'display_name' => 'Mobile App Release',
+                        'permissions' => [
+                            'mobile_app_release',
+                        ],
+                        'icon' => 'Upload',
+                        'url' => 'mobile-app-releases',
                         'child' => [],
                     ],
                     [

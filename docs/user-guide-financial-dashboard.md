@@ -1,4 +1,4 @@
-# User Guide: Financial Dashboard
+# Panduan: Dasbor Keuangan
 
 > **Disambiguasi:** Ini **bukan** beranda `/dashboard`. Beranda hanya menampilkan total customer/employee/supplier/asset — lihat `user-guide-dashboard.md`. Financial Dashboard = KPI keuangan di `/financial-dashboard`.
 
@@ -19,7 +19,7 @@ Untuk mengakses Financial Dashboard, pengguna memerlukan permission `financial_d
 ### Langkah-langkah:
 
 1. Login ke aplikasi dengan akun yang memiliki permission `financial_dashboard`.
-2. Klik menu **Financial Dashboard** di sidebar pada grup menu Accounting atau akses langsung melalui URL `/financial-dashboard`.
+2. Klik menu **Dasbor Keuangan** di sidebar pada grup menu Akuntansi atau akses langsung melalui URL `/financial-dashboard`.
 3. Halaman Financial Dashboard akan menampilkan data keuangan terkini.
 
 [Screenshot: Halaman Financial Dashboard utama dengan KPI cards dan grafik]

@@ -50,6 +50,7 @@ resources/js/
 - **`pipeline/` vs `pipelines/`** — `pipeline/` = runtime state actions/timeline; `pipelines/` = pipeline CRUD UI.
 - **Form prop naming** — always `entity` (never `product`, `customer`, etc.).
 - **Date fields** — form schemas use `z.string()` with `yyyy-MM-dd`; default values go through `toDateInputValue()` in `utils/date-format.ts`. Never use `z.date()` or send raw `Date` objects to the API.
+- **i18n (WAJIB)** — all UI text goes through `useTranslation` with keys in `lang/en.json` + `lang/id.json` (keep key parity). Default English text must not change (locked by `tests/Feature/Locale/Issue552EnglishLockTest.php`). Zod validation messages use `validation.<form>.<rule>` keys translated by `FormMessage`; seeder data stays in Indonesian.
 - **`useEntityForm` hook** — eliminates form setup boilerplate. Takes `schema`, `getDefaults`, `entity`.
 - **ViewModal** — always `memo()` wrapped, uses `ViewModalShell` + `ViewField`.
 - **Data fetching** — TanStack Query via `useCrudQuery`/`useCrudMutations`. No raw axios in components.
