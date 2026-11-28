@@ -103,8 +103,13 @@ class CoaSeeder extends Seeder
         // ==========================================
         // Saldo awal modal (nilai tetap, diposting lewat action aplikasi).
         // Transaksi dokumen demo diposting oleh seeder dokumen masing-masing.
+        //
+        // Modal FY lalu menutup perolehan aset tunai dan beban awal tahun, sehingga saldo
+        // kas bank tidak negatif dan saldo awalnya terbawa ke FY berjalan lewat jurnal
+        // OPENING-FY (DemoPeriodClosingSeeder). Modal FY berjalan menambah kas operasional.
         // ==========================================
-        $this->seedOpeningCapital($fiscalYear2026);
+        $this->seedOpeningCapital($fiscalYear2025, 1000000000);
+        $this->seedOpeningCapital($fiscalYear2026, 500000000);
     }
 
     /**
@@ -228,14 +233,14 @@ class CoaSeeder extends Seeder
     }
 
     /**
-     * Saldo awal modal disetor Rp 500.000.000 ke bank (nilai tetap).
-     * Idempoten lewat PostOpeningCapitalJournalAction.
+     * Saldo awal modal disetor ke bank (nilai tetap per tahun fiskal).
+     * Idempoten lewat PostOpeningCapitalJournalAction (referensi OPEN-CAP-{tahun}).
      */
-    private function seedOpeningCapital(FiscalYear $fiscalYear): void
+    private function seedOpeningCapital(FiscalYear $fiscalYear, float $amount): void
     {
         app(PostOpeningCapitalJournalAction::class)->execute(
             $fiscalYear->start_date->format('Y-m-d'),
-            500000000,
+            $amount,
             'OPEN-CAP-' . $fiscalYear->name,
             'Saldo awal modal disetor pemilik',
         );

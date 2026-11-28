@@ -12,6 +12,7 @@ use App\Models\StockAdjustment;
 use App\Models\StockTransfer;
 use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
+use App\Support\Demo\DemoCalendar;
 use Database\Seeders\DemoMasterData;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
 use Illuminate\Support\Carbon;
@@ -100,6 +101,27 @@ function postedBalance(int $accountId, bool $debitNormal): float
     $credit = (float) ($row->credit ?? 0);
 
     return $debitNormal ? $debit - $credit : $credit - $debit;
+}
+
+/**
+ * Saldo kas bank (kode 11100 pada COA lama, 11110 pada COA aktif) sampai tanggal tersebut.
+ *
+ * Kedua kode dijumlahkan karena saldo FY lama dipindahkan ke COA aktif lewat jurnal
+ * OPENING-FY: akun lama tetap menyimpan mutasi tahun lalu, akun aktif memuat saldo awal
+ * hasil pemetaan. Tidak ada mutasi yang dihitung dua kali.
+ */
+function bankCashBalanceOn(string $date): float
+{
+    $row = DB::table('journal_entry_lines')
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+        ->where('journal_entries.status', 'posted')
+        ->whereIn('accounts.code', ['11100', '11110'])
+        ->whereDate('journal_entries.entry_date', '<=', $date)
+        ->selectRaw('COALESCE(SUM(journal_entry_lines.debit), 0) as debit, COALESCE(SUM(journal_entry_lines.credit), 0) as credit')
+        ->first();
+
+    return (float) ($row->debit ?? 0) - (float) ($row->credit ?? 0);
 }
 
 /**
@@ -2210,4 +2232,53 @@ invariant('W8-459 asset approval submitted_at is not earlier than its Draft pipe
             "Asset {$request->approvable_id} submitted_at must not precede its Draft log",
         );
     }
+});
+
+// #571 review host C7 — saldo kas bank demo tidak boleh negatif di akhir bulan mana pun
+// dalam jendela 13 bulan. Saldo awal FY berjalan berasal dari jurnal OPENING-FY (pemetaan
+// akun COA lama ke COA aktif) dan modal awal harus cukup menutup perolehan aset tunai.
+invariant('W7-18 demo bank cash balance is non-negative at every month end of the window', function () {
+    foreach (DemoCalendar::months() as $month) {
+        $monthEnd = $month->copy()->endOfMonth()->toDateString();
+        $balance = bankCashBalanceOn($monthEnd);
+
+        expect($balance)->toBeGreaterThanOrEqual(
+            0.0,
+            "Saldo kas bank negatif pada akhir {$monthEnd}: {$balance}",
+        );
+    }
+});
+
+// #571 review host C7 — perusahaan demo harus sehat: laba bersih FY berjalan positif,
+// dengan pendapatan menutup beban (termasuk penyusutan dari register aset) di hampir semua bulan.
+invariant('W7-18 current fiscal year demo net profit is positive', function () {
+    $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
+
+    expect($fiscalYear)->not->toBeNull('Demo data must leave the current fiscal year open');
+
+    $totals = DB::table('journal_entry_lines')
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+        ->where('journal_entries.status', 'posted')
+        ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+        ->where('journal_entries.journal_type', '!=', 'closing')
+        ->whereIn('accounts.type', ['revenue', 'expense'])
+        ->selectRaw(
+            "COALESCE(SUM(CASE WHEN accounts.type = 'revenue' "
+            . 'THEN journal_entry_lines.credit - journal_entry_lines.debit ELSE 0 END), 0) as revenue',
+        )
+        ->selectRaw(
+            "COALESCE(SUM(CASE WHEN accounts.type = 'expense' "
+            . 'THEN journal_entry_lines.debit - journal_entry_lines.credit ELSE 0 END), 0) as expense',
+        )
+        ->first();
+
+    $revenue = (float) $totals->revenue;
+    $expense = (float) $totals->expense;
+
+    expect($revenue)->toBeGreaterThan(0.0, 'Pendapatan demo FY berjalan harus terisi')
+        ->and($revenue - $expense)->toBeGreaterThan(
+            0.0,
+            "Laba bersih demo FY berjalan harus positif: pendapatan {$revenue} vs beban {$expense}",
+        );
 });

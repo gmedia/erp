@@ -40,8 +40,14 @@ class ArMonthlyDemoSeeder extends Seeder
     /** Dasar jumlah invoice per bulan sebelum faktor volume. */
     private const INVOICES_PER_MONTH = 3;
 
-    /** Nilai dasar invoice rata-rata (IDR) sebelum faktor nilai bulan. */
-    private const BASE_INVOICE_VALUE = 9000000;
+    /**
+     * Nilai dasar invoice rata-rata (IDR) sebelum faktor nilai bulan.
+     *
+     * Nilai ini menentukan pendapatan demo. Agar perusahaan demo sehat, pendapatan harus
+     * menutup beban tetap (penyusutan dari register aset + beban umum) di hampir semua
+     * bulan, bukan hanya di bulan puncak (#571 review host C7).
+     */
+    private const BASE_INVOICE_VALUE = 20000000;
 
     public function run(): void
     {
