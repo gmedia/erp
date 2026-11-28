@@ -2,6 +2,7 @@ import { AppContent } from '@/components/app-content';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
+import { MobileUpdatePrompt } from '@/components/mobile-app/MobileUpdatePrompt';
 import { AppI18nProvider } from '@/contexts/i18n-context';
 import { type BreadcrumbItem } from '@/types';
 import { type PropsWithChildren } from 'react';
@@ -16,6 +17,7 @@ export default function AppSidebarLayout({
                 <AppSidebar />
                 <AppContent variant="sidebar" className="overflow-x-hidden">
                     <AppSidebarHeader breadcrumbs={breadcrumbs} />
+                    <MobileUpdatePrompt />
                     {children}
                 </AppContent>
             </AppShell>

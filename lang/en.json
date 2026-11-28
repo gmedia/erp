@@ -3777,6 +3777,12 @@
         "install_step_2_settings": "(Settings → Security → Install unknown apps).",
         "install_step_3": "Confirm the installation and open the app.",
         "empty_download_title": "No app release available",
-        "empty_download_description": "An administrator has not published an Android release yet. Check back later."
+        "empty_download_description": "An administrator has not published an Android release yet. Check back later.",
+        "update_available_title": "New version {version} is available",
+        "update_available_description": "Update the app to get the latest fixes and improvements.",
+        "update_action": "Update",
+        "update_required_title": "Update required",
+        "update_required_description": "This version is no longer supported. Update to {version} to continue.",
+        "update_required_action": "Update now"
     }
 }
