@@ -50,21 +50,21 @@ Cancelled         Overdue (jika melewati due date)
 
 | Status | Penjelasan |
 |--------|------------|
-| **Draft** | Baru dibuat, masih bisa diedit |
-| **Sent** | Dikirim ke pelanggan, piutang tercatat |
-| **Partially Paid** | Sebagian sudah diterima pembayarannya |
-| **Paid** | Lunas (amount_due = 0) |
-| **Overdue** | Melewati jatuh tempo dan belum lunas |
-| **Cancelled** | Dibatalkan sebelum sent |
-| **Void** | Dibatalkan setelah sent |
+| **Draf** | Baru dibuat, masih bisa diedit |
+| **Terkirim** | Dikirim ke pelanggan, piutang tercatat |
+| **Dibayar Sebagian** | Sebagian sudah diterima pembayarannya |
+| **Dibayar** | Lunas (amount_due = 0) |
+| **Jatuh Tempo** | Melewati jatuh tempo dan belum lunas |
+| **Dibatalkan** | Dibatalkan sebelum sent |
+| **Batal** | Dibatalkan setelah sent |
 
 > **Catatan**: Status `Partially Paid` dan `Paid` diupdate **otomatis** saat pembayaran diterima atau credit note diterapkan.
 
 ### Mengubah Status
 
 - **Send**: Edit invoice → ubah status ke `Sent` → Save (otomatis set `sent_by` dan `sent_at`)
-- **Cancel**: Edit invoice (status Draft) → ubah ke `Cancelled` → Save
-- **Void**: Edit invoice (status Sent) → ubah ke `Void` → Save
+- **Cancel**: Edit invoice (status Draf) → ubah ke `Cancelled` → Save
+- **Batal**: Edit invoice (status Terkirim) → ubah ke `Void` → Save
 
 ---
 
@@ -145,17 +145,17 @@ Saat receipt dihapus:
 Draft → Confirmed → Applied
   ↓
 Cancelled
-  ↓ (setelah confirmed)
+  ↓ (setelah dikonfirmasi)
 Void
 ```
 
 | Status | Penjelasan |
 |--------|------------|
-| **Draft** | Baru dibuat, masih bisa diedit |
-| **Confirmed** | Dikonfirmasi, siap diterapkan |
+| **Draf** | Baru dibuat, masih bisa diedit |
+| **Dikonfirmasi** | Dikonfirmasi, siap diterapkan |
 | **Applied** | Sudah diterapkan ke invoice, piutang berkurang |
-| **Cancelled** | Dibatalkan sebelum confirmed |
-| **Void** | Dibatalkan setelah confirmed |
+| **Dibatalkan** | Dibatalkan sebelum dikonfirmasi |
+| **Batal** | Dibatalkan setelah dikonfirmasi |
 
 ### Menerapkan Credit Note (Apply)
 
@@ -258,7 +258,7 @@ Customer Invoices memiliki pipeline lifecycle:
 - **Customer Invoice Lifecycle**: 7 states, 10 transitions
 
 Pipeline memungkinkan:
-- Tracking history transisi status
+- Pelacakan riwayat transisi status
 - Konfigurasi permission per transisi
 - Konfirmasi dan komentar wajib untuk transisi sensitif (Void)
 
@@ -293,7 +293,7 @@ Pipeline memungkinkan:
 3. **Cek AR Aging Report** secara berkala untuk follow-up pelanggan yang overdue
 4. **Customer Statement** berguna untuk rekonsiliasi dengan pelanggan
 5. **Jangan hapus receipt** yang sudah confirmed — gunakan Void untuk audit trail
-6. **Apply CN segera** setelah confirmed — CN yang belum applied tidak mengurangi piutang
+6. **Apply CN segera** setelah dikonfirmasi — CN yang belum applied tidak mengurangi piutang
 7. **Satu CN per invoice** — jika perlu multiple pengurangan, buat beberapa CN
 
 ---
@@ -306,7 +306,7 @@ Pipeline memungkinkan:
 
 **Q:** Apa perbedaan status Receipt "Draft", "Confirmed", dan "Cancelled"? Kapan masing-masing digunakan?
 
-**J:** Status **Draft** adalah status awal saat receipt baru dibuat dan belum diposting ke jurnal. Receipt masih bisa diedit atau dihapus. Status **Confirmed** berarti receipt sudah diposting — jurnal sudah tercatat, alokasi ke invoice sudah diterapkan, dan amount_received di invoice sudah bertambah. Receipt Confirmed tidak bisa diedit, hanya bisa di-void. Status **Cancelled** berarti receipt dibatalkan sebelum diposting (dari status Draft). Saat dibatalkan, alokasi dikembalikan dan invoice kembali ke status sebelumnya. Gunakan Draft untuk simulasi atau pengecekan ulang, Confirm saat pembayaran sudah diterima dan siap dicatat secara akuntansi, dan Cancel jika ada kesalahan input sebelum posting.
+**J:** Status **Draf** adalah status awal saat receipt baru dibuat dan belum diposting ke jurnal. Receipt masih bisa diedit atau dihapus. Status **Dikonfirmasi** berarti receipt sudah diposting — jurnal sudah tercatat, alokasi ke invoice sudah diterapkan, dan amount_received di invoice sudah bertambah. Receipt berstatus Dikonfirmasi tidak bisa diedit, hanya bisa di-void. Status **Dibatalkan** berarti receipt dibatalkan sebelum diposting (dari status Draf). Saat dibatalkan, alokasi dikembalikan dan invoice kembali ke status sebelumnya. Gunakan Draf untuk simulasi atau pengecekan ulang, Konfirmasi saat pembayaran sudah diterima dan siap dicatat secara akuntansi, dan Batalkan jika ada kesalahan input sebelum posting.
 
 **Q:** Bagaimana cara mencari receipt tertentu dengan cepat?
 
@@ -327,10 +327,10 @@ Filter dan pencarian bisa dikombinasikan — misalnya mencari semua receipt Conf
 
 **J:** AR Receipt adalah dokumen penerimaan pembayaran yang mengalokasikan dana ke satu atau beberapa Customer Invoice. Setiap alokasi di receipt mengurangi amount_due pada invoice terkait. Sistem otomatis memperbarui status invoice:
 - Saat receipt di-Confirm, amount_received invoice bertambah, amount_due berkurang
-- Jika amount_due menjadi 0, status invoice otomatis berubah menjadi **Paid**
-- Jika amount_due berkurang tapi belum 0, status invoice menjadi **Partially Paid**
+- Jika amount_due menjadi 0, status invoice otomatis berubah menjadi **Dibayar**
+- Jika amount_due berkurang tapi belum 0, status invoice menjadi **Dibayar Sebagian**
 
-Invoice yang sudah **Paid** atau **Cancelled** atau **Void** tidak akan muncul lagi di daftar invoice yang bisa dialokasi saat membuat receipt baru. Hanya invoice dengan status **Sent**, **Partially Paid**, atau **Overdue** yang tersedia untuk alokasi.
+Invoice yang sudah **Dibayar** atau **Dibatalkan** atau **Batal** tidak akan muncul lagi di daftar invoice yang bisa dialokasi saat membuat receipt baru. Hanya invoice dengan status **Terkirim**, **Dibayar Sebagian**, atau **Jatuh Tempo** yang tersedia untuk alokasi.
 
 **Q:** Bagaimana cara mengekspor data AR Receipts ke Excel?
 
@@ -350,13 +350,13 @@ Metode pembayaran menentukan akun kas/bank yang akan didebit di jurnal penerimaa
 
 **Q:** Apa yang terjadi jika receipt yang sudah di-Confirm dihapus? Apakah invoice kembali ke status sebelumnya?
 
-**J:** Receipt yang sudah berstatus **Confirmed** tidak bisa dihapus langsung — harus melalui proses **Void**. Saat receipt di-void:
+**J:** Receipt yang sudah berstatus **Dikonfirmasi** tidak bisa dihapus langsung — harus melalui proses **Batal**. Saat receipt di-void:
 - Jurnal penerimaan yang sudah tercatat akan direverse (jurnal reversal)
 - Semua alokasi ke invoice dikembalikan — amount_received di setiap invoice dikurangi
 - amount_due di invoice bertambah kembali sesuai jumlah yang sebelumnya dialokasi
 - Status invoice otomatis disesuaikan: jika sebelumnya Paid bisa kembali ke Sent atau Partially Paid, jika sebelumnya Partially Paid bisa kembali ke Sent
 
-Proses Void memastikan audit trail tetap tercatat — receipt yang di-void tetap ada di sistem dengan status Cancelled/Void, bukan hilang. Ini penting untuk kepatuhan audit dan rekonsiliasi.
+Proses Void memastikan audit trail tetap tercatat — receipt yang di-void tetap ada di sistem dengan status Dibatalkan/Batal, bukan hilang. Ini penting untuk kepatuhan audit dan rekonsiliasi.
 
 **Q:** Apa tips terbaik untuk mengelola piutang pelanggan secara efektif menggunakan modul ini?
 

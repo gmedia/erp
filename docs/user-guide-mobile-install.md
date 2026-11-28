@@ -1,4 +1,4 @@
-# Panduan: Memasang & Memperbarui Aplikasi Android (APK)
+# Panduan: Pasang Aplikasi Android
 
 Panduan ini untuk pengguna yang memasang aplikasi ERP di Android **tanpa Play Store**. Aplikasi
 diunduh sebagai berkas APK dari server ERP perusahaan Anda. Tanyakan tautan unduh dan versi terbaru

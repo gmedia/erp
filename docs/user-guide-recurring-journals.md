@@ -22,8 +22,6 @@ Setiap recurring journal memiliki:
 
 Sistem secara otomatis menjalankan jurnal yang jatuh tempo setiap hari melalui penjadwal `recurring-journals:execute`. Anda juga dapat mengeksekusi jurnal secara manual kapan saja.
 
-[Screenshot: Halaman daftar Recurring Journals dengan tabel dan filter]
-
 ## Menu & Navigasi
 
 | Menu | URL | Permission / Function |
@@ -52,8 +50,6 @@ Halaman utama menampilkan tabel semua jurnal berulang dengan kolom:
 | Is Active | Status aktif (Active/Inactive) | Ya |
 | Created At | Tanggal pembuatan | Ya |
 
-[Screenshot: Tabel Recurring Journals dengan beberapa data]
-
 ### 1.1 Menggunakan Filter
 
 Tersedia tiga filter untuk memudahkan pencarian:
@@ -61,8 +57,6 @@ Tersedia tiga filter untuk memudahkan pencarian:
 - **Search**: Cari berdasarkan nama atau deskripsi jurnal
 - **Frequency**: Filter berdasarkan frekuensi (Daily, Weekly, Monthly, Quarterly, Yearly)
 - **Status**: Filter berdasarkan status (Active atau Inactive)
-
-[Screenshot: Panel filter Recurring Journals]
 
 ### 1.2 Mengurutkan Data
 
@@ -82,8 +76,6 @@ Klik header kolom yang dapat diurutkan untuk mengurutkan data naik atau turun. K
 
 1. Klik tombol **Add New** di toolbar
 2. Formulir tambah recurring journal akan muncul
-
-[Screenshot: Form tambah Recurring Journal kosong]
 
 ### 2.2 Mengisi Header Jurnal
 
@@ -110,8 +102,6 @@ Isi field berikut:
 1. Klik tombol **Add Line** di bagian Journal Lines
 2. Dialog form baris akan muncul
 
-[Screenshot: Dialog form baris Recurring Journal]
-
 Isi field pada dialog:
 
 | Field | Keterangan | Wajib |
@@ -130,8 +120,6 @@ Isi field pada dialog:
 Sistem akan otomatis menghitung total debit dan kredit. Indikator keseimbangan menunjukkan:
 - **Balanced**: Total debit = total kredit, tombol Submit aktif
 - **Unbalanced**: Total debit != total kredit, peringatan ditampilkan
-
-[Screenshot: Indikator keseimbangan di form Recurring Journal]
 
 > **Penting**: Jurnal tidak dapat disimpan hingga total debit sama dengan total kredit. Ini adalah prinsip double-entry bookkeeping.
 
@@ -156,8 +144,6 @@ Setelah menambah baris, Anda dapat:
 
 1. Klik icon **mata** (View) pada baris jurnal yang ingin dilihat
 2. Modal detail akan menampilkan informasi lengkap
-
-[Screenshot: Modal detail Recurring Journal]
 
 ### 3.2 Informasi yang Ditampilkan
 
@@ -191,8 +177,6 @@ Modal detail menampilkan:
 1. Klik icon **pensil** (Edit) pada baris jurnal yang ingin diubah
 2. Form edit akan muncul dengan data jurnal yang sudah terisi
 3. Ubah field header atau baris jurnal sesuai kebutuhan
-
-[Screenshot: Form edit Recurring Journal]
 
 ### 4.2 Perilaku Edit Baris
 
@@ -234,15 +218,15 @@ Sistem menjalankan penjadwal `recurring-journals:execute` setiap hari secara oto
 
 Anda dapat mengeksekusi jurnal secara manual melalui API endpoint:
 - Endpoint: `POST /api/recurring-journals/{id}/execute`
-- Hanya dapat dilakukan jika jurnal dalam status Active
+- Hanya dapat dilakukan jika jurnal dalam status Aktif
 
 ### 6.3 Hasil Eksekusi
 
 Saat jurnal dieksekusi:
 - Journal Entry baru dibuat dengan tipe `recurring`
 - Entry Number di-generate otomatis dengan format `RJ-YYYYmmddHHiiss-NNN`
-- Jika `auto_post = true`: status journal entry langsung **Posted**
-- Jika `auto_post = false`: status journal entry **Draft**
+- Jika `auto_post = true`: status journal entry langsung **Diposting**
+- Jika `auto_post = false`: status journal entry **Draf**
 - `last_run_date` diperbarui ke tanggal eksekusi
 - `next_run_date` dimajukan sesuai frekuensi:
   - Daily → +1 hari
@@ -280,8 +264,8 @@ Setiap recurring journal harus memenuhi prinsip double-entry:
 
 ### 7.3 Auto Post
 
-- Jika Auto Post diaktifkan, journal entry hasil eksekusi akan langsung berstatus **Posted**
-- Jika tidak diaktifkan, journal entry akan berstatus **Draft** dan perlu diposting manual
+- Jika Auto Post diaktifkan, journal entry hasil eksekusi akan langsung berstatus **Diposting**
+- Jika tidak diaktifkan, journal entry akan berstatus **Draf** dan perlu diposting manual
 - Auto Post cocok untuk jurnal rutin yang sudah pasti kebenarannya
 
 ### 7.4 Template Reference
@@ -331,7 +315,7 @@ Setiap recurring journal harus memenuhi prinsip double-entry:
 
 **Q: Apa yang terjadi jika Auto Post diaktifkan?**
 
-**J:** Setiap Journal Entry yang dihasilkan dari eksekusi recurring journal akan langsung berstatus **Posted** dan tercatat di buku besar. Jika tidak diaktifkan, journal entry akan berstatus **Draft** dan perlu diposting manual.
+**J:** Setiap Journal Entry yang dihasilkan dari eksekusi recurring journal akan langsung berstatus **Diposting** dan tercatat di buku besar. Jika tidak diaktifkan, journal entry akan berstatus **Draf** dan perlu diposting manual.
 
 **Q: Mengapa tombol Submit tidak aktif saat membuat jurnal baru?**
 

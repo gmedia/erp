@@ -50,21 +50,21 @@ Cancelled              Overdue (jika melewati due date)
 
 | Status | Penjelasan |
 |--------|------------|
-| **Draft** | Baru dibuat, masih bisa diedit |
-| **Confirmed** | Dikonfirmasi, menunggu pembayaran |
-| **Partially Paid** | Sebagian sudah dibayar |
-| **Paid** | Lunas (amount_due = 0) |
-| **Overdue** | Melewati jatuh tempo dan belum lunas |
-| **Cancelled** | Dibatalkan sebelum confirmed |
-| **Void** | Dibatalkan setelah confirmed |
+| **Draf** | Baru dibuat, masih bisa diedit |
+| **Dikonfirmasi** | Dikonfirmasi, menunggu pembayaran |
+| **Dibayar Sebagian** | Sebagian sudah dibayar |
+| **Dibayar** | Lunas (amount_due = 0) |
+| **Jatuh Tempo** | Melewati jatuh tempo dan belum lunas |
+| **Dibatalkan** | Dibatalkan sebelum dikonfirmasi |
+| **Batal** | Dibatalkan setelah dikonfirmasi |
 
 > **Catatan**: Status `Partially Paid` dan `Paid` diupdate **otomatis** saat pembayaran dialokasikan.
 
 ### Mengubah Status
 
 - **Confirm**: Edit bill → ubah status ke `Confirmed` → Save
-- **Cancel**: Edit bill (status Draft) → ubah ke `Cancelled` → Save
-- **Void**: Edit bill (status Confirmed) → ubah ke `Void` → Save
+- **Cancel**: Edit bill (status Draf) → ubah ke `Cancelled` → Save
+- **Batal**: Edit bill (status Dikonfirmasi) → ubah ke `Void` → Save
 
 ---
 
@@ -160,7 +160,7 @@ Supplier Bills dan AP Payments memiliki pipeline lifecycle yang bisa dikelola me
 - **AP Payment Lifecycle**: 6 states, 7 transitions
 
 Pipeline memungkinkan:
-- Tracking history transisi status
+- Pelacakan riwayat transisi status
 - Konfigurasi permission per transisi
 - Konfirmasi dan komentar wajib untuk transisi sensitif (Void)
 
@@ -187,7 +187,7 @@ Pipeline memungkinkan:
 ## 6. Tips & Best Practices
 
 1. **Selalu confirm bill** sebelum membuat pembayaran — hanya bill confirmed yang bisa dibayar
-2. **Gunakan Payment Terms** untuk tracking jatuh tempo yang konsisten
+2. **Gunakan Payment Terms** untuk pelacakan jatuh tempo yang konsisten
 3. **Cek AP Aging Report** secara berkala untuk identifikasi tagihan overdue
 4. **Jangan hapus payment** yang sudah confirmed — gunakan Void untuk audit trail
 5. **Supplier Invoice Number** membantu rekonsiliasi dengan faktur fisik dari vendor
@@ -202,7 +202,7 @@ Pipeline memungkinkan:
 
 **Q:** Apa saja status yang dimiliki AP Payment dan apa artinya?
 
-**J:** Status payment terdiri dari: **Draft** (baru dibuat, bisa diedit dan dihapus), **Pending Approval** (menunggu persetujuan dari approver), **Confirmed** (sudah dikonfirmasi dan jurnal otomatis terposting ke buku besar), **Reconciled** (sudah dicocokkan dengan rekening koran/bank statement), **Cancelled** (dibatalkan sebelum confirmed), dan **Void** (dibatalkan setelah confirmed dengan jurnal reversal).
+**J:** Status payment terdiri dari: **Draf** (baru dibuat, bisa diedit dan dihapus), **Pending Approval** (menunggu persetujuan dari approver), **Dikonfirmasi** (sudah dikonfirmasi dan jurnal otomatis terposting ke buku besar), **Direkonsiliasi** (sudah dicocokkan dengan rekening koran/bank statement), **Dibatalkan** (dibatalkan sebelum dikonfirmasi), dan **Batal** (dibatalkan setelah dikonfirmasi dengan jurnal reversal).
 
 **Q:** Apa yang terjadi ketika payment dikonfirmasi (Confirmed)?
 
@@ -210,7 +210,7 @@ Pipeline memungkinkan:
 
 **Q:** Apa yang terjadi jika payment dibatalkan atau dihapus?
 
-**J:** Saat payment dihapus (status Draft/Cancelled), semua alokasi akan di-revert: amount_paid di setiap Supplier Bill yang terkait akan dikurangi, amount_due dihitung ulang, dan status bill otomatis disesuaikan (misalnya dari Paid kembali ke Partially Paid atau Confirmed). Jika payment sudah Confirmed dan ingin dibatalkan, gunakan status Void agar jurnal reversal tercatat dan audit trail tetap lengkap.
+**J:** Saat payment dihapus (status Draf/Cancelled), semua alokasi akan di-revert: amount_paid di setiap Supplier Bill yang terkait akan dikurangi, amount_due dihitung ulang, dan status bill otomatis disesuaikan (misalnya dari Paid kembali ke Partially Paid atau Confirmed). Jika payment sudah Confirmed dan ingin dibatalkan, gunakan status Void agar jurnal reversal tercatat dan audit trail tetap lengkap.
 
 **Q:** Bagaimana cara mencari dan memfilter data pembayaran?
 
@@ -218,7 +218,7 @@ Pipeline memungkinkan:
 
 **Q:** Bagaimana hubungan antara AP Payment dengan Supplier Bill?
 
-**J:** Satu AP Payment bisa membayar satu atau beberapa Supplier Bill sekaligus (multi-bill payment). Sebaliknya, satu Supplier Bill bisa dibayar bertahap melalui beberapa AP Payment (partial payment). Saat payment dibuat, alokasi menghubungkan payment ke bill tertentu dengan nominal tertentu. Sistem otomatis memvalidasi bahwa allocated amount tidak melebihi sisa tagihan (amount_due) dan hanya bill dengan status Confirmed/Partially Paid/Overdue yang bisa dialokasikan.
+**J:** Satu AP Payment bisa membayar satu atau beberapa Supplier Bill sekaligus (multi-bill payment). Sebaliknya, satu Supplier Bill bisa dibayar bertahap melalui beberapa AP Payment (partial payment). Saat payment dibuat, alokasi menghubungkan payment ke bill tertentu dengan nominal tertentu. Sistem otomatis memvalidasi bahwa allocated amount tidak melebihi sisa tagihan (amount_due) dan hanya bill dengan status Dikonfirmasi/Partially Paid/Overdue yang bisa dialokasikan.
 
 **Q:** Bagaimana cara mengekspor data pembayaran ke Excel?
 
@@ -234,4 +234,4 @@ Pipeline memungkinkan:
 
 **Q:** Bagaimana workflow approval untuk AP Payment?
 
-**J:** Setelah payment dibuat dengan status Draft, ubah status ke Pending Approval untuk mengajukan persetujuan. Approver yang memiliki permission dapat menyetujui payment melalui menu My Approvals atau langsung di halaman edit payment. Setelah disetujui, status berubah menjadi Confirmed dan jurnal otomatis terposting. Jika payment ditolak, status bisa dikembalikan ke Draft untuk diperbaiki. Proses approval dicatat lengkap dengan approved_by dan approved_at untuk keperluan audit trail.
+**J:** Setelah payment dibuat dengan status Draf, ubah status ke Pending Approval untuk mengajukan persetujuan. Approver yang memiliki permission dapat menyetujui payment melalui menu My Approvals atau langsung di halaman edit payment. Setelah disetujui, status berubah menjadi Confirmed dan jurnal otomatis terposting. Jika payment ditolak, status bisa dikembalikan ke Draft untuk diperbaiki. Proses approval dicatat lengkap dengan approved_by dan approved_at untuk keperluan audit trail.

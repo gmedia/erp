@@ -32,8 +32,6 @@ Fitur ini terintegrasi dengan sistem **Approval Flow** yang mengatur alur perset
    - **Rejected** — Request yang sudah Anda tolak.
    - **All Requests** — Semua request yang pernah ditujukan kepada Anda.
 
-[Screenshot: Halaman My Approvals dengan 4 tab dan daftar request]
-
 ### Prasyarat
 
 | Prasyarat | Penjelasan |
@@ -58,8 +56,6 @@ Setiap baris request menampilkan kolom informasi berikut:
 | **Current Step** | Step approval yang sedang aktif | `Level 2 - Manager` |
 | **Actions** | Tombol approve/reject (hanya di tab Pending) | `Approve`, `Reject` |
 
-[Screenshot: Detail baris request dengan kolom-kolom informasi]
-
 ---
 
 ## 3. Approve Request
@@ -70,14 +66,10 @@ Setiap baris request menampilkan kolom informasi berikut:
 2. Identifikasi request yang ingin Anda setujui.
 3. Klik tombol **Approve** pada baris request tersebut.
 
-   [Screenshot: Tombol Approve pada baris request]
-
 4. Jika approval flow mengharuskan komentar:
    - Dialog konfirmasi akan muncul.
    - Isi kolom **Comment** dengan alasan atau catatan persetujuan.
    - Klik **Submit** untuk menyelesaikan approval.
-
-   [Screenshot: Dialog approval dengan input komentar]
 
 5. Jika tidak ada komentar wajib:
    - Approval langsung diproses.
@@ -102,13 +94,9 @@ Setiap baris request menampilkan kolom informasi berikut:
 2. Identifikasi request yang ingin Anda tolak.
 3. Klik tombol **Reject** pada baris request tersebut.
 
-   [Screenshot: Tombol Reject pada baris request]
-
 4. Dialog rejection akan muncul (komentar **wajib** diisi):
    - Isi kolom **Reason** dengan alasan penolakan.
    - Klik **Submit Rejection**.
-
-   [Screenshot: Dialog rejection dengan input alasan wajib]
 
 5. Status request berubah menjadi `Rejected`.
 6. Requester akan menerima notifikasi bahwa dokumen ditolak.
@@ -134,8 +122,6 @@ Sebelum approve atau reject, Anda bisa membuka detail dokumen untuk memverifikas
 2. Sistem akan navigasi ke halaman detail dokumen tersebut.
 3. Periksa informasi dokumen: amount, items, requester, attachments, dll.
 4. Kembali ke My Approvals untuk melakukan aksi approve/reject.
-
-[Screenshot: Navigasi dari My Approvals ke halaman detail Purchase Order]
 
 ---
 
@@ -197,8 +183,6 @@ Jika Anda tidak bisa memproses approval (cuti, sakit, travel), Anda bisa mendele
    - **End Date** — Tanggal berakhir delegation.
    - **Reason** — Alasan delegation (wajib).
 4. Klik **Save**.
-
-[Screenshot: Form Approval Delegation]
 
 ### Efek Delegation
 

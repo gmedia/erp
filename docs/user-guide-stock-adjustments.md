@@ -6,7 +6,7 @@ Modul Stock Adjustments digunakan untuk mencatat penyesuaian stok barang di guda
 
 Fitur utama:
 - Pembuatan penyesuaian stok dengan detail item lengkap
-- Tracking kuantitas sebelum, sesudah, dan selisih penyesuaian
+- Pelacakan kuantitas sebelum, sesudah, dan selisih penyesuaian
 - Berbagai tipe penyesuaian: kerusakan, kadaluarsa, penyusutan, koreksi, hasil stock opname, lainnya
 - Integrasi dengan jurnal keuangan saat status diubah menjadi approved
 - Export data ke Excel untuk pelaporan
@@ -26,8 +26,6 @@ Untuk mengakses halaman Stock Adjustments:
 3. Klik submenu **Penyesuaian Stok**
 4. Halaman daftar stock adjustments akan ditampilkan
 
-[Screenshot: Halaman daftar stock adjustments dengan tabel dan filter]
-
 Pada halaman ini terdapat:
 - Tabel daftar penyesuaian dengan kolom: Adjustment Number, Warehouse, Adjustment Date, Adjustment Type, Status
 - Tombol **Add** di pojok kanan atas untuk membuat penyesuaian baru
@@ -45,8 +43,6 @@ Gunakan field pencarian untuk menemukan penyesuaian berdasarkan nomor atau catat
 2. Ketik kata kunci pencarian
 3. Tabel akan otomatis memfilter hasil sesuai kata kunci
 
-[Screenshot: Field pencarian stock adjustments]
-
 ### Filter Lanjutan
 
 Gunakan filter untuk menyaring data berdasarkan kriteria spesifik:
@@ -55,16 +51,12 @@ Gunakan filter untuk menyaring data berdasarkan kriteria spesifik:
 2. **Filter Status**: Pilih status (draft, approved, cancelled)
 3. **Filter Adjustment Type**: Pilih tipe penyesuaian (damage, expired, shrinkage, correction, stocktake_result, other)
 
-[Screenshot: Panel filter stock adjustments dengan dropdown]
-
 ## 3. Membuat Stock Adjustment Baru
 
 Untuk membuat penyesuaian stok baru:
 
 1. Klik tombol **Add** di pojok kanan atas tabel
 2. Dialog form "Add New Stock Adjustment" akan muncul
-
-[Screenshot: Dialog form pembuatan stock adjustment baru]
 
 ### Mengisi Data Utama
 
@@ -81,8 +73,6 @@ Isi field-field berikut:
    - **Other**: Lainnya
 4. **Notes**: Tambahkan catatan jika diperlukan (opsional)
 
-[Screenshot: Bagian data utama form stock adjustment]
-
 ### Menambahkan Item Penyesuaian
 
 Setelah mengisi data utama, tambahkan item-item yang akan disesuaikan:
@@ -97,8 +87,6 @@ Setelah mengisi data utama, tambahkan item-item yang akan disesuaikan:
 8. **Total Cost** akan dihitung otomatis (Qty Adjusted x Unit Cost)
 9. Isi **Reason** alasan penyesuaian untuk item ini (opsional)
 
-[Screenshot: Form penambahan item stock adjustment]
-
 Ulangi langkah di atas untuk menambahkan item lainnya.
 
 ### Menyimpan Stock Adjustment
@@ -107,8 +95,6 @@ Ulangi langkah di atas untuk menambahkan item lainnya.
 2. Klik tombol **Save**
 3. Stock adjustment akan dibuat dengan status **draft** dan nomor penyesuaian akan digenerate otomatis dengan prefix "SA"
 
-[Screenshot: Stock adjustment berhasil disimpan]
-
 ## 4. Melihat Detail Stock Adjustment
 
 Untuk melihat detail penyesuaian:
@@ -116,8 +102,6 @@ Untuk melihat detail penyesuaian:
 1. Cari penyesuaian yang ingin dilihat
 2. Klik ikon **View** (mata) pada kolom Actions
 3. Dialog detail akan muncul menampilkan informasi lengkap
-
-[Screenshot: Dialog detail stock adjustment]
 
 Informasi yang ditampilkan:
 - Adjustment Number: Nomor unik penyesuaian
@@ -148,8 +132,6 @@ Penyesuaian dengan status **draft** dapat diedit:
 4. Ubah data sesuai kebutuhan
 5. Klik **Save** untuk menyimpan perubahan
 
-[Screenshot: Dialog edit stock adjustment]
-
 Catatan: Penyesuaian dengan status **approved** atau **cancelled** tidak dapat diedit.
 
 ## 6. Mengubah Status Stock Adjustment
@@ -162,8 +144,6 @@ Untuk meng-approve penyesuaian stok:
 2. Ubah status menjadi **approved**
 3. Klik **Save**
 4. Sistem akan otomatis memposting jurnal keuangan terkait penyesuaian
-
-[Screenshot: Perubahan status ke approved]
 
 Setelah di-approve:
 - Stok di gudang akan diupdate sesuai penyesuaian
@@ -179,8 +159,6 @@ Untuk membatalkan penyesuaian:
 3. Konfirmasi pembatalan
 4. Status penyesuaian akan berubah menjadi **cancelled**
 
-[Screenshot: Konfirmasi pembatalan stock adjustment]
-
 Catatan: Pembatalan adalah soft-cancel. Data tetap tersimpan untuk audit trail.
 
 ## 7. Mengurutkan Data
@@ -195,8 +173,6 @@ Klik header kolom untuk mengurutkan data:
 
 Klik sekali untuk urutan ascending (A-Z, lama-baru), klik lagi untuk descending (Z-A, baru-lama).
 
-[Screenshot: Header kolom dengan indikator sorting]
-
 ## 8. Export ke Excel
 
 Untuk mengunduh data stock adjustment ke Excel:
@@ -204,8 +180,6 @@ Untuk mengunduh data stock adjustment ke Excel:
 1. Setel filter sesuai data yang ingin di-export
 2. Klik tombol **Export** di toolbar atas
 3. File Excel akan otomatis terunduh
-
-[Screenshot: Tombol Export dan proses download]
 
 File Excel berisi kolom yang sama dengan tabel di aplikasi sesuai filter yang aktif.
 
@@ -243,11 +217,11 @@ File Excel berisi kolom yang sama dengan tabel di aplikasi sesuai filter yang ak
 
 **Q:** Apakah setiap item harus memiliki Unit Cost?
 
-**J:** Tidak wajib, namun disarankan diisi untuk tracking nilai persediaan yang akurat. Jika dikosongkan, sistem tidak akan menghitung total cost untuk item tersebut.
+**J:** Tidak wajib, namun disarankan diisi untuk pelacakan nilai persediaan yang akurat. Jika dikosongkan, sistem tidak akan menghitung total cost untuk item tersebut.
 
 **Q:** Bagaimana hubungan dengan Stock Opname?
 
-**J:** Jika penyesuaian dibuat dari hasil stock opname, pilih Adjustment Type "Stocktake Result" dan field Stocktake akan menampilkan referensi ke nomor stock opname terkait. Ini memudahkan tracking dan audit.
+**J:** Jika penyesuaian dibuat dari hasil stock opname, pilih Adjustment Type "Stocktake Result" dan field Stocktake akan menampilkan referensi ke nomor stock opname terkait. Ini memudahkan pelacakan dan audit.
 
 **Q:** Apakah penyesuaian stok mempengaruhi average cost produk?
 

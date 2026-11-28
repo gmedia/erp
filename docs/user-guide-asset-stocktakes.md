@@ -7,11 +7,9 @@ Modul Asset Stocktakes mengelola proses stock opname (penghitungan fisik) aset p
 Fitur utama:
 - Perencanaan stocktake per cabang
 - Proses "Perform" untuk mencatat hasil pengecekan per aset
-- Tracking status (draft, in_progress, completed)
+- Pelacakan status (draft, in_progress, completed)
 - Laporan variance stocktake
 - Export data ke Excel
-
-[Screenshot: Daftar Asset Stocktakes]
 
 ## Menu & Navigasi
 
@@ -40,8 +38,6 @@ Halaman `/asset-stocktakes` menampilkan tabel stocktake:
 
 **Sorting:** Semua kolom sortable.
 
-[Screenshot: Tabel Asset Stocktakes dengan filter]
-
 ## 2. Membuat Stocktake Baru
 
 Klik tombol **Add** untuk membuka form stocktake.
@@ -50,8 +46,6 @@ Klik tombol **Add** untuk membuka form stocktake.
 - Branch: pilih cabang yang akan di-stocktake (wajib)
 - Planned Date: tanggal rencana pelaksanaan (wajib)
 - Notes: catatan atau instruksi (opsional)
-
-[Screenshot: Form Asset Stocktake]
 
 Klik **Save**. Stocktake dibuat dengan status **draft**.
 
@@ -73,8 +67,6 @@ Setelah stocktake dibuat, proses pengecekan dilakukan di halaman khusus:
 
 5. Untuk setiap aset, isi **Found Location** dan **Result**
 6. Klik **Save** untuk menyimpan progress
-
-[Screenshot: Halaman Perform Asset Stocktake]
 
 ## 4. Menyelesaikan Stocktake
 

@@ -2,19 +2,17 @@
 
 ## Gambaran Umum
 
-Modul Assets adalah modul CRUD Complex terlengkap dalam sistem ERP ini, mengelola siklus hidup aset perusahaan dari akuisisi hingga disposisi. Setiap aset memiliki identifikasi unik (code auto-generated), informasi fisik (lokasi, kondisi), data keuangan (cost, depreciation), dan relasi ke kategori, cabang, departemen, karyawan, serta supplier.
+Modul Aset adalah modul CRUD kompleks terlengkap dalam sistem ERP ini, mengelola siklus hidup aset perusahaan dari akuisisi hingga disposisi. Setiap aset memiliki identifikasi unik (code auto-generated), informasi fisik (lokasi, kondisi), data keuangan (cost, depreciation), dan relasi ke kategori, cabang, departemen, karyawan, serta supplier.
 
 Fitur utama:
-- Manajemen data aset lengkap dengan tracking status dan kondisi
+- Manajemen data aset lengkap dengan pelacakan status dan kondisi
 - Histori pergerakan aset (acquired, transferred, disposed)
 - Jadwal dan histori perawatan (preventive, corrective, calibration, other)
 - Stocktake aset dengan variance reporting
 - Depresiasi bulanan straight-line dengan posting ke journal entry
 - Dashboard visualisasi distribusi aset dan alert warranty/maintenance
-- Pipeline state dan approval history tracking per aset
+- Pipeline state dan pelacakan riwayat persetujuan per aset
 - Import dan export data dalam format Excel
-
-[Screenshot: Asset List Page - menampilkan tabel aset dengan kolom Code, Name, Category, Branch, Status, Cost, Purchase Date, Location, Department, Employee, Supplier]
 
 ## Menu & Navigasi
 
@@ -23,7 +21,7 @@ Fitur utama:
 | Assets | /assets | Daftar aset dengan filter, search, CRUD, import/export |
 | Asset Profile | /assets/{ulid} | Detail aset dengan 7 tab: Summary, Movements, Maintenance, Stocktake, Depreciation, Pipeline, Approvals |
 | Asset Dashboard | /asset-dashboard | Visualisasi distribusi aset, KPI, alerts warranty/maintenance |
-| Asset Register Report | /reports/assets/register | Laporan aset read-only dengan filter dan export |
+| Asset Register Report | /reports/assets/register | Laporan aset hanya baca dengan filter dan export |
 | Asset Categories | /asset-categories | Kategori aset dengan default useful life |
 | Asset Models | /asset-models | Model aset dengan manufacturer dan specs |
 | Asset Locations | /asset-locations | Lokasi fisik aset dengan hierarchy |
@@ -62,8 +60,6 @@ Halaman `/assets` menampilkan tabel aset dengan fitur:
 - Department: dropdown async select
 - Employee: dropdown async select
 
-[Screenshot: Asset Filters Panel - menampilkan semua field filter]
-
 **Sorting:** Semua kolom sortable kecuali Description. Klik header kolom untuk sort ascending/descending.
 
 ### 1.2 Menambah Aset Baru
@@ -95,8 +91,6 @@ Klik tombol "Add" di toolbar untuk membuka form tambah aset.
 - Accumulated Depreciation Account: akun akumulasi depresiasi (wajib jika ada depreciation)
 - Notes: catatan tambahan (opsional)
 
-[Screenshot: Add Asset Form - menampilkan semua field form]
-
 **Catatan:** Saat aset dibuat, sistem otomatis membuat movement record dengan type "acquired" yang mencatat lokasi awal aset.
 
 ### 1.3 Melihat Detail Aset
@@ -108,8 +102,6 @@ Profile page memiliki 7 tab:
 **Tab Summary:**
 Menampilkan informasi lengkap aset: identifikasi, lokasi, status, kondisi, data keuangan, data depresiasi, relasi.
 
-[Screenshot: Asset Profile Summary Tab]
-
 **Tab Movements:**
 Histori pergerakan aset dari acquired hingga disposed. Setiap movement record mencatat:
 - Movement Type: acquired, transferred, disposed
@@ -117,8 +109,6 @@ Histori pergerakan aset dari acquired hingga disposed. Setiap movement record me
 - To Branch/Location/Department/Employee
 - Movement Date
 - Notes
-
-[Screenshot: Asset Profile Movements Tab]
 
 **Tab Maintenance:**
 Histori perawatan aset dengan detail:
@@ -128,8 +118,6 @@ Histori perawatan aset dengan detail:
 - Cost
 - Supplier/Vendor
 - Notes
-
-[Screenshot: Asset Profile Maintenance Tab]
 
 **Tab Stocktake:**
 Histori pengecekan fisik aset dalam stocktake:
@@ -141,8 +129,6 @@ Histori pengecekan fisik aset dalam stocktake:
 - Notes
 - Checked By, Checked At
 
-[Screenshot: Asset Profile Stocktake Tab]
-
 **Tab Depreciation:**
 Histori depresiasi per aset dari semua depreciation run:
 - Run Period
@@ -151,15 +137,11 @@ Histori depresiasi per aset dari semua depreciation run:
 - Book Value After
 - Run Status
 
-[Screenshot: Asset Profile Depreciation Tab]
-
 **Tab Pipeline:**
 Timeline state aset dalam pipeline (jika aset terdaftar dalam pipeline):
 - Current State
 - State History
 - Available Transitions
-
-[Screenshot: Asset Profile Pipeline Tab]
 
 **Tab Approvals:**
 Histori approval request terkait aset:
@@ -170,11 +152,9 @@ Histori approval request terkait aset:
 - Comment
 - Timestamp
 
-[Screenshot: Asset Profile Approvals Tab]
-
 ### 1.4 Mengedit Aset
 
-Klik icon "Edit" di toolbar atau pada profile page untuk membuka form edit. Field sama seperti form tambah, dengan nilai existing sudah terisi.
+Klik icon "Edit" di toolbar atau pada profile page untuk membuka form edit. Field sama seperti form tambah, dengan nilai yang ada sudah terisi.
 
 **Catatan:** Saat edit lokasi/branch/department/employee, sistem otomatis membuat movement record dengan type "transferred" jika ada perubahan.
 
@@ -211,8 +191,6 @@ Klik tombol "Import" di toolbar untuk import batch aset dari Excel.
 | condition | No | good |
 | notes | No | Unit baru |
 
-[Screenshot: Import Dialog - menampilkan upload file dan preview template]
-
 **Proses import:**
 1. Download template Excel
 2. Isi data sesuai kolom
@@ -238,8 +216,6 @@ Halaman `/asset-categories` menampilkan daftar kategori aset. Setiap kategori me
 - Name: nama kategori
 - Default Useful Life (Months): masa manfaat default untuk aset dalam kategori ini
 
-[Screenshot: Asset Categories List]
-
 ### 2.2 Menambah Kategori
 
 Field form:
@@ -261,8 +237,6 @@ Halaman `/asset-models` menampilkan daftar model aset. Setiap model memiliki:
 - Category: kategori aset
 - Specs: spesifikasi teknis (JSON format)
 
-[Screenshot: Asset Models List]
-
 ### 3.2 Manfaat Model
 
 Model membantu standardisasi aset dengan specs yang sama. Saat pilih model di form aset, sistem tidak auto-fill field lain, tapi model bisa dipakai untuk reporting dan filtering.
@@ -277,8 +251,6 @@ Halaman `/asset-locations` menampilkan daftar lokasi fisik aset. Setiap lokasi m
 - Branch: cabang tempat lokasi berada
 - Parent Location: lokasi induk (untuk hierarchy)
 
-[Screenshot: Asset Locations List]
-
 ### 4.2 Hierarchy Lokasi
 
 Lokasi bisa memiliki sub-lokasi untuk representasi hierarchy. Misalnya:
@@ -287,8 +259,6 @@ Lokasi bisa memiliki sub-lokasi untuk representasi hierarchy. Misalnya:
     - Room 101
     - Room 102
   - Floor 2
-
-[Screenshot: Location Hierarchy Tree]
 
 ### 4.3 Filter Aset per Lokasi
 
@@ -301,7 +271,7 @@ Di halaman Assets, filter by Location untuk melihat semua aset di lokasi tertent
 Setiap pergerakan aset tercatat dalam movement record. Movement type:
 - **Acquired**: aset baru masuk (auto-created saat tambah aset)
 - **Transferred**: aset pindah lokasi/cabang/departemen/karyawan (auto-created saat edit aset)
-- **Disposed**: aset di-dispose (manual creation)
+- **Dihapus Buku**: aset di-dispose (manual creation)
 
 ### 5.2 Daftar Movement
 
@@ -313,8 +283,6 @@ Halaman `/asset-movements` menampilkan histori semua pergerakan aset.
 - From/To Branch, Location, Department, Employee
 - Movement Date
 - Notes
-
-[Screenshot: Asset Movements List]
 
 ### 5.3 Menambah Movement Manual
 
@@ -353,7 +321,7 @@ Selisih hasil penjualan terhadap nilai buku menjadi laba (jika hasil lebih besar
 
 ### 6.1 Konsep Maintenance
 
-Maintenance tracking untuk perawatan aset, baik terjadwal maupun tidak.
+Pelacakan perawatan aset, baik terjadwal maupun tidak.
 
 **Maintenance Type:**
 - Preventive: perawatan rutin terjadwal
@@ -369,7 +337,7 @@ Maintenance tracking untuk perawatan aset, baik terjadwal maupun tidak.
 
 ### 6.2 Daftar Maintenance
 
-Halaman `/asset-maintenances` menampilkan semua maintenance record.
+Halaman `/asset-maintenances` menampilkan semua catatan perawatan.
 
 **Kolom tabel:**
 - Asset Code dan Name
@@ -380,8 +348,6 @@ Halaman `/asset-maintenances` menampilkan semua maintenance record.
 - Supplier/Vendor
 - Cost
 - Notes
-
-[Screenshot: Asset Maintenances List]
 
 ### 6.3 Menambah Maintenance
 
@@ -398,7 +364,7 @@ Field form:
 ### 6.4 Update Status Maintenance
 
 Setelah maintenance selesai:
-1. Edit maintenance record
+1. Edit catatan perawatan
 2. Update Status ke "Completed"
 3. Isi Performed At dan Cost aktual
 
@@ -426,8 +392,6 @@ Halaman `/asset-stocktakes` menampilkan daftar stocktake.
 - Status
 - Created By
 
-[Screenshot: Asset Stocktakes List]
-
 ### 7.3 Membuat Stocktake Baru
 
 Field form:
@@ -445,8 +409,6 @@ Field form:
    - Condition: kondisi aktual
    - Notes: catatan jika ada variance
 4. Submit hasil stocktake
-
-[Screenshot: Stocktake Perform Page]
 
 ### 7.5 Variance Report
 
@@ -476,8 +438,6 @@ Halaman `/asset-depreciation-runs` menampilkan daftar run depresiasi.
 - Status: draft, calculated, posted, void
 - Journal Entry (jika sudah posted)
 - Created By, Posted By
-
-[Screenshot: Asset Depreciation Runs List]
 
 ### 8.3 Membuat Run Baru
 
@@ -530,9 +490,7 @@ Run yang sudah posted bisa di-void. Ini akan:
 
 Halaman `/asset-dashboard` menampilkan overview aset perusahaan.
 
-[Screenshot: Asset Dashboard]
-
-### 9.2 KPI Cards
+### 9.2 Kartu KPI
 
 4 KPI utama:
 - Total Assets: jumlah aset
@@ -563,9 +521,7 @@ List aset yang warranty-nya akan segera berakhir (dalam 30 hari).
 
 ### 10.1 Akses Report
 
-Halaman `/reports/assets/register` menampilkan laporan aset read-only dengan filter.
-
-[Screenshot: Asset Register Report]
+Halaman `/reports/assets/register` menampilkan laporan aset hanya baca dengan filter.
 
 ### 10.2 Filter Report
 
@@ -579,7 +535,7 @@ Klik "Export" untuk download laporan dalam format Excel.
 
 ## 11. Permissions
 
-Modul Assets menggunakan permission berikut:
+Modul Aset menggunakan permission berikut:
 
 | Permission | Akses |
 |------------|-------|
@@ -629,15 +585,15 @@ A: Buka profile aset, tab Summary menampilkan Book Value. Atau lihat di Asset Da
 
 ### Tips: Maintenance Scheduling
 
-Untuk maintenance rutin (preventive), buat maintenance record dengan status "Scheduled" dan tanggal di masa depan. Sistem akan menampilkannya di Asset Dashboard sebagai upcoming maintenance.
+Untuk maintenance rutin (preventive), buat catatan perawatan dengan status "Scheduled" dan tanggal di masa depan. Sistem akan menampilkannya di Asset Dashboard sebagai perawatan mendatang.
 
 ### Tips: Serial Number dan Barcode
 
 Isi Serial Number dan Barcode untuk aset yang memiliki label fisik. Ini memudahkan pencarian dan stocktake menggunakan scanner.
 
-### Tips: Warranty Tracking
+### Tips: Pelacakan Garansi
 
-Isi Warranty End Date untuk tracking warranty. Asset Dashboard akan menampilkan alert untuk aset yang warranty-nya segera berakhir.
+Isi Warranty End Date untuk pelacakan garansi. Asset Dashboard akan menampilkan alert untuk aset yang warranty-nya segera berakhir.
 
 **Q: Apa perbedaan antara Asset Categories dan Asset Models?**
 
@@ -649,17 +605,17 @@ A: Edit aset dan pilih karyawan di field Employee. Simpan perubahan. Sistem akan
 
 **Q: Apa yang dimaksud dengan Asset Profile Page?**
 
-A: Asset Profile Page adalah halaman detail aset yang diakses dari `/assets/{ulid}`. Halaman ini menampilkan 7 tab: Summary (informasi lengkap), Movements (histori perpindahan), Maintenance (histori perawatan), Stocktake (histori pengecekan), Depreciation (histori depresiasi), Pipeline (state workflow), dan Approvals (histori persetujuan). Gunakan halaman ini untuk tracking lengkap siklus hidup aset.
+A: Asset Profile Page adalah halaman detail aset yang diakses dari `/assets/{ulid}`. Halaman ini menampilkan 7 tab: Summary (informasi lengkap), Movements (histori perpindahan), Maintenance (histori perawatan), Stocktake (histori pengecekan), Depreciation (histori depresiasi), Pipeline (state workflow), dan Approvals (histori persetujuan). Gunakan halaman ini untuk pelacakan lengkap siklus hidup aset.
 
 **Q: Bagaimana cara mengubah kondisi aset dari "good" ke "needs_repair"?**
 
-A: Edit aset dan ubah field Condition. Untuk kondisi "needs_repair" atau "damaged", sebaiknya buat juga maintenance record dengan type "corrective" untuk mencatat proses perbaikan. Setelah perbaikan selesai, update kembali condition ke "good" melalui edit aset atau dari maintenance record.
+A: Edit aset dan ubah field Condition. Untuk kondisi "needs_repair" atau "damaged", sebaiknya buat juga catatan perawatan dengan type "corrective" untuk mencatat proses perbaikan. Setelah perbaikan selesai, update kembali condition ke "good" melalui edit aset atau dari catatan perawatan.
 
 **Q: Apa perbedaan status "active" dan "maintenance"?**
 
-A: Status "active" berarti aset sedang digunakan normal dan eligible untuk depreciation run. Status "maintenance" berarti aset sedang dalam proses perawatan, tidak digunakan sementara, namun tetap eligible untuk depreciation run. Gunakan status maintenance ketika aset dikirim ke bengkel atau dalam proses perbaikan yang memerlukan waktu.
+A: Status "active" berarti aset sedang digunakan normal dan eligible untuk depreciation run. Status "maintenance" berarti aset sedang dalam proses perawatan, tidak digunakan sementara, namun tetap eligible untuk depreciation run. Gunakan status perawatan ketika aset dikirim ke bengkel atau dalam proses perbaikan yang memerlukan waktu.
 
-**Q: Bagaimana cara tracking depresiasi aset per bulan?**
+**Q: Bagaimana cara melacak depresiasi aset per bulan?**
 
 A: Depresiasi dihitung melalui Asset Depreciation Runs di menu `/asset-depreciation-runs`. Buat run baru untuk periode tertentu, klik Calculate untuk menghitung depresiasi semua aset eligible, lalu klik Post untuk membuat journal entry. Setelah posted, setiap aset akan memiliki record depresiasi yang bisa dilihat di tab Depreciation pada Asset Profile Page.
 

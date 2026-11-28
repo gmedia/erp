@@ -1,4 +1,4 @@
-# User Guide: Rilis & Unduh Aplikasi Mobile
+# Panduan: Rilis & Unduh Aplikasi Mobile
 
 Panduan ini menjelaskan cara administrator menerbitkan rilis APK Android dari server ERP dan cara
 pengguna mengunduh, memasang, serta memverifikasi aplikasinya. Aplikasi didistribusikan langsung
@@ -25,8 +25,7 @@ Untuk membuka halaman ini di ponsel, pindai **QR code** yang tersedia di halaman
 4. Bila muncul peringatan Play Protect, lanjutkan hanya bila APK berasal dari server ERP perusahaan
    Anda.
 
-Panduan pemasangan dan pembaruan yang lebih rinci ada di user guide **Memasang & Memperbarui
-Aplikasi Android (APK)**.
+Panduan pemasangan dan pembaruan yang lebih rinci ada di panduan **Pasang Aplikasi Android**.
 
 ## 3. Verifikasi SHA-256
 
