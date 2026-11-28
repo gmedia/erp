@@ -2,15 +2,15 @@
 
 ## OVERVIEW
 
-106 migrations, 88 factories, 29 seeders. Migrations are append-only after merge; factories mirror models 1:1; seeders are idempotent.
+143 migrations, 96 factories, 37 seeders. Migrations are append-only after merge; factories mirror models 1:1; seeders are idempotent.
 
 ## STRUCTURE
 
 ```
 database/
-├── migrations/   # 106 timestamped, anonymous-class migrations
-├── factories/    # 88 model factories (`@extends Factory<Model>`)
-└── seeders/      # 29 seeders (base data + *SampleDataSeeder)
+├── migrations/   # 143 timestamped, anonymous-class migrations
+├── factories/    # 96 model factories (`@extends Factory<Model>`)
+└── seeders/      # 37 seeders (base data + *SampleDataSeeder)
 ```
 
 ## WHERE TO LOOK

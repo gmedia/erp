@@ -1282,6 +1282,7 @@ export function createSupplierFilterFields(): FieldDescriptor[] {
 // resources/js/components/{features}/{Feature}Columns.tsx
 import { type EntityColumnDef } from '@/components/common/EntityDataTable';
 import { type {Feature} } from '@/types/entity';
+import { formatDate } from '@/utils/formatters';
 
 export const {feature}Columns: EntityColumnDef<{Feature}>[] = [
     {
@@ -1312,13 +1313,13 @@ export const {feature}Columns: EntityColumnDef<{Feature}>[] = [
     {
         accessorKey: 'hire_date',
         header: 'Hire Date',
-        cell: ({ row }) => new Date(row.original.hire_date).toLocaleDateString(),
+        cell: ({ row }) => formatDate(row.original.hire_date),
     },
     {
         accessorKey: 'status',
         header: 'Status',
         cell: ({ row }) => (
-            <span className={row.original.status === 'active' ? 'text-green-600' : 'text-red-600'}>
+            <span className={row.original.status === 'active' ? 'text-success' : 'text-destructive'}>
                 {row.original.status}
             </span>
         ),
@@ -1332,6 +1333,7 @@ export const {feature}Columns: EntityColumnDef<{Feature}>[] = [
 // resources/js/components/{features}/{Feature}ViewModal.tsx
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { type {Feature} } from '@/types/entity';
+import { formatDate } from '@/utils/formatters';
 
 interface {Feature}ViewModalProps {
     open: boolean;
@@ -1365,7 +1367,7 @@ export function {Feature}ViewModal({ open, onClose, item }: {Feature}ViewModalPr
                         <span className="font-semibold">Salary:</span> ${item.salary}
                     </div>
                     <div>
-                        <span className="font-semibold">Hire Date:</span> {new Date(item.hire_date).toLocaleDateString()}
+                        <span className="font-semibold">Hire Date:</span> {formatDate(item.hire_date)}
                     </div>
                     <div>
                         <span className="font-semibold">Status:</span> {item.status}
@@ -1468,6 +1470,8 @@ Before marking complete:
 - [ ] Filters use `create{Feature}FilterFields()`
 - [ ] Columns defined with proper accessors
 - [ ] Entity config uses `createComplexEntityConfig()`
+- [ ] UI text uses `useTranslation` + keys in `lang/en.json` & `lang/id.json` (default English unchanged)
+- [ ] Zod validation uses `validation.<form>.<rule>` (translated by `FormMessage`); seeder data in Indonesian
 
 **Testing:**
 - [ ] Feature tests di `tests/Feature/{Features}/` subfolder
@@ -1481,7 +1485,8 @@ Before marking complete:
 ```bash
 // turbo-all
 ./vendor/bin/sail test --group {features}
-npx playwright test tests/e2e/{features}/
+# E2E: only specs you changed/added (+ max one affected spec); full folder runs in CI
+npx playwright test <changed-spec>
 ```
 
 ---

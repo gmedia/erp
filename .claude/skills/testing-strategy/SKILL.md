@@ -118,20 +118,19 @@ $this->assertTrue($validator->fails());
 
 ## ✅ Verification
 
+> **Pest:** satu proses saja (DB `testing` saling mengunci) dan selalu `timeout`; jalankan hanya grup/berkas terkait, bukan seluruh suite. **E2E:** lokal hanya spec yang diubah/ditambah (+ maks satu spec terdampak), sekali + `--last-failed`; pakai `bash scripts/e2e-full.sh <spec>` (bukan `sail npx playwright`). Suite penuh dijalankan CI.
+
 ```bash
 // turbo-all
 
-# Lint / formatter guard
-./vendor/bin/sail bin duster fix
+# Lint / formatter guard — hanya berkas PHP yang diubah
+timeout 900 ./vendor/bin/sail bin duster fix $(git diff --name-only origin/main...HEAD -- '*.php')
 
-# Backend tests
-./vendor/bin/sail test
+# Backend tests — grup/berkas terkait saja, satu proses, ber-timeout
+timeout 900 ./vendor/bin/sail test --group {slug} > /tmp/opencode/pest.log 2>&1
 
-# Specific module
-./vendor/bin/sail test --filter=Employee
-
-# E2E tests  
-./vendor/bin/sail npm run test:e2e
+# E2E — hanya spec yang diubah/ditambah (bukan folder modul penuh)
+bash scripts/e2e-full.sh tests/e2e/{module}/{spec}.spec.ts
 ```
 
 Jika test gagal:

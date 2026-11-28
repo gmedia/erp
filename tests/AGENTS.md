@@ -15,7 +15,7 @@ tests/
 │   ├── Domain/              # FilterService tests
 │   ├── Requests/            # FormRequest validation tests
 │   └── Resources/           # Resource transformation tests
-├── e2e/{module-slug}/       # 92 dirs / 106 Playwright specs + helpers
+├── e2e/{module-slug}/       # 104 dirs / 194 Playwright specs + helpers
 ├── Traits/                  # 10 shared test traits
 └── Pest.php                 # Pest config (base TestCase, RefreshDatabase)
 ```
@@ -28,9 +28,11 @@ tests/
 - **E2E auth** — Bearer token injected to localStorage
 - **E2E structure** — `helpers.ts` (factories/utils) + `{module}.spec.ts`
 - **E2E standard** — 9-10 test cases per module (Search, Filters, Add, View, Edit, Export, Checkbox, Sorting, Delete, Import)
-- **Factories** — 88 factories, 1:1 with models
-- **Coverage map** — 104 unique Pest groups; 67 Feature dirs, 10 Unit dirs
-- **Run by module** — `sail test --group {slug}` or `npx playwright test tests/e2e/{slug}/`
+- **Factories** — 96 factories
+- **Coverage map** — 158 unique Pest groups; 80 Feature dirs, 13 Unit dirs
+- **Pest serial & ber-timeout** — never run two Pest processes at once (DB `testing` locks); wrap with `timeout`. Tests needing seed call the specific seeder (`$this->seed(CoaSeeder::class)`); there is no shared `RefreshDatabaseSeededOnce` trait.
+- **E2E lokal ramping** — only specs you changed/added (+ max one affected spec), once + `--last-failed`; full folders/suite run in CI.
+- **Run by module** — `sail test --group {slug}` or `npx playwright test <changed-spec>`
 
 ## WHERE TO LOOK
 
