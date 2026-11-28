@@ -1589,7 +1589,10 @@ invariant('W7-17 demo document numbers start at -000001 with uniform digit width
     foreach ($journalNumbers as $number) {
         // Jurnal berulang memakai prefix RJ- (dibuat lewat alur aplikasi); jurnal lain JV-.
         // Keduanya wajib memakai tahun 4 digit dan sequence 5 digit yang seragam.
-        expect($number)->toMatch('/^(JV|RJ)-\d{4}-\d{5}$/', "Nomor jurnal {$number} harus memakai format JV/RJ-YYYY-NNNNN");
+        expect($number)->toMatch(
+            '/^(JV|RJ)-\d{4}-\d{5}$/',
+            "Nomor jurnal {$number} harus memakai format JV/RJ-YYYY-NNNNN",
+        );
     }
 });
 

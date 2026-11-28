@@ -10,6 +10,7 @@ use App\Models\FiscalYear;
 use App\Models\JournalEntryLine;
 use App\Models\Setting;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
@@ -67,7 +68,7 @@ class FinancialReportService
             return [];
         }
 
-        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId, $branchId)
+        $accounts = $this->accountsWithPostedSums($coaVersion->id, $fiscalYearId, $branchId, null, false, true)
             ->where('is_cash_flow', true)
             ->orderBy('code')
             ->get();
@@ -123,6 +124,7 @@ class FinancialReportService
             ->where('journal_entries.status', 'posted')
             ->where('line_accounts.is_cash_flow', true)
             ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
+            ->tap(fn ($query) => $this->excludeOpeningBalanceEntries($query))
             ->selectRaw('COALESCE(SUM(journal_entry_lines.debit - journal_entry_lines.credit), 0) as balance')
             ->value('balance');
 
@@ -185,6 +187,7 @@ class FinancialReportService
             ->where('journal_entries.fiscal_year_id', $fiscalYearId)
             ->where('journal_entries.status', 'posted')
             ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
+            ->tap(fn ($query) => $this->excludeOpeningBalanceEntries($query))
             ->get([
                 'journal_entry_lines.journal_entry_id',
                 'journal_entry_lines.debit',
@@ -1046,6 +1049,7 @@ class FinancialReportService
         ?int $branchId = null,
         ?int $departmentId = null,
         bool $withoutDepartment = false,
+        bool $excludeOpeningEntries = false,
     ): Builder {
         // Alias columns to posted_*_sum (NOT total_debit/total_credit): the Account
         // model defines getTotalDebitAttribute/getTotalCreditAttribute accessors that
@@ -1057,6 +1061,7 @@ class FinancialReportService
             ->when($branchId !== null, fn ($q) => $q->where('journal_entry_lines.branch_id', $branchId))
             ->when($departmentId !== null, fn ($q) => $q->where('journal_entry_lines.department_id', $departmentId))
             ->when($withoutDepartment, fn ($q) => $q->whereNull('journal_entry_lines.department_id'))
+            ->when($excludeOpeningEntries, fn ($q) => $this->excludeOpeningBalanceEntries($q))
             ->groupBy('journal_entry_lines.account_id')
             ->select('journal_entry_lines.account_id')
             ->selectRaw('SUM(journal_entry_lines.debit) as posted_debit_sum')
@@ -1066,6 +1071,19 @@ class FinancialReportService
             ->where('accounts.coa_version_id', $coaVersionId)
             ->leftJoinSub($postedSums, 'posted_sums', 'posted_sums.account_id', '=', 'accounts.id')
             ->select('accounts.*', 'posted_sums.posted_debit_sum', 'posted_sums.posted_credit_sum');
+    }
+
+    /**
+     * Jurnal saldo awal (referensi OPENING-FY-*) memindahkan saldo tahun lalu ke COA
+     * aktif, sehingga bukan arus kas tahun berjalan. Kas awal dilaporkan terpisah
+     * lewat getOpeningCashBalance() agar saldo kas tetap utuh.
+     */
+    private function excludeOpeningBalanceEntries(QueryBuilder|Builder $query): QueryBuilder|Builder
+    {
+        return $query->where(function ($nested): void {
+            $nested->whereNull('journal_entries.reference')
+                ->orWhere('journal_entries.reference', 'not like', 'OPENING-FY-%');
+        });
     }
 
     /**
