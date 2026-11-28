@@ -1,8 +1,11 @@
 <?php
 
+use App\Actions\Reports\GetGeneralLedgerReportAction;
+use App\Actions\Reports\GetTrialBalanceReportAction;
 use App\Actions\StockMonitor\IndexStockMonitorAction;
 use App\Http\Requests\StockMonitor\IndexStockMonitorRequest;
 use App\Models\Account;
+use App\Models\Budget;
 use App\Models\CoaVersion;
 use App\Models\CustomerInvoice;
 use App\Models\FiscalYear;
@@ -12,6 +15,7 @@ use App\Models\StockAdjustment;
 use App\Models\StockTransfer;
 use App\Models\SupplierBill;
 use App\Models\SupplierReturn;
+use App\Services\BudgetVarianceService;
 use App\Support\Demo\DemoCalendar;
 use Database\Seeders\DemoMasterData;
 use Illuminate\Foundation\Testing\RefreshDatabaseState;
@@ -1583,7 +1587,9 @@ invariant('W7-17 demo document numbers start at -000001 with uniform digit width
     $journalNumbers = DB::table('journal_entries')->pluck('entry_number');
 
     foreach ($journalNumbers as $number) {
-        expect($number)->toMatch('/^JV-\d{4}-\d{5}$/', "Nomor jurnal {$number} harus memakai format JV-YYYY-NNNNN");
+        // Jurnal berulang memakai prefix RJ- (dibuat lewat alur aplikasi); jurnal lain JV-.
+        // Keduanya wajib memakai tahun 4 digit dan sequence 5 digit yang seragam.
+        expect($number)->toMatch('/^(JV|RJ)-\d{4}-\d{5}$/', "Nomor jurnal {$number} harus memakai format JV/RJ-YYYY-NNNNN");
     }
 });
 
@@ -1627,8 +1633,10 @@ invariant('#503 default seeded account names are not mixed-language', function (
 });
 
 // #503 butir 3 — nomor JV demo naik sesuai tanggal jurnal (urut kronologis per tahun fiskal).
+// Jurnal berulang (RJ-) punya urutan sendiri dan tidak ikut skema nomor JV.
 invariant('#503 demo journal numbers ascend with entry date per fiscal year', function () {
     $entries = DB::table('journal_entries')
+        ->where('entry_number', 'like', 'JV-%')
         ->orderBy('fiscal_year_id')
         ->orderBy('entry_date')
         ->orderBy('entry_number')
@@ -2283,9 +2291,9 @@ invariant('W7-18 current fiscal year demo net profit is positive', function () {
         );
 });
 
-// #571 C9 — review host menemukan beban > pendapatan di 8 dari 11 bulan berjalan.
-// Kini laba FY berjalan harus positif di setiap bulan yang sudah berjalan, bukan hanya total.
-invariant('W7-18 current fiscal year demo net profit is positive every month', function () {
+// #571 C9 lalu #603 review host 2026-11-28 — beban demo harus realistis: laba FY berjalan
+// tetap positif secara total, tetapi 1-2 bulan boleh rugi tipis (maks 5% pendapatan bulan itu).
+invariant('W7-18 current fiscal year demo has at most two thin loss months', function () {
     $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
 
     expect($fiscalYear)->not->toBeNull('Demo data must leave the current fiscal year open');
@@ -2297,6 +2305,8 @@ invariant('W7-18 current fiscal year demo net profit is positive every month', f
         ->values();
 
     expect($months)->not->toBeEmpty('Jendela demo harus memuat bulan pada FY berjalan');
+
+    $lossMonths = 0;
 
     foreach ($months as $month) {
         $start = $month->copy()->startOfMonth()->toDateString();
@@ -2322,14 +2332,22 @@ invariant('W7-18 current fiscal year demo net profit is positive every month', f
 
         $revenue = (float) $totals->revenue;
         $expense = (float) $totals->expense;
+        $net = $revenue - $expense;
         $label = $month->format('Y-m');
 
-        expect($revenue)->toBeGreaterThan(0.0, "Pendapatan {$label} harus terisi")
-            ->and($revenue - $expense)->toBeGreaterThan(
-                0.0,
-                "Laba bersih {$label} harus positif: pendapatan {$revenue} vs beban {$expense}",
+        expect($revenue)->toBeGreaterThan(0.0, "Pendapatan {$label} harus terisi");
+
+        if ($net < 0.0) {
+            $lossMonths++;
+
+            expect(abs($net))->toBeLessThanOrEqual(
+                $revenue * 0.05,
+                "Rugi {$label} harus tipis (maks 5% pendapatan): pendapatan {$revenue} vs beban {$expense}",
             );
+        }
     }
+
+    expect($lossMonths)->toBeLessThanOrEqual(2, 'Demo hanya boleh punya maksimal dua bulan rugi tipis');
 });
 
 // #571 C8 — FY2025 (Nov–Des 2025 di jendela demo) harus punya aktivitas nyata:
@@ -2484,4 +2502,242 @@ invariant('W7-18 open receivables and payables fill all five aging buckets', fun
             );
         }
     }
+});
+
+// #603 review host 2026-11-28 — marjin bersih FY berjalan harus wajar 10-20%.
+invariant('W7-18 current fiscal year demo net margin is between 10 and 20 percent', function () {
+    $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
+
+    expect($fiscalYear)->not->toBeNull('Demo data must leave the current fiscal year open');
+
+    $totals = DB::table('journal_entry_lines')
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+        ->where('journal_entries.status', 'posted')
+        ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+        ->where('journal_entries.journal_type', '!=', 'closing')
+        ->whereIn('accounts.type', ['revenue', 'expense'])
+        ->selectRaw(
+            "COALESCE(SUM(CASE WHEN accounts.type = 'revenue' "
+            . 'THEN journal_entry_lines.credit - journal_entry_lines.debit ELSE 0 END), 0) as revenue',
+        )
+        ->selectRaw(
+            "COALESCE(SUM(CASE WHEN accounts.type = 'expense' "
+            . 'THEN journal_entry_lines.debit - journal_entry_lines.credit ELSE 0 END), 0) as expense',
+        )
+        ->first();
+
+    $revenue = (float) $totals->revenue;
+    $expense = (float) $totals->expense;
+    $margin = $revenue > 0.0 ? ($revenue - $expense) / $revenue * 100 : 0.0;
+
+    expect($margin)->toBeGreaterThanOrEqual(10.0, "Marjin bersih FY berjalan terlalu rendah: {$margin}%")
+        ->and($margin)->toBeLessThanOrEqual(20.0, "Marjin bersih FY berjalan terlalu tinggi: {$margin}%");
+});
+
+// #603 review host 2026-11-28 — beban operasional tidak boleh seragam/terlalu rendah dan
+// beban November tidak boleh anjlok karena penyusutan bulan berjalan tidak diposting.
+invariant('W7-18 current fiscal year November expense and depreciation are not missing', function () {
+    $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
+
+    expect($fiscalYear)->not->toBeNull('Demo data must leave the current fiscal year open');
+
+    $rows = DB::table('journal_entry_lines')
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+        ->where('journal_entries.status', 'posted')
+        ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+        ->where('journal_entries.journal_type', '!=', 'closing')
+        ->where('accounts.type', 'expense')
+        ->selectRaw("DATE_FORMAT(journal_entries.entry_date, '%Y-%m') as ym")
+        ->selectRaw('COALESCE(SUM(journal_entry_lines.debit - journal_entry_lines.credit), 0) as expense')
+        ->groupBy('ym')
+        ->get();
+
+    expect($rows)->not->toBeEmpty('Demo data must include current fiscal year expenses');
+
+    $byMonth = $rows->mapWithKeys(fn ($row): array => [$row->ym => (float) $row->expense]);
+    $november = $byMonth->get(now()->format('Y-m'));
+
+    expect($november)->not->toBeNull('Beban bulan berjalan harus terisi')
+        ->and($november)->toBeGreaterThanOrEqual(
+            $byMonth->average() * 0.8,
+            'Beban bulan berjalan tidak boleh anjlok jauh di bawah rata-rata',
+        );
+
+    $novemberDepreciation = (float) DB::table('journal_entry_lines')
+        ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+        ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+        ->where('journal_entries.status', 'posted')
+        ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+        ->where('journal_entries.journal_type', '!=', 'closing')
+        ->where('accounts.code', '53000')
+        ->whereBetween('journal_entries.entry_date', [
+            now()->startOfMonth()->toDateString(),
+            now()->endOfMonth()->toDateString(),
+        ])
+        ->selectRaw('COALESCE(SUM(journal_entry_lines.debit - journal_entry_lines.credit), 0) as amount')
+        ->value('amount');
+
+    expect($novemberDepreciation)->toBeGreaterThan(0.0, 'Penyusutan bulan berjalan harus terposting');
+});
+
+// #603 butir 1 — jurnal berulang punya riwayat run bulanan untuk seluruh jendela 13 bulan,
+// dibuat lewat alur aplikasi (sumber RecurringJournal) dan berstatus posted.
+invariant('W7-18 monthly recurring journals have 13 posted runs across the demo window', function () {
+    $templates = DB::table('recurring_journals')
+        ->where('frequency', 'monthly')
+        ->get(['id', 'name', 'last_run_date', 'next_run_date']);
+
+    expect($templates)->not->toBeEmpty('Demo data must include monthly recurring journals');
+
+    $windowStart = DemoCalendar::windowStart();
+    $windowEnd = now()->startOfMonth();
+
+    foreach ($templates as $template) {
+        $runs = DB::table('journal_entries')
+            ->where('source_type', 'App\\Models\\RecurringJournal')
+            ->where('source_id', $template->id)
+            ->where('status', 'posted')
+            ->get(['entry_date']);
+
+        expect($runs)->toHaveCount(
+            DemoCalendar::MONTHS,
+            "Jurnal berulang {$template->name} harus punya " . DemoCalendar::MONTHS . ' run posted',
+        );
+
+        $months = $runs
+            ->map(fn ($run): string => Carbon::parse($run->entry_date)->format('Y-m'))
+            ->unique()
+            ->sort()
+            ->values();
+
+        expect($months)->toHaveCount(DemoCalendar::MONTHS)
+            ->and($months->first())->toBe($windowStart->format('Y-m'))
+            ->and($months->last())->toBe($windowEnd->format('Y-m'));
+
+        expect($template->last_run_date)->not->toBeNull("Jurnal berulang {$template->name} harus punya last_run_date")
+            ->and(Carbon::parse($template->last_run_date)->format('Y-m'))->toBe($windowEnd->format('Y-m'));
+    }
+});
+
+// #603 butir 2 — anggaran tahun berjalan punya baris per akun/periode dengan tiga status variance.
+invariant('W7-18 current year budget produces within, warning and over variance statuses', function () {
+    $fiscalYear = FiscalYear::query()->where('status', 'open')->first();
+
+    expect($fiscalYear)->not->toBeNull('Demo data must leave the current fiscal year open');
+
+    $budget = Budget::query()
+        ->where('fiscal_year_id', $fiscalYear->id)
+        ->where('name', 'like', 'Anggaran Operasional%')
+        ->where('name', 'not like', '%Triwulan%')
+        ->first();
+
+    expect($budget)->not->toBeNull('Demo data must include the annual operational budget');
+
+    $variance = app(BudgetVarianceService::class)->calculateVariance($budget);
+    $statuses = $variance->pluck('status')->unique()->values()->all();
+
+    expect($statuses)->toContain('within_budget')
+        ->and($statuses)->toContain('warning')
+        ->and($statuses)->toContain('over_budget');
+});
+
+// #603 butir 3 — peminjaman kendaraan tersebar di jendela 13 bulan dan tetap mencakup semua stage.
+invariant('W7-18 vehicle loans spread across the demo window with every stage', function () {
+    $loans = DB::table('vehicle_loans')->get(['code', 'status', 'start_at']);
+
+    expect($loans)->toHaveCount(9, 'Demo harus memuat sembilan peminjaman kendaraan');
+
+    $statuses = $loans->pluck('status')->unique()->sort()->values()->all();
+
+    expect($statuses)->toBe([
+        'approved',
+        'cancelled',
+        'draft',
+        'in_progress',
+        'pending',
+        'pickup_done',
+        'rejected',
+        'returned',
+    ]);
+
+    $windowStart = DemoCalendar::windowStart()->startOfMonth();
+    $windowEnd = now()->startOfMonth();
+
+    $months = $loans
+        ->map(fn ($loan): string => Carbon::parse($loan->start_at)->format('Y-m'))
+        ->unique()
+        ->sort()
+        ->values();
+
+    expect($months->first())->toBe($windowStart->format('Y-m'), 'Peminjaman tertua harus di awal jendela demo')
+        ->and($months->last())->toBe($windowEnd->format('Y-m'), 'Peminjaman terbaru harus di bulan berjalan')
+        ->and((int) $windowStart->diffInMonths($windowEnd))->toBe(DemoCalendar::MONTHS - 1);
+});
+
+// #603 review host 2026-11-28 — sebagian besar piutang/utang lunas tepat waktu; hanya
+// 15-30% nilai terbuka yang menunggak, dan semua bucket aging tetap terisi.
+invariant('W7-18 open receivables and payables have a healthy overdue ratio', function () {
+    $today = Carbon::today()->startOfDay();
+
+    $overdueRatio = function ($rows) use ($today): float {
+        $total = 0.0;
+        $overdue = 0.0;
+
+        foreach ($rows as $row) {
+            $daysPastDue = (int) Carbon::parse($row->due_date)->startOfDay()->diffInDays($today, false);
+            $amount = (float) $row->amount_due;
+            $total += $amount;
+
+            if ($daysPastDue > 0) {
+                $overdue += $amount;
+            }
+        }
+
+        return $total > 0.0 ? $overdue / $total * 100 : 0.0;
+    };
+
+    $receivables = DB::table('customer_invoices')
+        ->whereIn('status', ['sent', 'partially_paid', 'overdue'])
+        ->where('amount_due', '>', 0)
+        ->get(['due_date', 'amount_due']);
+    $payables = DB::table('supplier_bills')
+        ->whereIn('status', ['confirmed', 'partially_paid', 'overdue'])
+        ->where('amount_due', '>', 0)
+        ->get(['due_date', 'amount_due']);
+
+    expect($overdueRatio($receivables))->toBeGreaterThanOrEqual(15.0)
+        ->and($overdueRatio($receivables))->toBeLessThanOrEqual(30.0);
+    expect($overdueRatio($payables))->toBeGreaterThanOrEqual(15.0)
+        ->and($overdueRatio($payables))->toBeLessThanOrEqual(30.0);
+});
+
+// #603 butir 4 — laporan GL, trial balance detail, dan customer statement terisi dengan
+// filter default (tanpa perlu memilih periode/akun terlebih dahulu).
+invariant('W7-18 general ledger, trial balance and customer statement show default data', function () {
+    $trialBalance = app(GetTrialBalanceReportAction::class)->execute([]);
+
+    expect($trialBalance['data'])->not->toBeEmpty('Trial balance detail harus terisi dengan filter default')
+        ->and($trialBalance['summary']['is_balanced'])->toBeTrue('Trial balance harus seimbang');
+
+    $account = Account::query()
+        ->where('coa_version_id', DemoCalendar::currentCoaVersionId())
+        ->where('is_active', true)
+        ->whereDoesntHave('children')
+        ->orderBy('code')
+        ->first();
+
+    expect($account)->not->toBeNull('COA aktif harus punya akun daun');
+
+    $ledger = app(GetGeneralLedgerReportAction::class)->execute(['account_id' => $account->id]);
+
+    expect($ledger)->not->toBeEmpty('Buku besar harus terisi untuk akun default');
+
+    $openInvoices = DB::table('customer_invoices')
+        ->whereIn('status', ['sent', 'partially_paid', 'overdue'])
+        ->where('amount_due', '>', 0)
+        ->count();
+
+    expect($openInvoices)->toBeGreaterThan(0, 'Customer statement harus punya invoice terbuka');
 });

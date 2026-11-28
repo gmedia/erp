@@ -56,7 +56,7 @@ class VehicleLoanApprovalFlowSeeder extends Seeder
                 'is_active' => true,
                 'conditions' => null,
                 'created_by' => $approver->id,
-            ] + ($isNew ? ['created_at' => now()->subDays(60)] : []),
+            ] + ($isNew ? ['created_at' => now()->subMonths(14)] : []),
         );
 
         $steps = [

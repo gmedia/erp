@@ -73,15 +73,71 @@ class VehicleLoanSampleDataSeeder extends Seeder
         $departmentId = Department::query()->orderBy('id')->value('id');
 
         $scenarios = [
-            ['code' => 'VL-2026-0001', 'status' => 'draft', 'unit' => 0, 'purpose' => 'Perjalanan dinas ke Kantor Cabang Bandung'],
-            ['code' => 'VL-2026-0002', 'status' => 'pending', 'unit' => 1, 'purpose' => 'Antar dokumen kontrak ke kantor notaris'],
-            ['code' => 'VL-2026-0003', 'status' => 'in_progress', 'unit' => 2, 'purpose' => 'Kunjungan koordinasi proyek di Gedung Menara Kuningan'],
-            ['code' => 'VL-2026-0004', 'status' => 'approved', 'unit' => 0, 'purpose' => 'Penjemputan tamu dari Bandara Soekarno-Hatta'],
-            ['code' => 'VL-2026-0005', 'status' => 'rejected', 'unit' => 1, 'purpose' => 'Survey lokasi gudang di Cikarang'],
-            ['code' => 'VL-2026-0006', 'status' => 'pickup_done', 'unit' => 0, 'purpose' => 'Pengiriman suku cadang ke pemasok di Tangerang', 'ready' => true],
-            ['code' => 'VL-2026-0007', 'status' => 'returned', 'unit' => 1, 'purpose' => 'Rapat koordinasi bulanan di kantor pusat'],
-            ['code' => 'VL-2026-0008', 'status' => 'cancelled', 'unit' => 2, 'purpose' => 'Kunjungan supplier ke pabrik Karawang'],
-            ['code' => 'VL-2026-0009', 'status' => 'pickup_done', 'unit' => 2, 'purpose' => 'Perjalanan dinas ke Surabaya', 'overdue' => true],
+            [
+                'code' => 'VL-2026-0001',
+                'status' => 'draft',
+                'unit' => 0,
+                'purpose' => 'Perjalanan dinas ke Kantor Cabang Bandung',
+                'months_ago' => 0,
+            ],
+            [
+                'code' => 'VL-2026-0002',
+                'status' => 'pending',
+                'unit' => 1,
+                'purpose' => 'Antar dokumen kontrak ke kantor notaris',
+                'months_ago' => 0,
+            ],
+            [
+                'code' => 'VL-2026-0003',
+                'status' => 'in_progress',
+                'unit' => 2,
+                'purpose' => 'Kunjungan koordinasi proyek di Gedung Menara Kuningan',
+                'months_ago' => 0,
+            ],
+            [
+                'code' => 'VL-2026-0004',
+                'status' => 'approved',
+                'unit' => 0,
+                'purpose' => 'Penjemputan tamu dari Bandara Soekarno-Hatta',
+                'months_ago' => 0,
+            ],
+            [
+                'code' => 'VL-2026-0005',
+                'status' => 'rejected',
+                'unit' => 1,
+                'purpose' => 'Survey lokasi gudang di Cikarang',
+                'months_ago' => 12,
+            ],
+            [
+                'code' => 'VL-2026-0006',
+                'status' => 'pickup_done',
+                'unit' => 0,
+                'purpose' => 'Pengiriman suku cadang ke pemasok di Tangerang',
+                'ready' => true,
+                'months_ago' => 0,
+            ],
+            [
+                'code' => 'VL-2026-0007',
+                'status' => 'returned',
+                'unit' => 1,
+                'purpose' => 'Rapat koordinasi bulanan di kantor pusat',
+                'months_ago' => 6,
+            ],
+            [
+                'code' => 'VL-2026-0008',
+                'status' => 'cancelled',
+                'unit' => 2,
+                'purpose' => 'Kunjungan supplier ke pabrik Karawang',
+                'months_ago' => 3,
+            ],
+            [
+                'code' => 'VL-2026-0009',
+                'status' => 'pickup_done',
+                'unit' => 2,
+                'purpose' => 'Perjalanan dinas ke Surabaya',
+                'overdue' => true,
+                'months_ago' => 0,
+            ],
         ];
 
         foreach ($scenarios as $index => $scenario) {
@@ -109,19 +165,26 @@ class VehicleLoanSampleDataSeeder extends Seeder
     {
         $status = $scenario['status'];
         $overdue = (bool) ($scenario['overdue'] ?? false);
+        $monthsAgo = (int) ($scenario['months_ago'] ?? 0);
+        $monthStart = now()->startOfMonth()->subMonths($monthsAgo);
 
         if ($overdue) {
             $start = now()->subDays(3)->setTime(8, 0);
             $end = now()->subDay()->setTime(17, 0);
         } elseif ($status === 'returned') {
-            $start = now()->subDays(6)->setTime(8, 0);
-            $end = now()->subDays(5)->setTime(17, 0);
+            $start = $monthStart->copy()->day(8)->setTime(8, 0);
+            $end = $monthStart->copy()->day(9)->setTime(17, 0);
+        } elseif (in_array($status, ['rejected', 'cancelled'], true)) {
+            $start = $monthStart->copy()->day(12)->setTime(8, 0);
+            $end = $start->copy()->setTime(17, 0);
         } elseif ($status === 'pickup_done') {
-            $start = now()->subDay()->setTime(8, 0);
-            $end = now()->setTime(17, 0);
+            $start = $monthStart->copy()->day(5)->setTime(8, 0);
+            $end = $start->copy()->setTime(17, 0);
         } else {
-            $start = now()->addDays($index + 1)->setTime(8, 0);
-            $end = (clone $start)->setTime(17, 0);
+            // Draft/pending/in_progress/approved berada di bulan berjalan agar status
+            // aktif tetap masuk akal, sementara status historis tersebar di jendela demo.
+            $start = $monthStart->copy()->day(20)->setTime(8, 0);
+            $end = $start->copy()->setTime(17, 0);
         }
 
         if (in_array($status, ['draft'], true)) {

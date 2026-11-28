@@ -98,7 +98,7 @@ class DemoAgingSeeder extends Seeder
                 $customer = $customers[$sequence % $customers->count()];
                 $product = $products[$sequence % $products->count()];
                 $unit = $units[$sequence % $units->count()];
-                $grandTotal = $this->invoiceAmount($sequence);
+                $grandTotal = $this->invoiceAmount($offset);
                 $subtotal = round($grandTotal / 1.1, 2);
                 $taxAmount = round($grandTotal - $subtotal, 2);
                 $status = $offset < 0 ? 'overdue' : 'sent';
@@ -167,7 +167,7 @@ class DemoAgingSeeder extends Seeder
 
                 $supplier = $suppliers[$sequence % $suppliers->count()];
                 $product = $products[$sequence % $products->count()];
-                $grandTotal = $this->billAmount($sequence);
+                $grandTotal = $this->billAmount($offset);
                 $subtotal = round($grandTotal / 1.11, 2);
                 $taxAmount = round($grandTotal - $subtotal, 2);
                 $status = $offset < 0 ? 'overdue' : 'confirmed';
@@ -221,18 +221,25 @@ class DemoAgingSeeder extends Seeder
             ->first();
     }
 
-    private function invoiceAmount(int $sequence): float
+    /**
+     * Nilai invoice terbuka per bucket aging.
+     *
+     * Sebagian besar piutang demo harus belum jatuh tempo (current) dan hanya sebagian
+     * kecil yang menunggak, sehingga rasio overdue AR berada di rentang wajar 15-30%
+     * (#603 review host 2026-11-28). Nilai lama membuat hampir seluruh piutang overdue.
+     */
+    private function invoiceAmount(int $offset): float
     {
-        $amounts = [12500000, 18400000, 9600000, 22750000, 14300000, 17200000, 26800000, 11000000];
-
-        return (float) $amounts[($sequence - 8) % count($amounts)];
+        return $offset >= 0 ? 100000000.0 : 2000000.0;
     }
 
-    private function billAmount(int $sequence): float
+    /**
+     * Nilai tagihan terbuka per bucket aging. Sama seperti piutang: tagihan lancar
+     * mendominasi, tagihan menunggak kecil tetapi tetap mengisi semua bucket.
+     */
+    private function billAmount(int $offset): float
     {
-        $amounts = [5400000, 8750000, 12300000, 6900000, 10450000, 7800000, 9600000];
-
-        return (float) $amounts[($sequence - 8) % count($amounts)];
+        return $offset >= 0 ? 90000000.0 : 1500000.0;
     }
 
     private function seedInvoiceItem(
