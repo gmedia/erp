@@ -75,17 +75,26 @@ function ComputedSectionRow({
 export function ComputedSectionsCard({
     sections,
     title = 'Computed Sections',
-}: Readonly<{ sections: ComputedSection[]; title?: string }>) {
+    titleKey,
+}: Readonly<{
+    sections: ComputedSection[];
+    title?: string;
+    titleKey?: string;
+}>) {
+    const { t } = useTranslation();
+
     if (sections.length === 0) {
         return null;
     }
 
     const sorted = [...sections].sort((a, b) => a.sort_order - b.sort_order);
+    const cardTitle =
+        titleKey && t(titleKey) !== titleKey ? t(titleKey) : title;
 
     return (
         <Card>
             <CardHeader className="pb-2">
-                <CardTitle className="text-lg">{title}</CardTitle>
+                <CardTitle className="text-lg">{cardTitle}</CardTitle>
             </CardHeader>
             <CardContent>
                 <div className="rounded-lg border bg-background p-4">

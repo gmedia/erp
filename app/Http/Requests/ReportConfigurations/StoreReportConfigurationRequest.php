@@ -35,6 +35,8 @@ class StoreReportConfigurationRequest extends FormRequest
             'sections.*.section_type' => ['required_with:sections', Rule::in(ReportSection::SECTION_TYPES)],
             'sections.*.account_type_filter' => ['nullable', 'string', 'max:30'],
             'sections.*.account_sub_type_filter' => ['nullable', 'string', 'max:50'],
+            'sections.*.account_codes' => ['nullable', 'array'],
+            'sections.*.account_codes.*' => ['string', 'max:30'],
             'sections.*.sign_convention' => ['nullable', Rule::in(ReportSection::SIGN_CONVENTIONS)],
             'sections.*.formula' => ['nullable', 'string', 'max:255'],
             'sections.*.is_active' => ['boolean'],

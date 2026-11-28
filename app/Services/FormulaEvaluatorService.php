@@ -88,24 +88,21 @@ class FormulaEvaluatorService
 
     private function evaluateArithmetic(string $expression): float
     {
-        $expression = trim($expression);
-        $tokens = preg_split('/\s*([+\-])\s*(?=\d)/', $expression, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        $expression = preg_replace('/\s+/', '', trim($expression)) ?? '';
 
-        if ($tokens === false || count($tokens) === 0) {
+        // Angka pertama boleh negatif (mis. total laba operasional negatif),
+        // lalu diikuti pasangan operator + angka bertanda.
+        if (! preg_match('/^([+-]?\d+(?:\.\d+)?)(.*)$/', $expression, $matches)) {
             return 0.0;
         }
 
-        $result = (float) array_shift($tokens);
+        $result = (float) $matches[1];
+        $remaining = $matches[2];
 
-        while (count($tokens) >= 2) {
-            $operator = array_shift($tokens);
-            $operand = (float) array_shift($tokens);
-
-            if ($operator === '+') {
-                $result += $operand;
-            } elseif ($operator === '-') {
-                $result -= $operand;
-            }
+        while ($remaining !== '' && preg_match('/^([+-])([+-]?\d+(?:\.\d+)?)(.*)$/', $remaining, $parts)) {
+            $operand = (float) $parts[2];
+            $result = $parts[1] === '+' ? $result + $operand : $result - $operand;
+            $remaining = $parts[3];
         }
 
         return round($result, 2);

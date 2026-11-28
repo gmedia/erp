@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn, formatCurrency } from '@/lib/utils';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
+import { translateOr } from './FinancialReportPageShell';
 
 export interface ReportAccountNode {
     id: number | string;
@@ -35,6 +37,7 @@ type FinancialReportTotals = Partial<
 
 type FinancialReportSectionConfig = {
     title: string;
+    titleKey: string;
     metric: FinancialReportMetric;
 };
 
@@ -44,9 +47,21 @@ type FinancialReportSectionGroupReport = Partial<
 
 export const financialPositionSectionConfigs: readonly FinancialReportSectionConfig[] =
     [
-        { title: 'Assets', metric: 'assets' },
-        { title: 'Liabilities', metric: 'liabilities' },
-        { title: 'Equity', metric: 'equity' },
+        {
+            title: 'Assets',
+            titleKey: 'reports.financial.section.assets',
+            metric: 'assets',
+        },
+        {
+            title: 'Liabilities',
+            titleKey: 'reports.financial.section.liabilities',
+            metric: 'liabilities',
+        },
+        {
+            title: 'Equity',
+            titleKey: 'reports.financial.section.equity',
+            metric: 'equity',
+        },
     ];
 
 export const getChangeTextClass = (
@@ -222,6 +237,7 @@ function AccountRow({
 
 export function FinancialReportSection({
     title,
+    titleKey,
     nodes,
     total,
     comparisonTotal,
@@ -232,6 +248,7 @@ export function FinancialReportSection({
     compactIndent = false,
 }: Readonly<{
     title: string;
+    titleKey?: string;
     nodes: ReportAccountNode[];
     total: number;
     comparisonTotal?: number;
@@ -241,10 +258,12 @@ export function FinancialReportSection({
     metric?: FinancialReportMetric;
     compactIndent?: boolean;
 }>) {
+    const { t } = useTranslation();
     const [expandAll, setExpandAll] = useState(true);
     const [expandKey, setExpandKey] = useState(0);
     const changeValue = change || 0;
     const changeTextClass = getChangeTextClass(changeValue, metric);
+    const sectionTitle = titleKey ? translateOr(t, titleKey, title) : title;
 
     const setExpanded = (value: Readonly<boolean>) => {
         setExpandAll(value);
@@ -256,7 +275,9 @@ export function FinancialReportSection({
             <CardHeader className="pb-2">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-wrap items-center gap-2">
-                        <CardTitle className="text-lg">{title}</CardTitle>
+                        <CardTitle className="text-lg">
+                            {sectionTitle}
+                        </CardTitle>
                         <div className="flex items-center gap-2">
                             <Button
                                 size="sm"
@@ -264,7 +285,7 @@ export function FinancialReportSection({
                                 onClick={() => setExpanded(true)}
                                 disabled={expandAll}
                             >
-                                Expand all
+                                {t('reports.financial.expand_all')}
                             </Button>
                             <Button
                                 size="sm"
@@ -272,7 +293,7 @@ export function FinancialReportSection({
                                 onClick={() => setExpanded(false)}
                                 disabled={!expandAll}
                             >
-                                Collapse all
+                                {t('reports.financial.collapse_all')}
                             </Button>
                         </div>
                     </div>
@@ -327,7 +348,7 @@ export function FinancialReportSection({
             <CardContent>
                 {nodes.length === 0 ? (
                     <div className="py-4 text-center text-muted-foreground italic">
-                        No accounts found
+                        {t('reports.financial.no_accounts')}
                     </div>
                 ) : (
                     <div className="overflow-hidden rounded-md border">
@@ -341,22 +362,30 @@ export function FinancialReportSection({
                                     sejajar dengan teks baris (W5-12). */}
                                 <div className="flex min-w-[10rem] flex-1 items-center gap-2 md:min-w-40">
                                     <div className="w-4" aria-hidden />
-                                    <span>Account</span>
+                                    <span>
+                                        {t('reports.financial.column.account')}
+                                    </span>
                                 </div>
                                 <div className="flex shrink-0 gap-2 text-right tabular-nums sm:gap-4">
                                     <div className="w-28 shrink-0 md:w-36">
-                                        Current
+                                        {t('reports.financial.column.current')}
                                     </div>
                                     {showComparison && (
                                         <>
                                             <div className="w-28 shrink-0 md:w-36">
-                                                Comparison
+                                                {t(
+                                                    'reports.financial.column.comparison',
+                                                )}
                                             </div>
                                             <div className="w-24 shrink-0 md:w-28">
-                                                Change
+                                                {t(
+                                                    'reports.financial.column.change',
+                                                )}
                                             </div>
                                             <div className="w-14 shrink-0 md:w-16">
-                                                %
+                                                {t(
+                                                    'reports.financial.column.percentage',
+                                                )}
                                             </div>
                                         </>
                                     )}
@@ -381,6 +410,7 @@ export function FinancialReportSection({
 
 export function ComparisonFinancialReportSection({
     title,
+    titleKey,
     metric,
     nodes,
     totals,
@@ -388,6 +418,7 @@ export function ComparisonFinancialReportSection({
     compactIndent = false,
 }: Readonly<{
     title: string;
+    titleKey?: string;
     metric: FinancialReportMetric;
     nodes: ReportAccountNode[];
     totals: FinancialReportTotals;
@@ -397,6 +428,7 @@ export function ComparisonFinancialReportSection({
     return (
         <FinancialReportSection
             title={title}
+            titleKey={titleKey}
             nodes={nodes}
             total={totals[metric] || 0}
             comparisonTotal={totals[`comparison_${metric}`]}
@@ -424,10 +456,11 @@ export function ComparisonFinancialReportSectionGroup({
     className?: string;
     compactIndent?: boolean;
 }>) {
-    const content = sections.map(({ title, metric }) => (
+    const content = sections.map(({ title, titleKey, metric }) => (
         <ComparisonFinancialReportSection
             key={metric}
             title={title}
+            titleKey={titleKey}
             metric={metric}
             nodes={report[metric] || []}
             totals={totals}

@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property string $section_type
  * @property string|null $account_type_filter
  * @property string|null $account_sub_type_filter
+ * @property array<int, string>|null $account_codes
  * @property string $sign_convention
  * @property string|null $formula
  * @property bool $is_active
@@ -98,6 +99,7 @@ class ReportSection extends Model
         'section_type',
         'account_type_filter',
         'account_sub_type_filter',
+        'account_codes',
         'sign_convention',
         'formula',
         'is_active',
@@ -108,6 +110,7 @@ class ReportSection extends Model
      */
     protected $casts = [
         'sort_order' => 'integer',
+        'account_codes' => 'array',
         'is_active' => 'boolean',
     ];
 

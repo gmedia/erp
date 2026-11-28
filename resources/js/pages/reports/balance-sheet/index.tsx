@@ -18,6 +18,7 @@ import {
     FinancialSummaryCard,
 } from '@/components/reports/financial/FinancialSummaryCard';
 import { Separator } from '@/components/ui/separator';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useExport } from '@/hooks/useExport';
 import { formatCurrency } from '@/lib/utils';
 
@@ -56,6 +57,7 @@ const emptyBalanceSheetReport: BalanceSheetResponse['report'] = {
 const balanceSheetSecondarySections = financialPositionSectionConfigs.slice(1);
 
 export default function BalanceSheet() {
+    const { t } = useTranslation();
     const {
         fiscalYears,
         selectedYearId,
@@ -113,8 +115,12 @@ export default function BalanceSheet() {
                 >
                     <FinancialStatusBadge
                         isPositive={isBalanced}
-                        positiveLabel="Balanced"
-                        negativeLabel={`Unbalanced • ${formatCurrency(difference)}`}
+                        positiveLabel={t(
+                            'reports.financial.balance_sheet.balanced',
+                        )}
+                        negativeLabel={`${t(
+                            'reports.financial.balance_sheet.unbalanced',
+                        )} • ${formatCurrency(difference)}`}
                     />
                 </FinancialReportHeaderMeta>
             }
@@ -131,6 +137,7 @@ export default function BalanceSheet() {
             <div className="grid min-w-0 gap-6">
                 <ComparisonFinancialReportSection
                     title={financialPositionSectionConfigs[0]?.title ?? ''}
+                    titleKey={financialPositionSectionConfigs[0]?.titleKey}
                     metric={
                         financialPositionSectionConfigs[0]?.metric ?? 'assets'
                     }
@@ -148,20 +155,28 @@ export default function BalanceSheet() {
                 />
 
                 <FinancialSummaryCard
-                    description="Assets should equal liabilities plus equity."
+                    description={t(
+                        'reports.financial.balance_sheet.description',
+                    )}
                     isPositive={isBalanced}
                     status={
                         <FinancialStatusBadge
                             isPositive={isBalanced}
-                            positiveLabel="Balanced"
-                            negativeLabel={`Unbalanced • ${formatCurrency(difference)}`}
+                            positiveLabel={t(
+                                'reports.financial.balance_sheet.balanced',
+                            )}
+                            negativeLabel={`${t(
+                                'reports.financial.balance_sheet.unbalanced',
+                            )} • ${formatCurrency(difference)}`}
                         />
                     }
                 >
                     <div className="grid gap-3 rounded-lg border bg-background p-4">
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-sm text-muted-foreground">
-                                Total Assets
+                                {t(
+                                    'reports.financial.balance_sheet.total_assets',
+                                )}
                             </span>
                             <span className="text-sm font-semibold tabular-nums">
                                 {formatCurrency(totalAssets)}
@@ -170,7 +185,9 @@ export default function BalanceSheet() {
                         <Separator />
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-sm text-muted-foreground">
-                                Total Liabilities &amp; Equity
+                                {t(
+                                    'reports.financial.balance_sheet.total_liabilities_equity',
+                                )}
                             </span>
                             <span className="text-sm font-semibold tabular-nums">
                                 {formatCurrency(totalLiabilitiesAndEquity)}
@@ -179,8 +196,13 @@ export default function BalanceSheet() {
                     </div>
 
                     {!isBalanced && (
-                        <PageBanner tone="destructive" title="Unbalanced">
-                            Difference:{' '}
+                        <PageBanner
+                            tone="destructive"
+                            title={t(
+                                'reports.financial.balance_sheet.unbalanced',
+                            )}
+                        >
+                            {t('reports.financial.balance_sheet.difference')}:{' '}
                             <span className="font-medium tabular-nums">
                                 {formatCurrency(difference)}
                             </span>
@@ -191,6 +213,7 @@ export default function BalanceSheet() {
                 <ComputedSectionsCard
                     sections={computedSections}
                     title="Financial Position Summary"
+                    titleKey="reports.financial.balance_sheet.position_summary"
                 />
             </div>
         </FinancialReportPageShell>

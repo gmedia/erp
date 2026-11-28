@@ -435,6 +435,89 @@ describe('Financial Dashboard API', function () {
             ->toBe((float) $unscoped->json('cash_flow_summary.net'));
     });
 
+    test('expense breakdown lists top expense accounts with others instead of one root bar', function () {
+        $fiscalYear = FiscalYear::factory()->create([
+            'status' => 'open',
+            'start_date' => '2024-01-01',
+            'end_date' => '2024-12-31',
+        ]);
+        $coaVersion = CoaVersion::factory()->create([
+            'fiscal_year_id' => $fiscalYear->id,
+            'status' => 'active',
+        ]);
+
+        $cash = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'code' => '11110',
+            'name' => 'Cash in Bank',
+            'type' => 'asset',
+            'normal_balance' => 'debit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+
+        $expenseRoot = Account::factory()->create([
+            'coa_version_id' => $coaVersion->id,
+            'code' => '50000',
+            'name' => 'Expenses',
+            'type' => 'expense',
+            'normal_balance' => 'debit',
+            'level' => 1,
+            'parent_id' => null,
+        ]);
+
+        $expenseNames = ['Salaries', 'Rent', 'Utilities', 'Marketing', 'Depreciation', 'Office Supplies'];
+        $expenseAmounts = [600000, 500000, 400000, 300000, 200000, 100000];
+
+        foreach ($expenseNames as $index => $name) {
+            $account = Account::factory()->create([
+                'coa_version_id' => $coaVersion->id,
+                'code' => (string) (51000 + $index),
+                'name' => $name,
+                'type' => 'expense',
+                'normal_balance' => 'debit',
+                'level' => 2,
+                'parent_id' => $expenseRoot->id,
+            ]);
+
+            $entry = JournalEntry::factory()->create([
+                'fiscal_year_id' => $fiscalYear->id,
+                'status' => 'posted',
+                'entry_date' => '2024-06-01',
+            ]);
+
+            JournalEntryLine::factory()->create([
+                'journal_entry_id' => $entry->id,
+                'account_id' => $account->id,
+                'debit' => $expenseAmounts[$index],
+                'credit' => 0,
+            ]);
+            JournalEntryLine::factory()->create([
+                'journal_entry_id' => $entry->id,
+                'account_id' => $cash->id,
+                'debit' => 0,
+                'credit' => $expenseAmounts[$index],
+            ]);
+        }
+
+        $response = getJson("/api/financial-dashboard?fiscal_year_id={$fiscalYear->id}");
+        $response->assertOk();
+
+        $breakdown = $response->json('expense_breakdown');
+        $values = array_map(static fn (array $item): float => (float) $item['value'], $breakdown);
+
+        expect($breakdown)->toHaveCount(6)
+            ->and(array_column($breakdown, 'name'))->toBe([
+                'Salaries',
+                'Rent',
+                'Utilities',
+                'Marketing',
+                'Depreciation',
+                'Others',
+            ])
+            ->and($values)->toBe([600000.0, 500000.0, 400000.0, 300000.0, 200000.0, 100000.0]);
+    });
+
     test('cash balance includes opening balance while net cash flow excludes opening entries', function () {
         $priorYear = FiscalYear::factory()->create([
             'name' => '2024',

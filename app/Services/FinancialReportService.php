@@ -365,18 +365,7 @@ class FinancialReportService
         }
 
         // Add Current Year Earnings to Equity
-        $buckets['equity'][] = [
-            'id' => 'current_year_earnings',
-            'code' => '9999-CYE',
-            'name' => 'Current Year Earnings',
-            'level' => 1,
-            'parent_id' => null,
-            'balance' => $netIncome,
-            'comparison_balance' => $comparisonNetIncome,
-            'sub_type' => 'equity',
-        ];
-        $totals['equity'] += $netIncome;
-        $totals['comparison_equity'] += $comparisonNetIncome;
+        $this->appendCurrentYearEarnings($buckets, $totals, $netIncome, $comparisonNetIncome);
 
         $this->appendChangeMetrics($totals, ['assets', 'liabilities', 'equity']);
 
@@ -483,6 +472,12 @@ class FinancialReportService
             ]
         );
 
+        // Laba tahun berjalan (pendapatan - beban) masuk ekuitas pada kedua
+        // periode agar Kewajiban + Ekuitas = Aset di laporan perbandingan.
+        $netIncome = $totals['revenues'] - $totals['expenses'];
+        $comparisonNetIncome = $totals['comparison_revenues'] - $totals['comparison_expenses'];
+        $this->appendCurrentYearEarnings($buckets, $totals, $netIncome, $comparisonNetIncome);
+
         $this->appendChangeMetrics($totals, ['assets', 'liabilities', 'equity', 'revenues', 'expenses']);
 
         return [
@@ -505,6 +500,7 @@ class FinancialReportService
                 'assets' => 0,
                 'liabilities' => 0,
                 'equity' => 0,
+                'current_year_earnings' => 0,
                 'comparison_assets' => 0,
                 'comparison_liabilities' => 0,
                 'comparison_equity' => 0,
@@ -787,6 +783,15 @@ class FinancialReportService
             $buckets[$bucketKey][] = $this->buildReportItem($account, $balance, $comparisonBalance);
             $totals[$totalKey] += $balance;
             $totals["comparison_{$totalKey}"] += $comparisonBalance;
+
+            // Total per akun dan per sub_type untuk kartu ringkasan
+            // (computed_sections); dipakai EvaluateReportSectionsAction.
+            $totals["account_{$account->code}"] = ($totals["account_{$account->code}"] ?? 0) + $balance;
+            if ($account->sub_type !== null) {
+                $totals[$account->sub_type] = ($totals[$account->sub_type] ?? 0) + $balance;
+                $subTypeKey = "{$account->type}_{$account->sub_type}";
+                $totals[$subTypeKey] = ($totals[$subTypeKey] ?? 0) + $balance;
+            }
         }
 
         return [
@@ -822,6 +827,32 @@ class FinancialReportService
         };
     }
 
+    /**
+     * @param  array<string, array<int, array<string, mixed>>>  $buckets
+     * @param  array<string, float|int>  $totals
+     */
+    private function appendCurrentYearEarnings(
+        array &$buckets,
+        array &$totals,
+        float $netIncome,
+        float $comparisonNetIncome,
+    ): void {
+        $buckets['equity'][] = [
+            'id' => 'current_year_earnings',
+            'code' => '9999-CYE',
+            'name' => 'Current Year Earnings',
+            'level' => 1,
+            'parent_id' => null,
+            'balance' => $netIncome,
+            'comparison_balance' => $comparisonNetIncome,
+            'sub_type' => 'equity',
+        ];
+        $totals['equity'] += $netIncome;
+        $totals['comparison_equity'] += $comparisonNetIncome;
+        $totals['current_year_earnings'] = $netIncome;
+        $totals['comparison_current_year_earnings'] = $comparisonNetIncome;
+    }
+
     private function computeAccountBalance(string $normalBalance, float|int $debit, float|int $credit): float
     {
         $debit = (float) $debit;
@@ -830,59 +861,60 @@ class FinancialReportService
         return $normalBalance === 'debit' ? ($debit - $credit) : ($credit - $debit);
     }
 
-    private function computePostedBalance(Account $account): float
+    private function applyNormalBalance(string $normalBalance, float $rawNet): float
     {
-        return $this->computeAccountBalance(
-            $account->normal_balance,
-            $account->posted_debit_sum ?? 0,
-            $account->posted_credit_sum ?? 0
-        );
+        return $normalBalance === 'debit' ? $rawNet : -$rawNet;
     }
 
     /**
+     * Nilai mentah (debit - kredit) per akun, sebelum diterjemahkan ke sisi
+     * normal akun tujuan. Dipakai agar saldo CoA arsip dapat disajikan dengan
+     * tanda akun versi baru (mis. akumulasi penyusutan tetap negatif).
+     *
      * @param  Collection<int, Account>  $accounts
      * @param  callable(Account): (int|string)  $keyResolver
      * @return array<int|string, float>
      */
-    private function mapAccountBalances(Collection $accounts, callable $keyResolver): array
+    private function mapAccountRawNets(Collection $accounts, callable $keyResolver): array
     {
-        $balances = [];
+        $nets = [];
 
         foreach ($accounts as $account) {
-            $balances[$keyResolver($account)] = $this->computePostedBalance($account);
+            $nets[$keyResolver($account)] = (float) ($account->posted_debit_sum ?? 0)
+                - (float) ($account->posted_credit_sum ?? 0);
         }
 
-        return $balances;
+        return $nets;
     }
 
     /**
      * @param  Collection<int, Account>  $accounts
      * @return array<int, float>
      */
-    private function mapAccountBalancesById(Collection $accounts): array
+    private function mapAccountRawNetsById(Collection $accounts): array
     {
-        /** @var array<int, float> $balances */
-        $balances = $this->mapAccountBalances(
+        /** @var array<int, float> $nets */
+        $nets = $this->mapAccountRawNets(
             $accounts,
             static fn (Account $account): int => $account->id,
         );
 
-        return $balances;
+        return $nets;
     }
 
     /**
      * @param  Collection<int, Account>  $accounts
      * @return array<string, float>
      */
-    private function mapAccountBalancesByCode(Collection $accounts): array
+    private function mapAccountRawNetsByCode(Collection $accounts): array
     {
-        /** @var array<string, float> $balances */
-        $balances = $this->mapAccountBalances(
+        /** @var array<string, float> $nets */
+        $nets = $this->mapAccountRawNets(
             $accounts,
             static fn (Account $account): string => $account->code,
         );
 
-        return $balances;
+        return $nets;
     }
 
     private function buildComparisonBalanceMap(
@@ -908,11 +940,16 @@ class FinancialReportService
             ->whereIn('code', $codes)
             ->get();
 
-        $comparisonBalanceByCode = $this->mapAccountBalancesByCode($comparisonAccounts);
+        $comparisonRawNetByCode = $this->mapAccountRawNetsByCode($comparisonAccounts);
 
+        /** @var Collection<int, Account> $currentAccountsById */
+        $currentAccountsById = $currentAccounts->keyBy('id');
         $comparisonBalanceByCurrentId = array_fill_keys($currentIds, 0);
         foreach ($currentAccounts as $account) {
-            $comparisonBalanceByCurrentId[$account->id] = $comparisonBalanceByCode[$account->code] ?? 0;
+            $comparisonBalanceByCurrentId[$account->id] = $this->applyNormalBalance(
+                $this->effectiveNormalBalance($account),
+                (float) ($comparisonRawNetByCode[$account->code] ?? 0),
+            );
         }
 
         $mappings = AccountMapping::query()
@@ -935,29 +972,37 @@ class FinancialReportService
             ->whereIn('id', $sourceIds)
             ->get();
 
-        $sourceBalanceById = $this->mapAccountBalancesById($sourceAccounts);
+        $sourceRawNetById = $this->mapAccountRawNetsById($sourceAccounts);
 
-        $mappingSumByTargetId = [];
+        $mappingRawNetSumByTargetId = [];
         foreach ($mappings as $mapping) {
             if ($mapping->type === 'split') {
                 continue;
             }
 
-            $mappingSumByTargetId[$mapping->target_account_id] =
-                ($mappingSumByTargetId[$mapping->target_account_id] ?? 0)
-                + ($sourceBalanceById[$mapping->source_account_id] ?? 0);
+            $mappingRawNetSumByTargetId[$mapping->target_account_id] =
+                ($mappingRawNetSumByTargetId[$mapping->target_account_id] ?? 0)
+                + ($sourceRawNetById[$mapping->source_account_id] ?? 0);
         }
 
-        foreach ($mappingSumByTargetId as $targetId => $sum) {
-            $comparisonBalanceByCurrentId[$targetId] = $sum;
+        foreach ($mappingRawNetSumByTargetId as $targetId => $rawNetSum) {
+            /** @var Account|null $target */
+            $target = $currentAccountsById->get($targetId);
+            if (! $target) {
+                continue;
+            }
+
+            $comparisonBalanceByCurrentId[$targetId] = $this->applyNormalBalance(
+                $this->effectiveNormalBalance($target),
+                $rawNetSum,
+            );
         }
 
-        $parentMap = $currentAccounts->pluck('parent_id', 'id')->toArray();
         $splitGroups = $mappings->where('type', 'split')->groupBy('source_account_id');
 
         foreach ($splitGroups as $sourceId => $group) {
-            $sourceBalance = $sourceBalanceById[$sourceId] ?? 0;
-            if ($sourceBalance == 0) {
+            $sourceRawNet = $sourceRawNetById[$sourceId] ?? 0;
+            if (round($sourceRawNet, 2) === 0.0) {
                 continue;
             }
 
@@ -966,49 +1011,22 @@ class FinancialReportService
                 continue;
             }
 
-            $lcaTargetId = $this->lowestCommonAncestor($targetIds, $parentMap);
-            if (! $lcaTargetId) {
-                $lcaTargetId = $targetIds[0];
+            // Pemetaan split tidak menyimpan bobot alokasi. Saldo sumber
+            // ditempatkan pada target pertama (primary) agar subtotal induk
+            // tetap sama dengan jumlah anak setelah pemetaan CoA lama -> baru.
+            $primaryTargetId = (int) $targetIds[0];
+            /** @var Account|null $target */
+            $target = $currentAccountsById->get($primaryTargetId);
+            if (! $target) {
+                continue;
             }
 
-            $comparisonBalanceByCurrentId[$lcaTargetId] =
-                ($comparisonBalanceByCurrentId[$lcaTargetId] ?? 0)
-                + $sourceBalance;
+            $comparisonBalanceByCurrentId[$primaryTargetId] =
+                ($comparisonBalanceByCurrentId[$primaryTargetId] ?? 0)
+                + $this->applyNormalBalance($this->effectiveNormalBalance($target), $sourceRawNet);
         }
 
         return $comparisonBalanceByCurrentId;
-    }
-
-    private function lowestCommonAncestor(array $nodeIds, array $parentMap): ?int
-    {
-        if (count($nodeIds) === 0) {
-            return null;
-        }
-
-        $common = $this->ancestorChain((int) $nodeIds[0], $parentMap);
-        for ($i = 1; $i < count($nodeIds); $i++) {
-            $ancestors = array_flip($this->ancestorChain((int) $nodeIds[$i], $parentMap));
-            $common = array_values(array_filter($common, fn ($id) => isset($ancestors[$id])));
-            if (count($common) === 0) {
-                return null;
-            }
-        }
-
-        return (int) $common[0];
-    }
-
-    private function ancestorChain(int $nodeId, array $parentMap): array
-    {
-        $chain = [];
-        $visited = [];
-
-        while ($nodeId && ! isset($visited[$nodeId])) {
-            $visited[$nodeId] = true;
-            $chain[] = $nodeId;
-            $nodeId = (int) ($parentMap[$nodeId] ?? 0);
-        }
-
-        return $chain;
     }
 
     /**
