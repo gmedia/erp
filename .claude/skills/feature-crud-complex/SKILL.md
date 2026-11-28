@@ -1470,6 +1470,8 @@ Before marking complete:
 - [ ] Filters use `create{Feature}FilterFields()`
 - [ ] Columns defined with proper accessors
 - [ ] Entity config uses `createComplexEntityConfig()`
+- [ ] UI text uses `useTranslation` + keys in `lang/en.json` & `lang/id.json` (default English unchanged)
+- [ ] Zod validation uses `validation.<form>.<rule>` (translated by `FormMessage`); seeder data in Indonesian
 
 **Testing:**
 - [ ] Feature tests di `tests/Feature/{Features}/` subfolder
@@ -1483,7 +1485,8 @@ Before marking complete:
 ```bash
 // turbo-all
 ./vendor/bin/sail test --group {features}
-npx playwright test tests/e2e/{features}/
+# E2E: only specs you changed/added (+ max one affected spec); full folder runs in CI
+npx playwright test <changed-spec>
 ```
 
 ---

@@ -670,6 +670,8 @@ npx playwright test tests/e2e/{features}/
 - [ ] Config ditambahkan di `entityConfigs.ts`
 - [ ] Entity name sesuai display format
 - [ ] API base menggunakan kebab-case plural
+- [ ] Teks UI memakai `useTranslation` + kunci di `lang/en.json` & `lang/id.json` (English default tidak berubah)
+- [ ] Pesan validasi Zod memakai `validation.<form>.<rule>` (diterjemahkan `FormMessage`); data seeder Bahasa Indonesia
 
 ### Testing
 - [ ] Unit Model test di `tests/Unit/Models/` menggunakan Pest syntax
@@ -683,7 +685,7 @@ npx playwright test tests/e2e/{features}/
 - [ ] Group annotation `->group('{features}')` di SEMUA test files
 - [ ] E2E test menggunakan `generateModuleTests()` dari `shared-test-factories.ts`
 - [ ] E2E helpers di `tests/e2e/{features}/helpers.ts` (bukan global)
-- [ ] Semua tests pass: `sail test --group {features}` + `npx playwright test tests/e2e/{features}/`
+- [ ] Semua tests pass: `sail test --group {features}`; E2E lokal hanya spec yang diubah/ditambah (+ maks satu spec terdampak), folder penuh di CI
 
 ### Naming Conventions
 - [ ] Semua file mengikuti naming conventions

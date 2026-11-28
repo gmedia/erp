@@ -88,8 +88,17 @@ Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed Ope
 - CI memecah E2E menjadi **6 shard** (`--shard=n/6`, matrix job). Saat menambah/menghapus test/direktori E2E, pastikan tiap shard tetap terisi (tidak perlu memperbarui angka tetap di dokumen).
 - CI memakai **1 worker Playwright per shard**. `PLAYWRIGHT_WORKERS>1` adalah **jalan buntu**: flaky di bawah beban, dan menaikkan `PHP_CLI_SERVER_WORKERS` ke 8 **tetap gagal** (E2E hang >50m, `waitForResponse` timeout massal — lihat #219). Jangan ulangi eksperimen ini; konfigurasi stabil 6 shard × 1 worker.
 - **`sail test --parallel` ditolak** di repo ini. Tanpa `RefreshDatabase` di base `tests/TestCase.php`, worker paralel bertabrakan di DB `testing` (`Table 'testing.*' doesn't exist`). Menambahkan `RefreshDatabase` global pun tidak menolong: uji lokal → 41 failed / 2129 passed, **483s (lebih lambat dari serial ~314s)** karena state eksternal (cache/storage) dibagi antar worker. Pertahankan Pest serial (lihat #162/#183).
+- **Pest satu proses & ber-timeout**: jangan menjalankan dua proses Pest bersamaan (DB `testing` saling mengunci) — cek `pgrep -af 'artisan test|vendor/bin/pest'` dulu; bungkus dengan `timeout` dan alihkan log ke `/tmp/opencode/`. Test yang butuh data seed memanggil seeder spesifik di test (`$this->seed(CoaSeeder::class)`); tidak ada trait bersama untuk seed penuh.
+- **E2E lokal ramping**: jalankan hanya spec yang diubah/ditambah (+ maksimal satu spec modul yang langsung terdampak), sekali; `--last-failed` sekali bila perlu. Folder modul penuh dan suite besar diserahkan ke CI.
 
 - **E2E Octane mingguan** (`.github/workflows/e2e-octane.yml`, Minggu 19:00 UTC + manual, 6 shard): menjalankan E2E dengan `octane:swoole` lewat `docker-compose.override.yml` (`SUPERVISOR_PHP_COMMAND`), tidak menahan merge; `tests.yml` tidak diubah.
+
+### Verifikasi & Lingkup Sebelum Push
+
+- **Bukti visual wajib cocok dengan klaim.** Sebelum menulis klaim visual: `npm run build` ulang dan pastikan `public/hot` tidak ada; set locale dengan `page.addInitScript(() => localStorage.setItem("app_locale","id"))` **sebelum** `goto`; buka setiap PNG bukti dengan `look_at_ide` (Read tidak membaca gambar) dan tulis satu kalimat apa yang terlihat; angka DOM harus mengukur kontainer + teks, bukan hanya `<td>` — bila angka DOM dan gambar bertentangan, gambar menang. Sertakan tabel "klaim → bukti (nama berkas PNG + kalimat yang terlihat)" di laporan/PR.
+- **Duster hanya berkas PHP yang diubah**: `timeout 900 ./vendor/bin/sail bin duster fix $(git diff --name-only origin/main...HEAD -- '*.php')`; jangan jalankan pada seluruh repo (pernah macet >15 menit dan menulis ulang ±100 berkas).
+- **Lingkup kecil**: satu langkah ≈ ≤300 baris / ≤12 berkas. Bila membesar, selesaikan potongan yang koheren, commit + push, lalu tulis sisa butir sebagai daftar — jangan berhenti tanpa commit.
+- **PR & CI**: `gh pr edit`/`gh pr ready` bisa gagal karena Projects classic → pakai GraphQL `markPullRequestReadyForReview` atau REST. Bila head remote adalah commit autofix `github-actions[bot]`, merge lalu push satu commit sendiri (jangan menunggu CI). PR konflik = CI tidak berjalan.
 
 ## Workflow
 
@@ -344,6 +353,7 @@ erp/
 | Migrations/factories/seeders | `database/` | 143 / 96 / 37 — see `database/AGENTS.md` |
 | Backend route files | `routes/api/` | 71 files, 475 routes — see `routes/AGENTS.md` |
 | CI pipelines | `.github/workflows/`, `.gitlab/ci/` | Pest + Playwright + deploy |
+| Mobile build & APK | `docs/mobile-multi-company-build.md` | Build per perusahaan, distribusi APK privat |
 | Session handoff | `gmedia/erp/issues` | Active claim + checkpoint (`task.md` deprecated) |
 | Skills/templates | `.claude/skills/` | Scaffolding for new features |
 | Agent commands | `.claude/commands/` | `/claim-issue`, `/create-feature`, `/refactor-sonar`, … |
