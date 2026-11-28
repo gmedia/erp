@@ -1,11 +1,10 @@
-import { AsyncSelect } from '@/components/common/AsyncSelect';
 import {
     createDateRangeFilterFields,
     createSelectFilterField,
+    TranslatedAsyncSelect,
     type FieldDescriptor,
     type SelectOption,
 } from '@/components/common/filters';
-import { useTranslatableText } from '@/components/common/TranslatedText';
 
 const journalTypeOptions: SelectOption[] = [
     {
@@ -36,33 +35,6 @@ const journalTypeOptions: SelectOption[] = [
     },
 ];
 
-function TranslatedAccountSelect() {
-    const placeholder = useTranslatableText({
-        key: 'filter.gl_select_account',
-        fallback: 'Select Account',
-    });
-    return (
-        <AsyncSelect
-            url="/api/accounts?is_active=1&has_children=0"
-            placeholder={placeholder}
-        />
-    );
-}
-
-function TranslatedFiscalYearSelect() {
-    const placeholder = useTranslatableText({
-        key: 'filter.gl_select_fiscal_year',
-        fallback: 'Select Fiscal Year',
-    });
-    return (
-        <AsyncSelect
-            url="/api/fiscal-years"
-            placeholder={placeholder}
-            preferredMetaKey="preferred_fiscal_year_id"
-        />
-    );
-}
-
 export function createGeneralLedgerFilterFields(): FieldDescriptor[] {
     return [
         {
@@ -71,12 +43,29 @@ export function createGeneralLedgerFilterFields(): FieldDescriptor[] {
                 key: 'filter.gl_account_required',
                 fallback: 'Account (Required)',
             },
-            component: <TranslatedAccountSelect />,
+            component: (
+                <TranslatedAsyncSelect
+                    url="/api/accounts?is_active=1&has_children=0"
+                    placeholder={{
+                        key: 'filter.gl_select_account',
+                        fallback: 'Select Account',
+                    }}
+                />
+            ),
         },
         {
             name: 'fiscal_year_id',
             label: { key: 'filter.gl_fiscal_year', fallback: 'Fiscal Year' },
-            component: <TranslatedFiscalYearSelect />,
+            component: (
+                <TranslatedAsyncSelect
+                    url="/api/fiscal-years"
+                    placeholder={{
+                        key: 'filter.gl_select_fiscal_year',
+                        fallback: 'Select Fiscal Year',
+                    }}
+                    preferredMetaKey="preferred_fiscal_year_id"
+                />
+            ),
         },
         ...createDateRangeFilterFields(),
         createSelectFilterField(

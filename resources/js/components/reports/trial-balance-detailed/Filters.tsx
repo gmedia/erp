@@ -1,10 +1,9 @@
-import { AsyncSelect } from '@/components/common/AsyncSelect';
 import {
     createSelectFilterField,
+    TranslatedAsyncSelect,
     type FieldDescriptor,
     type SelectOption,
 } from '@/components/common/filters';
-import { useTranslatableText } from '@/components/common/TranslatedText';
 
 const monthNames = [
     'January',
@@ -26,26 +25,21 @@ const monthOptions: SelectOption[] = monthNames.map((fallback, index) => ({
     label: { key: `filter.month_${index + 1}`, fallback },
 }));
 
-function TranslatedFiscalYearSelect() {
-    const placeholder = useTranslatableText({
-        key: 'filter.select_fiscal_year',
-        fallback: 'Select fiscal year',
-    });
-    return (
-        <AsyncSelect
-            url="/api/fiscal-years"
-            placeholder={placeholder}
-            preferredMetaKey="preferred_fiscal_year_id"
-        />
-    );
-}
-
 export function createTrialBalanceDetailedFilterFields(): FieldDescriptor[] {
     return [
         {
             name: 'fiscal_year_id',
             label: { key: 'filter.gl_fiscal_year', fallback: 'Fiscal Year' },
-            component: <TranslatedFiscalYearSelect />,
+            component: (
+                <TranslatedAsyncSelect
+                    url="/api/fiscal-years"
+                    placeholder={{
+                        key: 'filter.select_fiscal_year',
+                        fallback: 'Select fiscal year',
+                    }}
+                    preferredMetaKey="preferred_fiscal_year_id"
+                />
+            ),
         },
         createSelectFilterField(
             'period_month',

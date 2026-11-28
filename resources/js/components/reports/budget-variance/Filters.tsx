@@ -1,10 +1,9 @@
-import { AsyncSelect } from '@/components/common/AsyncSelect';
 import {
     createSelectFilterField,
+    TranslatedAsyncSelect,
     type FieldDescriptor,
     type SelectOption,
 } from '@/components/common/filters';
-import { useTranslatableText } from '@/components/common/TranslatedText';
 
 const varianceStatusOptions: SelectOption[] = [
     {
@@ -44,20 +43,20 @@ const accountTypeOptions: SelectOption[] = [
     },
 ];
 
-function TranslatedBudgetSelect() {
-    const placeholder = useTranslatableText({
-        key: 'filter.select_budget',
-        fallback: 'Select budget',
-    });
-    return <AsyncSelect url="/api/budgets" placeholder={placeholder} />;
-}
-
 export function createBudgetVarianceFilterFields(): FieldDescriptor[] {
     return [
         {
             name: 'budget_id',
             label: { key: 'filter_field.budget', fallback: 'Budget' },
-            component: <TranslatedBudgetSelect />,
+            component: (
+                <TranslatedAsyncSelect
+                    url="/api/budgets"
+                    placeholder={{
+                        key: 'filter.select_budget',
+                        fallback: 'Select budget',
+                    }}
+                />
+            ),
         },
         createSelectFilterField(
             'status',

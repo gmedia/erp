@@ -1,6 +1,9 @@
 'use client';
 
-import { AsyncSelect } from '@/components/common/AsyncSelect';
+import {
+    AsyncSelect,
+    type AsyncSelectProps,
+} from '@/components/common/AsyncSelect';
 import { FilterDatePicker } from '@/components/common/FilterDatePicker';
 import {
     LabelText,
@@ -391,13 +394,16 @@ export function createTextFilterField(
     };
 }
 
-function TranslatedAsyncSelect({
-    url,
+export function TranslatedAsyncSelect({
     placeholder,
-}: Readonly<{ url: string; placeholder: TranslatableLabel }>) {
+    ...rest
+}: Readonly<
+    Omit<AsyncSelectProps, 'placeholder'> & { placeholder: TranslatableLabel }
+>) {
     const translatedPlaceholder = useTranslatableText(placeholder);
-    return <AsyncSelect url={url} placeholder={translatedPlaceholder} />;
+    return <AsyncSelect {...rest} placeholder={translatedPlaceholder} />;
 }
+TranslatedAsyncSelect.displayName = 'AsyncSelect';
 
 export function createAsyncSelectFilterField(
     name: string,
@@ -1460,10 +1466,16 @@ export function createApReportCommonFilterFields(
 
 function TranslatedDatePicker({
     placeholder,
-}: Readonly<{ placeholder: TranslatableLabel }>) {
+    ...rest
+}: Readonly<
+    Omit<React.ComponentProps<typeof FilterDatePicker>, 'placeholder'> & {
+        placeholder: TranslatableLabel;
+    }
+>) {
     const translatedPlaceholder = useTranslatableText(placeholder);
-    return <FilterDatePicker placeholder={translatedPlaceholder} />;
+    return <FilterDatePicker {...rest} placeholder={translatedPlaceholder} />;
 }
+TranslatedDatePicker.displayName = 'FilterDatePicker';
 
 export function createDateFilterFields(
     configs: DateFilterConfig[],
