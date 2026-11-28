@@ -2282,3 +2282,157 @@ invariant('W7-18 current fiscal year demo net profit is positive', function () {
             "Laba bersih demo FY berjalan harus positif: pendapatan {$revenue} vs beban {$expense}",
         );
 });
+
+// #571 C8 — FY2025 (Nov–Des 2025 di jendela demo) harus punya aktivitas nyata:
+// penjualan, beban, dan penyusutan di kedua bulan tersebut.
+invariant('W7-18 fiscal year 2025 has sales, expenses and depreciation in November and December', function () {
+    $fiscalYear = FiscalYear::query()->where('name', '2025')->first();
+
+    expect($fiscalYear)->not->toBeNull('Demo data must include fiscal year 2025');
+
+    foreach (['2025-11', '2025-12'] as $month) {
+        $start = Carbon::parse($month . '-01')->startOfMonth()->toDateString();
+        $end = Carbon::parse($month . '-01')->endOfMonth()->toDateString();
+
+        $totals = DB::table('journal_entry_lines')
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+            ->where('journal_entries.status', 'posted')
+            ->where('journal_entries.journal_type', '!=', 'closing')
+            ->whereBetween('journal_entries.entry_date', [$start, $end])
+            ->whereIn('accounts.type', ['revenue', 'expense'])
+            ->selectRaw(
+                "COALESCE(SUM(CASE WHEN accounts.type = 'revenue' "
+                . 'THEN journal_entry_lines.credit - journal_entry_lines.debit ELSE 0 END), 0) as revenue',
+            )
+            ->selectRaw(
+                "COALESCE(SUM(CASE WHEN accounts.type = 'expense' "
+                . 'THEN journal_entry_lines.debit - journal_entry_lines.credit ELSE 0 END), 0) as expense',
+            )
+            ->first();
+
+        $depreciation = DB::table('journal_entry_lines')
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+            ->where('journal_entries.status', 'posted')
+            ->where('journal_entries.journal_type', '!=', 'closing')
+            ->whereBetween('journal_entries.entry_date', [$start, $end])
+            ->where('accounts.code', '53000')
+            ->selectRaw('COALESCE(SUM(journal_entry_lines.debit - journal_entry_lines.credit), 0) as amount')
+            ->value('amount');
+
+        expect((float) $totals->revenue)->toBeGreaterThan(0.0, "Pendapatan {$month} harus terisi")
+            ->and((float) $totals->expense)->toBeGreaterThan(0.0, "Beban {$month} harus terisi")
+            ->and((float) $depreciation)->toBeGreaterThan(0.0, "Penyusutan {$month} harus terisi");
+    }
+});
+
+// #571 C8 — laba/rugi penutupan tahunan harus masuk ke Retained Earnings (32000),
+// bukan mengurangi Owner Capital (31000). Sebelumnya seeder memilih akun equity daun
+// pertama (31000), sehingga modal disetor tampak tergerus di laporan komparatif.
+invariant('W7-18 annual closing entry posts the fiscal year result to retained earnings', function () {
+    $fiscalYear = FiscalYear::query()->where('name', '2025')->first();
+
+    expect($fiscalYear)->not->toBeNull('Demo data must include fiscal year 2025');
+
+    $closing = DB::table('journal_entries')
+        ->where('fiscal_year_id', $fiscalYear->id)
+        ->where('journal_type', 'closing')
+        ->first(['id']);
+
+    expect($closing)->not->toBeNull('FY2025 must have an annual closing entry');
+
+    $equityCodes = DB::table('journal_entry_lines')
+        ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+        ->where('journal_entry_lines.journal_entry_id', $closing->id)
+        ->where('accounts.type', 'equity')
+        ->pluck('accounts.code')
+        ->all();
+
+    expect($equityCodes)->toContain('32000')
+        ->and($equityCodes)->not->toContain('31000');
+});
+
+// #571 C8 — akumulasi penyusutan bersaldo kredit dan modal disetor positif pada
+// akhir FY2025 dan FY2026 (saldo mentah jurnal, bukan tampilan laporan komparatif).
+invariant('W7-18 accumulated depreciation is credit and paid-in capital is positive at fiscal year end', function () {
+    foreach (['2025', '2026'] as $year) {
+        $fiscalYear = FiscalYear::query()->where('name', $year)->first();
+
+        expect($fiscalYear)->not->toBeNull("Demo data must include fiscal year {$year}");
+
+        foreach (['12200' => 'Akumulasi penyusutan', '31000' => 'Modal disetor'] as $code => $label) {
+            $row = DB::table('journal_entry_lines')
+                ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+                ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+                ->where('journal_entries.fiscal_year_id', $fiscalYear->id)
+                ->where('journal_entries.status', 'posted')
+                ->where('accounts.code', $code)
+                ->selectRaw('COALESCE(SUM(journal_entry_lines.debit), 0) as debit')
+                ->selectRaw('COALESCE(SUM(journal_entry_lines.credit), 0) as credit')
+                ->first();
+
+            $creditBalance = (float) $row->credit - (float) $row->debit;
+
+            expect($creditBalance)->toBeGreaterThan(
+                0.0,
+                "{$label} ({$code}) harus bersaldo kredit positif di akhir FY{$year}",
+            );
+        }
+    }
+});
+
+// #571 C8 — piutang dan utang terbuka tersebar di lima bucket aging (current, 1–30,
+// 31–60, 61–90, >90). Jumlah dokumen terbuka dijaga pada rentang demo yang wajar.
+invariant('W7-18 open receivables and payables fill all five aging buckets', function () {
+    $today = Carbon::today()->startOfDay();
+
+    $bucketize = function ($rows) use ($today): array {
+        $buckets = ['current' => 0.0, '1_30' => 0.0, '31_60' => 0.0, '61_90' => 0.0, 'over_90' => 0.0];
+
+        foreach ($rows as $row) {
+            $dueDate = Carbon::parse($row->due_date)->startOfDay();
+            $daysPastDue = (int) $dueDate->diffInDays($today, false);
+            $amount = (float) $row->amount_due;
+
+            if ($daysPastDue <= 0) {
+                $buckets['current'] += $amount;
+            } elseif ($daysPastDue <= 30) {
+                $buckets['1_30'] += $amount;
+            } elseif ($daysPastDue <= 60) {
+                $buckets['31_60'] += $amount;
+            } elseif ($daysPastDue <= 90) {
+                $buckets['61_90'] += $amount;
+            } else {
+                $buckets['over_90'] += $amount;
+            }
+        }
+
+        return $buckets;
+    };
+
+    $receivables = DB::table('customer_invoices')
+        ->whereIn('status', ['sent', 'partially_paid', 'overdue'])
+        ->where('amount_due', '>', 0)
+        ->get(['due_date', 'amount_due']);
+    $payables = DB::table('supplier_bills')
+        ->whereIn('status', ['confirmed', 'partially_paid', 'overdue'])
+        ->where('amount_due', '>', 0)
+        ->get(['due_date', 'amount_due']);
+
+    expect($receivables->count())->toBeGreaterThanOrEqual(8)->toBeLessThanOrEqual(15)
+        ->and($payables->count())->toBeGreaterThanOrEqual(6)->toBeLessThanOrEqual(10);
+
+    foreach (['piutang' => $receivables, 'utang' => $payables] as $label => $rows) {
+        $buckets = $bucketize($rows);
+
+        foreach ($buckets as $bucket => $amount) {
+            expect($amount)->toBeGreaterThan(
+                0.0,
+                "Bucket aging {$bucket} untuk {$label} harus terisi",
+            );
+        }
+    }
+});

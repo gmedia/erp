@@ -202,6 +202,8 @@ class DatabaseSeeder extends Seeder
             StockMovementSampleDataSeeder::class,
             ArSampleDataSeeder::class,
             ArMonthlyDemoSeeder::class,
+            // Dokumen AR/AP terbuka yang tersebar di lima bucket aging (#571 C8).
+            DemoAgingSeeder::class,
             // Normalisasi depresiasi aset (semua aset, termasuk kendaraan, sudah
             // ada) sebelum rekonsiliasi GL (W7-05). Harus sebelum GlExtendedSampleDataSeeder,
             // karena periode bulan yang diposting di sini ditutup di seeder tersebut (#423).

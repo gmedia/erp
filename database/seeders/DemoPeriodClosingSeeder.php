@@ -203,7 +203,12 @@ class DemoPeriodClosingSeeder extends Seeder
     }
 
     /**
-     * Akun laba ditahan = akun equity aktif daun pada COA version FY tersebut (urut kode).
+     * Akun laba ditahan = akun 32000 (Retained Earnings) pada COA version FY tersebut.
+     *
+     * Jangan mengambil akun equity daun pertama (urut kode): pada COA demo akun itu
+     * adalah 31000 Owner Capital, sehingga laba/rugi penutupan tahunan mengurangi modal
+     * disetor dan membuat saldo modal tampak negatif di laporan komparatif (#571 C8).
+     * Bila 32000 tidak ada, baru jatuh ke akun equity daun pertama.
      */
     private function retainedEarningsAccountId(FiscalYear $fiscalYear): ?int
     {
@@ -213,6 +218,16 @@ class DemoPeriodClosingSeeder extends Seeder
 
         if ($coaVersionId === null) {
             return null;
+        }
+
+        $retainedEarningsId = Account::query()
+            ->where('coa_version_id', $coaVersionId)
+            ->where('code', '32000')
+            ->where('is_active', true)
+            ->value('id');
+
+        if ($retainedEarningsId !== null) {
+            return (int) $retainedEarningsId;
         }
 
         return Account::query()
