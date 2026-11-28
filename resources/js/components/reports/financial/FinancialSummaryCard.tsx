@@ -6,6 +6,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { useTranslation } from '@/contexts/i18n-context';
 import { cn } from '@/lib/utils';
 import type { ReactNode } from 'react';
 
@@ -54,6 +55,8 @@ export function FinancialSummaryCard({
     contentClassName,
     hideStatusBorder = false,
 }: Readonly<FinancialSummaryCardProps>) {
+    const { t } = useTranslation();
+
     return (
         <Card
             className={cn(
@@ -69,7 +72,9 @@ export function FinancialSummaryCard({
             <CardHeader className="bg-muted/15">
                 <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1">
-                        <CardTitle className="text-base">Summary</CardTitle>
+                        <CardTitle className="text-base">
+                            {t('reports.financial.summary')}
+                        </CardTitle>
                         <CardDescription className="text-xs">
                             {description}
                         </CardDescription>

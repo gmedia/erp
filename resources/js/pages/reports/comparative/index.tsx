@@ -62,8 +62,16 @@ const emptyComparativeReport: ComparativeReportResponse['report'] = {
 };
 
 const comparativePerformanceSections = [
-    { title: 'Revenue', metric: 'revenues' },
-    { title: 'Expense', metric: 'expenses' },
+    {
+        title: 'Revenue',
+        titleKey: 'reports.financial.section.revenue',
+        metric: 'revenues',
+    },
+    {
+        title: 'Expense',
+        titleKey: 'reports.financial.section.expense',
+        metric: 'expenses',
+    },
 ] as const;
 
 export default function ComparativeReport() {

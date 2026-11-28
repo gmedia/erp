@@ -302,6 +302,54 @@
     },
     "reports": {
         "breadcrumbGroup": "Reports",
+        "financial": {
+            "section": {
+                "assets": "Assets",
+                "liabilities": "Liabilities",
+                "equity": "Equity",
+                "revenue": "Revenue",
+                "expense": "Expense"
+            },
+            "column": {
+                "account": "Account",
+                "current": "Current",
+                "comparison": "Comparison",
+                "change": "Change",
+                "percentage": "%"
+            },
+            "expand_all": "Expand all",
+            "collapse_all": "Collapse all",
+            "no_accounts": "No accounts found",
+            "summary": "Summary",
+            "status": {
+                "profit": "Profit",
+                "loss": "Loss"
+            },
+            "balance_sheet": {
+                "description": "Assets should equal liabilities plus equity.",
+                "total_assets": "Total Assets",
+                "total_liabilities_equity": "Total Liabilities & Equity",
+                "position_summary": "Financial Position Summary",
+                "balanced": "Balanced",
+                "unbalanced": "Unbalanced",
+                "difference": "Difference"
+            },
+            "income_statement": {
+                "description": "Net Income = Total Revenue - Total Expense.",
+                "total_revenue": "Total Revenue",
+                "total_expense": "Total Expense",
+                "net_income": "Net Income",
+                "net_income_comparison": "Net Income (Comparison)",
+                "net_income_change": "Net Income Change",
+                "summary": "Income Summary"
+            },
+            "compare_none": "Compare: None",
+            "compare_with": "Compare: {year}",
+            "none": "None",
+            "loading": "Loading report...",
+            "error": "Error loading report."
+        },
+
         "sections": {
             "operating_header": "Cash Flows from Operating Activities",
             "net_income_source": "Net Income",

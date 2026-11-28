@@ -302,6 +302,54 @@
     },
     "reports": {
         "breadcrumbGroup": "Laporan",
+        "financial": {
+            "section": {
+                "assets": "Aset",
+                "liabilities": "Liabilitas",
+                "equity": "Ekuitas",
+                "revenue": "Pendapatan",
+                "expense": "Beban"
+            },
+            "column": {
+                "account": "Akun",
+                "current": "Saldo Saat Ini",
+                "comparison": "Pembanding",
+                "change": "Perubahan",
+                "percentage": "%"
+            },
+            "expand_all": "Buka semua",
+            "collapse_all": "Tutup semua",
+            "no_accounts": "Tidak ada akun",
+            "summary": "Ringkasan",
+            "status": {
+                "profit": "Laba",
+                "loss": "Rugi"
+            },
+            "balance_sheet": {
+                "description": "Aset harus sama dengan liabilitas ditambah ekuitas.",
+                "total_assets": "Total Aset",
+                "total_liabilities_equity": "Total Liabilitas & Ekuitas",
+                "position_summary": "Ringkasan Posisi Keuangan",
+                "balanced": "Seimbang",
+                "unbalanced": "Tidak Seimbang",
+                "difference": "Selisih"
+            },
+            "income_statement": {
+                "description": "Laba Bersih = Total Pendapatan - Total Beban.",
+                "total_revenue": "Total Pendapatan",
+                "total_expense": "Total Beban",
+                "net_income": "Laba Bersih",
+                "net_income_comparison": "Laba Bersih (Pembanding)",
+                "net_income_change": "Perubahan Laba Bersih",
+                "summary": "Ringkasan Laba Rugi"
+            },
+            "compare_none": "Bandingkan: Tidak Ada",
+            "compare_with": "Bandingkan: {year}",
+            "none": "Tidak Ada",
+            "loading": "Memuat laporan...",
+            "error": "Gagal memuat laporan."
+        },
+
         "sections": {
             "operating_header": "Arus Kas dari Aktivitas Operasi",
             "net_income_source": "Laba Bersih",

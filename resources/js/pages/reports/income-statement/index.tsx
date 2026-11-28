@@ -16,6 +16,7 @@ import {
     FinancialSummaryCard,
 } from '@/components/reports/financial/FinancialSummaryCard';
 import { Separator } from '@/components/ui/separator';
+import { useTranslation } from '@/contexts/i18n-context';
 import { useExport } from '@/hooks/useExport';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -50,6 +51,7 @@ const emptyIncomeStatementReport: IncomeStatementResponse['report'] = {
 };
 
 export default function IncomeStatement() {
+    const { t } = useTranslation();
     const {
         fiscalYears,
         selectedYearId,
@@ -115,8 +117,8 @@ export default function IncomeStatement() {
                 >
                     <FinancialStatusBadge
                         isPositive={isProfit}
-                        positiveLabel="Profit"
-                        negativeLabel="Loss"
+                        positiveLabel={t('reports.financial.status.profit')}
+                        negativeLabel={t('reports.financial.status.loss')}
                     />
                 </FinancialReportHeaderMeta>
             }
@@ -134,6 +136,7 @@ export default function IncomeStatement() {
             <div className="grid min-w-0 gap-6">
                 <FinancialReportSection
                     title="Revenue"
+                    titleKey="reports.financial.section.revenue"
                     nodes={report.revenues || []}
                     total={report.totals?.revenue || 0}
                     comparisonTotal={report.totals?.comparison_revenue}
@@ -144,6 +147,7 @@ export default function IncomeStatement() {
 
                 <FinancialReportSection
                     title="Expense"
+                    titleKey="reports.financial.section.expense"
                     nodes={report.expenses || []}
                     total={report.totals?.expense || 0}
                     comparisonTotal={report.totals?.comparison_expense}
@@ -153,21 +157,27 @@ export default function IncomeStatement() {
                 />
 
                 <FinancialSummaryCard
-                    description="Net Income = Total Revenue - Total Expense."
+                    description={t(
+                        'reports.financial.income_statement.description',
+                    )}
                     hideStatusBorder
                     isPositive={isProfit}
                     status={
                         <FinancialStatusBadge
                             isPositive={isProfit}
-                            positiveLabel="Profit"
-                            negativeLabel="Loss"
+                            positiveLabel={t(
+                                'reports.financial.status.profit',
+                            )}
+                            negativeLabel={t('reports.financial.status.loss')}
                         />
                     }
                 >
                     <div className="grid gap-3 rounded-lg border bg-background p-4">
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-sm text-muted-foreground">
-                                Total Revenue
+                                {t(
+                                    'reports.financial.income_statement.total_revenue',
+                                )}
                             </span>
                             <span className="text-sm font-semibold tabular-nums">
                                 {formatCurrency(totalRevenue)}
@@ -176,7 +186,9 @@ export default function IncomeStatement() {
                         <Separator />
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-sm text-muted-foreground">
-                                Total Expense
+                                {t(
+                                    'reports.financial.income_statement.total_expense',
+                                )}
                             </span>
                             <span className="text-sm font-semibold tabular-nums">
                                 {formatCurrency(totalExpense)}
@@ -185,7 +197,9 @@ export default function IncomeStatement() {
                         <Separator />
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-sm text-muted-foreground">
-                                Net Income
+                                {t(
+                                    'reports.financial.income_statement.net_income',
+                                )}
                             </span>
                             <span
                                 className={cn(
@@ -203,7 +217,9 @@ export default function IncomeStatement() {
                                 <Separator />
                                 <div className="flex items-center justify-between gap-4">
                                     <span className="text-sm text-muted-foreground">
-                                        Net Income (Comparison)
+                                        {t(
+                                            'reports.financial.income_statement.net_income_comparison',
+                                        )}
                                     </span>
                                     <span className="text-sm font-semibold text-muted-foreground tabular-nums">
                                         {formatCurrency(netIncomeComparison)}
@@ -212,7 +228,9 @@ export default function IncomeStatement() {
                                 <Separator />
                                 <div className="flex items-center justify-between gap-4">
                                     <span className="text-sm text-muted-foreground">
-                                        Net Income Change
+                                        {t(
+                                            'reports.financial.income_statement.net_income_change',
+                                        )}
                                     </span>
                                     <span
                                         className={cn(
@@ -232,6 +250,7 @@ export default function IncomeStatement() {
                 <ComputedSectionsCard
                     sections={computedSections}
                     title="Income Summary"
+                    titleKey="reports.financial.income_statement.summary"
                 />
             </div>
         </FinancialReportPageShell>

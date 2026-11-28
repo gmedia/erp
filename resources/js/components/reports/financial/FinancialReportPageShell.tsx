@@ -70,7 +70,7 @@ type FinancialReportPageShellProps = {
     children?: ReactNode;
 };
 
-const translateOr = (
+export const translateOr = (
     t: (key: string) => string,
     key: string,
     fallback: string,
@@ -312,6 +312,8 @@ export function FinancialReportHeaderMeta({
     showComparisonBadge = false,
     children,
 }: Readonly<FinancialReportHeaderMetaProps>) {
+    const { t } = useTranslation();
+
     if (!fiscalYear && !showComparisonBadge && !children) {
         return null;
     }
@@ -326,8 +328,10 @@ export function FinancialReportHeaderMeta({
             {showComparisonBadge && (
                 <Badge variant="outline">
                     {comparisonFiscalYear
-                        ? `Compare: ${comparisonFiscalYear.name}`
-                        : 'Compare: None'}
+                        ? t('reports.financial.compare_with', {
+                              year: comparisonFiscalYear.name,
+                          })
+                        : t('reports.financial.compare_none')}
                 </Badge>
             )}
             {children}
@@ -366,13 +370,13 @@ export function FinancialReportPageShell({
     if (isLoading) {
         content = (
             <div className="flex h-full items-center justify-center p-4">
-                Loading report...
+                {t('reports.financial.loading')}
             </div>
         );
     } else if (hasError) {
         content = (
             <div className="flex h-full items-center justify-center p-4 text-destructive">
-                Error loading report.
+                {t('reports.financial.error')}
             </div>
         );
     } else {
@@ -394,7 +398,11 @@ export function FinancialReportPageShell({
                         <>
                             <div className="flex w-full flex-col gap-1 sm:w-[220px]">
                                 <span className="text-xs font-medium text-muted-foreground">
-                                    Fiscal Year
+                                    {translateOr(
+                                        t,
+                                        'column.fiscal_year',
+                                        'Fiscal Year',
+                                    )}
                                 </span>
                                 <Select
                                     value={String(selectedYearId)}
@@ -469,7 +477,7 @@ export function FinancialReportPageShell({
                                             value="none"
                                             className="text-muted-foreground"
                                         >
-                                            None
+                                            {t('reports.financial.none')}
                                         </SelectItem>
                                         {fiscalYears
                                             .filter(
