@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsFinancialActivity;
 use Database\Factories\JournalEntryFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -67,6 +68,8 @@ class JournalEntry extends Model
 {
     /** @use HasFactory<JournalEntryFactory> */
     use HasFactory;
+
+    use LogsFinancialActivity;
 
     /**
      * The attributes that are mass assignable.

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasCustomerRelation;
 use App\Models\Concerns\HasFinancialTransactionRelations;
+use App\Models\Concerns\LogsFinancialActivity;
 use Database\Factories\ArReceiptFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -78,7 +79,7 @@ use Illuminate\Support\Carbon;
 class ArReceipt extends Model
 {
     /** @use HasFactory<ArReceiptFactory> */
-    use BuildsAttributeCasts, HasCustomerRelation, HasFactory, HasFinancialTransactionRelations;
+    use BuildsAttributeCasts, HasCustomerRelation, HasFactory, HasFinancialTransactionRelations, LogsFinancialActivity;
 
     /**
      * The attributes that are mass assignable.

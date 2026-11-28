@@ -125,6 +125,7 @@ const ApprovalAuditTrail = lazy(
     () => import('./pages/approval-audit-trail/index'),
 );
 const SecurityLogs = lazy(() => import('./pages/security-logs/index'));
+const AuditLogs = lazy(() => import('./pages/audit-logs/index'));
 const MyApprovals = lazy(() => import('./pages/my-approvals/index'));
 const VehicleLoanRequest = lazy(() => import('./pages/vehicle-loans/request'));
 const VehicleLoanPickup = lazy(() => import('./pages/vehicle-loans/pickup'));
@@ -759,6 +760,14 @@ export default function AppRoutes() {
                     element={
                         <P>
                             <SecurityLogs />
+                        </P>
+                    }
+                />
+                <Route
+                    path="/audit-logs"
+                    element={
+                        <P>
+                            <AuditLogs />
                         </P>
                     }
                 />

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasFinancialTransactionRelations;
 use App\Models\Concerns\HasSupplierRelation;
+use App\Models\Concerns\LogsFinancialActivity;
 use Database\Factories\ApPaymentFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -84,7 +85,7 @@ use Illuminate\Support\Carbon;
 class ApPayment extends Model
 {
     /** @use HasFactory<ApPaymentFactory> */
-    use BuildsAttributeCasts, HasFactory, HasFinancialTransactionRelations, HasSupplierRelation;
+    use BuildsAttributeCasts, HasFactory, HasFinancialTransactionRelations, HasSupplierRelation, LogsFinancialActivity;
 
     /**
      * The attributes that are mass assignable.
