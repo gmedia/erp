@@ -257,10 +257,17 @@ class DatabaseSeeder extends Seeder
      */
     private function renumberDemoJournalEntries(int $journalIdBoundary, bool $includeClosingEntries = false): void
     {
+        // Jurnal demo juga punya created_by (admin) dan journal_type general untuk
+        // depresiasi. Kunci renumber hanya untuk jurnal yang benar-benar dibuat
+        // pengguna: selain tipe sistem/penutup dan selain jurnal DEPR- (#503).
         $hasUserJournal = DB::table('journal_entries')
             ->where('id', '<=', $journalIdBoundary)
             ->where('entry_number', 'like', 'JV-%')
             ->whereNotNull('created_by')
+            ->whereNotIn('journal_type', ['system', 'closing', 'st_dispatch', 'st_receive', 'st_shortage'])
+            ->where(fn ($query) => $query
+                ->whereNull('reference')
+                ->orWhere('reference', 'not like', 'DEPR-%'))
             ->exists();
 
         if ($hasUserJournal) {

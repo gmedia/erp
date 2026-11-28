@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Actions\AccountingPosting\PostAssetAcquisitionJournalAction;
 use App\Actions\AccountingPosting\PostAssetDisposalJournalAction;
 use App\Actions\AccountingPosting\PostAssetLossJournalAction;
 use App\Actions\AssetDepreciationRuns\CalculateDepreciationAction;
@@ -120,6 +121,8 @@ class AssetDepreciationNormalizationSeeder extends Seeder
     /**
      * Register (accumulated_depreciation, book_value) = saldo awal opening
      * (jurnal ACQ-* dari PostAssetAcquisitionJournalAction) + total run terposting.
+     * Saldo awal dibaca lewat kode akun 12200, bukan account_id COA aktif, karena
+     * aset lama dijurnal di COA tahun sebelumnya yang sudah diarsipkan.
      * Nilai hardcode di sample aset digantikan agar register sama dengan GL.
      */
     private function syncRegisterFromPostedSources(): void
@@ -133,9 +136,10 @@ class AssetDepreciationNormalizationSeeder extends Seeder
 
             $openingAccumulated = (float) JournalEntryLine::query()
                 ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+                ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
                 ->where('journal_entries.reference', 'ACQ-' . $asset->asset_code)
                 ->where('journal_entries.status', 'posted')
-                ->where('journal_entry_lines.account_id', $asset->accumulated_depr_account_id)
+                ->where('accounts.code', PostAssetAcquisitionJournalAction::ACCUMULATED_DEPRECIATION_ACCOUNT_CODE)
                 ->sum('journal_entry_lines.credit');
 
             $runAccumulated = (float) AssetDepreciationLine::query()

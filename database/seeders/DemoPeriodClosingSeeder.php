@@ -62,6 +62,10 @@ class DemoPeriodClosingSeeder extends Seeder
 
         $this->closeYear($fiscalYear, $periodYear, $user->id, $retainedEarningsAccountId);
 
+        // Jurnal demo diposting pada tanggal dokumennya, bukan saat seeder berjalan,
+        // agar posted_at tidak melewati closed_at periode (#494, W9-494).
+        $this->backdatePostedJournals($fiscalYear);
+
         // Saldo akun neraca tahun lalu dibawa ke COA tahun berjalan lewat account mapping,
         // sehingga laporan yang hanya membaca COA aktif tetap melihat saldo awal (#571).
         $this->carryForwardBalanceSheet($fiscalYear);
@@ -218,6 +222,19 @@ class DemoPeriodClosingSeeder extends Seeder
             ->whereDoesntHave('children')
             ->orderBy('code')
             ->value('id');
+    }
+
+    /**
+     * Samakan posted_at dengan entry_date untuk seluruh jurnal posted tahun yang
+     * ditutup. Data demo tidak "diposting" di masa depan relatif terhadap periode
+     * yang sudah ditutup (#494, W9-494).
+     */
+    private function backdatePostedJournals(FiscalYear $fiscalYear): void
+    {
+        DB::table('journal_entries')
+            ->where('fiscal_year_id', $fiscalYear->id)
+            ->where('status', 'posted')
+            ->update(['posted_at' => DB::raw('entry_date')]);
     }
 
     private function closeMonth(
