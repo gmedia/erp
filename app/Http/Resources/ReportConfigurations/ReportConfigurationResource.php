@@ -32,6 +32,7 @@ class ReportConfigurationResource extends JsonResource
                         'section_type' => $section->section_type,
                         'account_type_filter' => $section->account_type_filter,
                         'account_sub_type_filter' => $section->account_sub_type_filter,
+                        'account_codes' => $section->account_codes,
                         'sign_convention' => $section->sign_convention,
                         'formula' => $section->formula,
                         'is_active' => $section->is_active,

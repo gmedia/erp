@@ -374,6 +374,8 @@ class FinancialReportService
         ];
         $totals['equity'] += $netIncome;
         $totals['comparison_equity'] += $comparisonNetIncome;
+        // Laba tahun berjalan (pendapatan - beban) untuk section ringkasan neraca.
+        $totals['current_year_earnings'] = $netIncome;
 
         $this->appendChangeMetrics($totals, ['assets', 'liabilities', 'equity']);
 
@@ -502,6 +504,7 @@ class FinancialReportService
                 'assets' => 0,
                 'liabilities' => 0,
                 'equity' => 0,
+                'current_year_earnings' => 0,
                 'comparison_assets' => 0,
                 'comparison_liabilities' => 0,
                 'comparison_equity' => 0,
@@ -784,6 +787,15 @@ class FinancialReportService
             $buckets[$bucketKey][] = $this->buildReportItem($account, $balance, $comparisonBalance);
             $totals[$totalKey] += $balance;
             $totals["comparison_{$totalKey}"] += $comparisonBalance;
+
+            // Total per akun dan per sub_type untuk kartu ringkasan
+            // (computed_sections); dipakai EvaluateReportSectionsAction.
+            $totals["account_{$account->code}"] = ($totals["account_{$account->code}"] ?? 0) + $balance;
+            if ($account->sub_type !== null) {
+                $totals[$account->sub_type] = ($totals[$account->sub_type] ?? 0) + $balance;
+                $subTypeKey = "{$account->type}_{$account->sub_type}";
+                $totals[$subTypeKey] = ($totals[$subTypeKey] ?? 0) + $balance;
+            }
         }
 
         return [

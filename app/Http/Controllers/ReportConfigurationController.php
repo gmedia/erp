@@ -101,6 +101,7 @@ class ReportConfigurationController extends Controller
                 'section_type' => $item['section_type'],
                 'account_type_filter' => $item['account_type_filter'] ?? null,
                 'account_sub_type_filter' => $item['account_sub_type_filter'] ?? null,
+                'account_codes' => $item['account_codes'] ?? null,
                 'sign_convention' => $item['sign_convention'] ?? ReportSection::SIGN_NORMAL,
                 'formula' => $item['formula'] ?? null,
                 'is_active' => $item['is_active'] ?? true,

@@ -63,6 +63,18 @@ class EvaluateReportSectionsAction
             return 0.0;
         }
 
+        $accountCodes = $section['account_codes'] ?? null;
+        if (is_array($accountCodes) && $accountCodes !== []) {
+            // Section granular (mis. HPP, beban operasional) menjumlah saldo akun
+            // tertentu dari pohon akun (lihat ReportConfigurationSeeder).
+            $value = 0.0;
+            foreach ($accountCodes as $accountCode) {
+                $value += (float) ($reportTotals["account_{$accountCode}"] ?? 0);
+            }
+
+            return $value;
+        }
+
         $accountType = $section['account_type_filter'] ?? null;
         $subType = $section['account_sub_type_filter'] ?? null;
 
@@ -76,6 +88,19 @@ class EvaluateReportSectionsAction
             return (float) ($reportTotals["{$accountType}_{$subType}"] ?? $reportTotals[$subType] ?? 0);
         }
 
-        return (float) ($reportTotals[$accountType] ?? $reportTotals["{$accountType}s"] ?? 0);
+        return (float) ($reportTotals[$this->totalKeyForType($accountType)] ?? 0);
+    }
+
+    /**
+     * Nama key total per tipe akun. Bentuk jamak tidak selalu `{type}s`
+     * (liability -> liabilities), sehingga dipetakan eksplisit.
+     */
+    private function totalKeyForType(string $accountType): string
+    {
+        return match ($accountType) {
+            'asset' => 'assets',
+            'liability' => 'liabilities',
+            default => $accountType,
+        };
     }
 }

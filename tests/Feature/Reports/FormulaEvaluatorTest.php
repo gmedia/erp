@@ -80,6 +80,20 @@ test('FormulaEvaluatorService handles multi-term formulas', function () {
     expect($result['net_change'])->toBe(700000.0);
 });
 
+test('FormulaEvaluatorService evaluates formulas whose first operand is negative', function () {
+    $service = new FormulaEvaluatorService;
+
+    $sections = collect([
+        ['code' => 'operating_income', 'value' => -143196333.0, 'formula' => null],
+        ['code' => 'non_operating_expense', 'value' => 0.0, 'formula' => null],
+        ['code' => 'income_before_tax', 'value' => 0.0, 'formula' => '{operating_income} - {non_operating_expense}'],
+    ]);
+
+    $result = $service->evaluate($sections);
+
+    expect($result['income_before_tax'])->toBe(-143196333.0);
+});
+
 test('EvaluateReportSectionsAction computes section values from report totals', function () {
     $action = app(EvaluateReportSectionsAction::class);
 
