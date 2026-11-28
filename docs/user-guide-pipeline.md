@@ -402,3 +402,9 @@ Keduanya harus selalu konsisten. Pastikan setiap transisi memiliki action Update
 **J:** Buka halaman detail entity (misalnya asset), lalu buka tab **Timeline**. Tab ini menampilkan seluruh log transisi: dari state mana ke state mana, siapa yang melakukan, kapan, dan komentar yang disertakan.
 
 ---
+
+## Panduan terkait
+
+- [Dasbor Pipeline](./user-guide-pipeline-dashboard.md) — sebaran status dan entitas stale.
+- [Jejak Audit Pipeline](./user-guide-pipeline-audit-trail.md) — riwayat perpindahan status.
+

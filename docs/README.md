@@ -16,6 +16,12 @@ Index for agents and developers. Prefer these paths over inventing new status do
 | `user-guide-*.md` | End-user guides served via `/api/user-guide` |
 | [user-guide-mobile-install.md](./user-guide-mobile-install.md) | Pasang & perbarui APK Android |
 | [user-guide-mobile-app.md](./user-guide-mobile-app.md) | Rilis APK, unduh, verifikasi SHA-256, versi minimum |
+| [user-guide-users.md](./user-guide-users.md) | Akun pengguna yang terhubung dengan karyawan |
+| [user-guide-permissions.md](./user-guide-permissions.md) | Izin akses per karyawan |
+| [user-guide-admin-settings.md](./user-guide-admin-settings.md) | Perusahaan, regional, SMTP, autentikasi, akuntansi |
+| [user-guide-approvals.md](./user-guide-approvals.md) | Alur, delegasi, pemantauan, dan jejak audit persetujuan |
+| [user-guide-pipeline-dashboard.md](./user-guide-pipeline-dashboard.md) | Dasbor sebaran status dan entitas stale |
+| [user-guide-pipeline-audit-trail.md](./user-guide-pipeline-audit-trail.md) | Riwayat perpindahan status pipeline |
 
 ## Mobile
 
@@ -40,7 +46,7 @@ Index for agents and developers. Prefer these paths over inventing new status do
 | Financial | `/financial-dashboard` | [user-guide-financial-dashboard.md](./user-guide-financial-dashboard.md) — KPI / YoY |
 | Aging AR/AP | `/aging-dashboard` | [user-guide-aging-dashboard.md](./user-guide-aging-dashboard.md) |
 | Asset | `/asset-dashboard` | [user-guide-asset-dashboard.md](./user-guide-asset-dashboard.md) |
-| Pipeline | `/pipeline-dashboard` | Covered under pipeline docs / registry |
+| Pipeline | `/pipeline-dashboard` | [user-guide-pipeline-dashboard.md](./user-guide-pipeline-dashboard.md) |
 
 ## Design docs
 
