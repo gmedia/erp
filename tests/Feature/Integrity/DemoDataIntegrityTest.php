@@ -2646,8 +2646,10 @@ invariant('W7-18 current year budget produces within, warning and over variance 
         ->and($statuses)->toContain('over_budget');
 });
 
-// #603 butir 3 — peminjaman kendaraan tersebar di jendela 13 bulan dan tetap mencakup semua stage.
-invariant('W7-18 vehicle loans spread across the demo window with every stage', function () {
+// #603 butir 3 — peminjaman kendaraan tersebar di jendela demo dan tetap mencakup semua stage.
+// #603 sub-langkah 3 — kode VL-2026-* harus konsisten dengan tahun tanggal permintaannya,
+// sehingga seluruh tanggal peminjaman demo jatuh di tahun berjalan (2026).
+invariant('W7-18 vehicle loans spread across the current year with every stage', function () {
     $loans = DB::table('vehicle_loans')->get(['code', 'status', 'start_at']);
 
     expect($loans)->toHaveCount(9, 'Demo harus memuat sembilan peminjaman kendaraan');
@@ -2665,8 +2667,18 @@ invariant('W7-18 vehicle loans spread across the demo window with every stage', 
         'returned',
     ]);
 
-    $windowStart = DemoCalendar::windowStart()->startOfMonth();
-    $windowEnd = now()->startOfMonth();
+    $currentYear = now()->format('Y');
+
+    foreach ($loans as $loan) {
+        expect(Carbon::parse($loan->start_at)->format('Y'))->toBe(
+            $currentYear,
+            "Tanggal peminjaman {$loan->code} harus di tahun {$currentYear} agar konsisten dengan kodenya",
+        );
+        expect($loan->code)->toStartWith(
+            'VL-' . $currentYear . '-',
+            "Kode peminjaman {$loan->code} harus konsisten dengan tahun tanggalnya",
+        );
+    }
 
     $months = $loans
         ->map(fn ($loan): string => Carbon::parse($loan->start_at)->format('Y-m'))
@@ -2674,9 +2686,9 @@ invariant('W7-18 vehicle loans spread across the demo window with every stage', 
         ->sort()
         ->values();
 
-    expect($months->first())->toBe($windowStart->format('Y-m'), 'Peminjaman tertua harus di awal jendela demo')
-        ->and($months->last())->toBe($windowEnd->format('Y-m'), 'Peminjaman terbaru harus di bulan berjalan')
-        ->and((int) $windowStart->diffInMonths($windowEnd))->toBe(DemoCalendar::MONTHS - 1);
+    expect($months->first())->toStartWith($currentYear . '-', 'Peminjaman tertua harus di tahun berjalan')
+        ->and($months->last())->toBe(now()->format('Y-m'), 'Peminjaman terbaru harus di bulan berjalan')
+        ->and($months->count())->toBeGreaterThanOrEqual(5, 'Peminjaman harus tersebar di beberapa bulan');
 });
 
 // #603 review host 2026-11-28 — sebagian besar piutang/utang lunas tepat waktu; hanya

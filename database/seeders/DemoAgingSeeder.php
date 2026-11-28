@@ -54,6 +54,43 @@ class DemoAgingSeeder extends Seeder
         'over_90' => [-106, -126],
     ];
 
+    /**
+     * Nominal invoice terbuka per offset jatuh tempo (hari).
+     *
+     * Nilai sengaja berbeda antar dokumen dan antar bucket agar laporan aging tidak
+     * menampilkan bucket 31–60, 61–90, dan >90 dengan nominal seragam (#603 review
+     * host 2026-11-28). Total overdue tetap di rentang wajar 15–30% dari seluruh
+     * piutang terbuka.
+     *
+     * @var array<int, float>
+     */
+    private const INVOICE_AMOUNTS = [
+        10 => 96000000.0,
+        24 => 104000000.0,
+        -42 => 1850000.0,
+        -56 => 2400000.0,
+        -72 => 2150000.0,
+        -86 => 1700000.0,
+        -102 => 2950000.0,
+        -124 => 1600000.0,
+    ];
+
+    /**
+     * Nominal bill terbuka per offset jatuh tempo (hari). Sama seperti piutang:
+     * tiap dokumen dan bucket punya nominal berbeda, bukan seragam.
+     *
+     * @var array<int, float>
+     */
+    private const BILL_AMOUNTS = [
+        14 => 90000000.0,
+        -45 => 1350000.0,
+        -58 => 1800000.0,
+        -74 => 1650000.0,
+        -88 => 1250000.0,
+        -106 => 2100000.0,
+        -126 => 1400000.0,
+    ];
+
     public function run(): void
     {
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id')
@@ -226,20 +263,22 @@ class DemoAgingSeeder extends Seeder
      *
      * Sebagian besar piutang demo harus belum jatuh tempo (current) dan hanya sebagian
      * kecil yang menunggak, sehingga rasio overdue AR berada di rentang wajar 15-30%
-     * (#603 review host 2026-11-28). Nilai lama membuat hampir seluruh piutang overdue.
+     * (#603 review host 2026-11-28). Nilai lama membuat hampir seluruh piutang overdue
+     * dan nominal tiap bucket seragam.
      */
     private function invoiceAmount(int $offset): float
     {
-        return $offset >= 0 ? 100000000.0 : 2000000.0;
+        return self::INVOICE_AMOUNTS[$offset];
     }
 
     /**
      * Nilai tagihan terbuka per bucket aging. Sama seperti piutang: tagihan lancar
-     * mendominasi, tagihan menunggak kecil tetapi tetap mengisi semua bucket.
+     * mendominasi, tagihan menunggak kecil tetapi tetap mengisi semua bucket dengan
+     * nominal yang bervariasi.
      */
     private function billAmount(int $offset): float
     {
-        return $offset >= 0 ? 90000000.0 : 1500000.0;
+        return self::BILL_AMOUNTS[$offset];
     }
 
     private function seedInvoiceItem(

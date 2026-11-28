@@ -25,12 +25,22 @@ use Illuminate\Support\Str;
 class BudgetSampleDataSeeder extends Seeder
 {
     /**
-     * Rasio realisasi terhadap alokasi untuk tiap status variance.
-     * 0.5 = within_budget, 0.9 = warning, 1.2 = over_budget.
+     * Rasio realisasi terhadap alokasi per akun/periode.
      *
-     * @var list<float>
+     * Tiap akun memakai rasio berbeda agar alokasi tidak tampak sebagai pembagian
+     * balik dari realisasi (persis 50%/90%/120%). Nilai tetap menghasilkan status
+     * within_budget (< 0,8), warning (0,8–1,0), dan over_budget (> 1,0).
+     *
+     * @var array<int, list<float>>
      */
-    private const VARIANCE_RATIOS = [0.5, 0.9, 1.2];
+    private const VARIANCE_RATIOS = [
+        [0.62, 0.88, 1.15],
+        [0.55, 0.92, 1.22],
+        [0.71, 0.85, 1.08],
+    ];
+
+    /** Pembulatan alokasi anggaran agar terlihat seperti rencana, bukan hasil hitung mundur. */
+    private const ALLOCATION_ROUNDING = 500000.0;
 
     public function run(): void
     {
@@ -58,10 +68,12 @@ class BudgetSampleDataSeeder extends Seeder
     private function seedOperationalBudget(int $adminUserId, FiscalYear $fiscalYear): void
     {
         $accounts = $this->accountsByCodes(['51000', '52000', '53000']);
-        $periods = $this->firstMonths($fiscalYear, count(self::VARIANCE_RATIOS));
+        $periods = $this->firstMonths($fiscalYear, count(self::VARIANCE_RATIOS[0]));
         $lines = [];
 
-        foreach ($accounts as $account) {
+        foreach ($accounts as $accountIndex => $account) {
+            $ratios = self::VARIANCE_RATIOS[$accountIndex % count(self::VARIANCE_RATIOS)];
+
             foreach ($periods as $index => $period) {
                 $actual = $this->actualFor($account, $period['start'], $period['end'], $fiscalYear);
 
@@ -69,13 +81,13 @@ class BudgetSampleDataSeeder extends Seeder
                     continue;
                 }
 
-                $ratio = self::VARIANCE_RATIOS[$index % count(self::VARIANCE_RATIOS)];
+                $ratio = $ratios[$index % count($ratios)];
 
                 $lines[] = [
                     'account_id' => $account->id,
                     'period_start' => $period['start']->toDateString(),
                     'period_end' => $period['end']->toDateString(),
-                    'allocated_amount' => round($actual / $ratio, 2),
+                    'allocated_amount' => $this->allocatedAmount($actual, $ratio),
                     'notes' => 'Alokasi anggaran per periode',
                 ];
             }
@@ -111,7 +123,7 @@ class BudgetSampleDataSeeder extends Seeder
                     'account_id' => $account->id,
                     'period_start' => $period['start']->toDateString(),
                     'period_end' => $period['end']->toDateString(),
-                    'allocated_amount' => round($actual * 1.3, 2),
+                    'allocated_amount' => round(($actual * 1.3) / self::ALLOCATION_ROUNDING) * self::ALLOCATION_ROUNDING,
                     'notes' => 'Alokasi anggaran triwulan I',
                 ];
             }
@@ -265,5 +277,20 @@ class BudgetSampleDataSeeder extends Seeder
         return in_array($account->type, ['expense', 'asset'], true)
             ? $debit - $credit
             : $credit - $debit;
+    }
+
+    /**
+     * Alokasi anggaran bulat (kelipatan Rp 500.000) dari rasio target, dengan pengaman
+     * agar status variance tidak berubah karena pembulatan.
+     */
+    private function allocatedAmount(float $actual, float $ratio): float
+    {
+        $rounded = round(($actual / $ratio) / self::ALLOCATION_ROUNDING) * self::ALLOCATION_ROUNDING;
+
+        if ($ratio >= 1.0 && $rounded >= $actual) {
+            $rounded = floor(($actual - 1) / self::ALLOCATION_ROUNDING) * self::ALLOCATION_ROUNDING;
+        }
+
+        return max(self::ALLOCATION_ROUNDING, $rounded);
     }
 }
