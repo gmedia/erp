@@ -82,8 +82,10 @@ Host RAM/CPU is limited. Parallel `Read`/`Edit`/`task` batches have **killed Ope
 - **Jangan** menjalankan `./vendor/bin/sail npx playwright test ...` untuk mengukur performa E2E: itu menambah overlay container dan bukan konfigurasi yang dipakai CI (CI menjalankan `npx playwright test` langsung di runner).
 - `DISABLE_RATE_LIMITING=true` **harus aktif di proses web server di dalam container**, bukan hanya di Artisan CLI. Tanpa ini, E2E gagal dengan `429 Too Many Requests` (limiter `throttle:api` 60/menit). Cara aman tanpa mengubah `.env`: compose override yang menambah environment variable ke service `laravel.test`, lalu `config:cache` sekali supaya request HTTP ikut membaca nilai tersebut.
 - `APP_ADMIN` yang dipakai `global-setup.ts` harus sama dengan admin hasil seed di container (CI pakai `admin@example.com`; host bisa berbeda). Jangan mengubah `.env` — set `APP_ADMIN` di environment proses Playwright.
-- Pre-flight wajib sebelum push: jalankan `npx playwright test --list` dengan daftar direktori `tests/e2e/...` dari step `Run Playwright E2E` di `tests.yml` (99 direktori termasuk `business-flows` dan `misc`; hanya `visual-audit` yang dikecualikan). Saat ini **774 tests di 133 files** (6 shard × ±129 tests); `--list` tanpa argumen menghitung semua spec — bukan angka yang dipakai CI.
-- CI memecah E2E menjadi **6 shard** (`--shard=n/6`, matrix job). Saat menambah/menghapus test/direktori E2E, update angka di atas dan pastikan tiap shard tetap terisi.
+- Pre-flight wajib sebelum push: CI **menemukan direktori E2E secara otomatis** — lihat step `Run Playwright E2E` di `.github/workflows/tests.yml` (perintah `find tests/e2e … | grep -vxF -f .github/ci/e2e-excluded.txt`) dan daftar pengecualian di `.github/ci/e2e-excluded.txt`. Jangan menulis angka direktori/test tetap di dokumen.
+  - Hitung sendiri bila perlu: `find tests/e2e -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | grep -vxF -f .github/ci/e2e-excluded.txt | wc -l` (direktori) dan `npx playwright test --list <dir…>` (jumlah test).
+  - `npx playwright test --list` tanpa argumen menghitung semua spec termasuk yang dikecualikan — bukan angka yang dipakai CI.
+- CI memecah E2E menjadi **6 shard** (`--shard=n/6`, matrix job). Saat menambah/menghapus test/direktori E2E, pastikan tiap shard tetap terisi (tidak perlu memperbarui angka tetap di dokumen).
 - CI memakai **1 worker Playwright per shard**. `PLAYWRIGHT_WORKERS>1` adalah **jalan buntu**: flaky di bawah beban, dan menaikkan `PHP_CLI_SERVER_WORKERS` ke 8 **tetap gagal** (E2E hang >50m, `waitForResponse` timeout massal — lihat #219). Jangan ulangi eksperimen ini; konfigurasi stabil 6 shard × 1 worker.
 - **`sail test --parallel` ditolak** di repo ini. Tanpa `RefreshDatabase` di base `tests/TestCase.php`, worker paralel bertabrakan di DB `testing` (`Table 'testing.*' doesn't exist`). Menambahkan `RefreshDatabase` global pun tidak menolong: uji lokal → 41 failed / 2129 passed, **483s (lebih lambat dari serial ~314s)** karena state eksternal (cache/storage) dibagi antar worker. Pertahankan Pest serial (lihat #162/#183).
 
@@ -292,8 +294,8 @@ ERP ini dipasang di banyak perusahaan berbeda (on premise). Kode, UI, dan dokume
 
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-11-09
-**Commit:** 446c9498
+**Generated:** 2026-11-28
+**Commit:** 4dba28a1
 **Branch:** main
 
 ## OVERVIEW
@@ -306,10 +308,10 @@ ERP system (gmedia) — Laravel 12 JSON API backend + React 19 full SPA frontend
 erp/
 ├── app/                # Backend: Actions, Domain, DTOs, Exports, Http, Models, Services
 ├── resources/js/       # Frontend SPA: React + TypeScript + Shadcn UI + TanStack Query
-├── routes/api/         # 63 modular route files (auto-included by routes/api.php)
-├── database/           # Migrations (106), Factories (88), Seeders (29)
-├── tests/              # Pest (Feature/Unit) + Playwright E2E (106 specs)
-├── docs/               # Design docs, module registry, 35 user guides
+├── routes/api/         # 71 modular route files (auto-included by routes/api.php)
+├── database/           # Migrations (143), Factories (96), Seeders (37)
+├── tests/              # Pest (Feature/Unit) + Playwright E2E (194 specs)
+├── docs/               # Design docs, module registry, 41 user guides
 ├── .claude/            # Agent skills, commands, subagents (OpenCode + Claude CLI)
 ├── .github/            # CI workflows, issue templates
 ├── .gitlab/            # GitLab CI deploy include (.gitlab-ci.yml)
@@ -332,15 +334,15 @@ erp/
 | Shared backend traits | `app/Actions/Concerns/`, `app/Http/Controllers/Concerns/` | `InteractsWithExportFilters`, `LoadsResourceRelations` |
 | Entity configs | `resources/js/utils/entityConfigs.ts` | Simple vs Complex config |
 | Form schemas | `resources/js/utils/schemas.ts` (or per-module) | Zod validation |
-| Type definitions | `resources/js/types/` | 46 type files |
-| Hooks | `resources/js/hooks/` | 30 hooks; `useEntityForm`, `useCrudQuery`, `useCrudMutations` |
-| User guide content | `docs/user-guide-*.md` | 35 guides served via `/api/user-guide` |
+| Type definitions | `resources/js/types/` | 47 type files |
+| Hooks | `resources/js/hooks/` | 34 hooks; `useEntityForm`, `useCrudQuery`, `useCrudMutations` |
+| User guide content | `docs/user-guide-*.md` | 41 guides served via `/api/user-guide` |
 | User guide page | `resources/js/pages/user-guide/index.tsx` | Renders markdown from API |
 | Module metadata | `docs/module-registry.md` | Full E2E + Pest registry |
 | Dev patterns | `docs/development-patterns.md` | Canonical implementation guide |
 | UI design rules | `docs/ui-design-rules.md` | Aturan pembuatan + review/koreksi UI konsisten antar modul |
-| Migrations/factories/seeders | `database/` | 106 / 88 / 29 — see `database/AGENTS.md` |
-| Backend route files | `routes/api/` | 63 files, 406 defs — see `routes/AGENTS.md` |
+| Migrations/factories/seeders | `database/` | 143 / 96 / 37 — see `database/AGENTS.md` |
+| Backend route files | `routes/api/` | 71 files, 475 routes — see `routes/AGENTS.md` |
 | CI pipelines | `.github/workflows/`, `.gitlab/ci/` | Pest + Playwright + deploy |
 | Session handoff | `gmedia/erp/issues` | Active claim + checkpoint (`task.md` deprecated) |
 | Skills/templates | `.claude/skills/` | Scaffolding for new features |
@@ -437,12 +439,12 @@ sail artisan ide-helper:models -RW    # Model PHPDoc
 
 ## NOTES
 
-- **2,931 files** in tracked source (1,998 PHP, 479 TSX, 255 TS) — large codebase.
-- **63 API route files** / **406 route definitions** — auto-included by `routes/api.php`.
-- **89 models**, **106 migrations**, **88 factories**, **29 seeders** — near 1:1 model/factory ratio.
-- **61 backend action modules**, **48 domain filter modules**, **24 DTO modules**.
-- **63 frontend page dirs** (98 files), **57 component dirs**, **106 Playwright specs**.
-- **104 Pest test groups** (`->group('...')`); 67 Feature dirs, 10 Unit dirs.
+- **3,695 files** in tracked source (2,459 PHP, 532 TSX, 370 TS) — large codebase.
+- **71 API route files** / **475 API routes** (`sail artisan route:list --path=api`) — auto-included by `routes/api.php`.
+- **100 models**, **143 migrations**, **96 factories**, **37 seeders** — near 1:1 model/factory ratio.
+- **67 backend action modules**, **48 domain filter modules**, **24 DTO modules**.
+- **67 frontend page dirs** (108 files), **61 component dirs**, **194 Playwright specs** in 104 dirs (CI excludes `visual-audit`).
+- **158 Pest test groups** (`->group('...')`); 80 Feature dirs, 13 Unit dirs.
 - **SonarCloud** integrated — quality gate, duplication, coverage tracked.
 - **Sentry** for error monitoring.
 - **Octane** for performance (production).

@@ -2,7 +2,7 @@
 
 ## OVERVIEW
 
-63 module files under `routes/api/`, auto-required inside the `auth:sanctum` group in `routes/api.php`. 406 route definitions; `routes/web.php` is the SPA catch-all only.
+71 module files under `routes/api/`, auto-required inside the `auth:sanctum` group in `routes/api.php`. 475 API routes (`sail artisan route:list --path=api`); `routes/web.php` is the SPA catch-all only.
 
 ## STRUCTURE
 

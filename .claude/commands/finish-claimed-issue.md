@@ -4,7 +4,7 @@ description: "Use when: melanjutkan work item yang sudah diklaim di host ini dar
 
 # Lanjutkan Issue yang Sudah Diklaim (host eksekusi)
 
-Prompt ini dipakai di host **tempat issue diklaim** (mis. `dest-1` untuk #117). Ia melanjutkan pekerjaan dari branch lokal yang sudah ada sampai PR dan verifikasi label. File ini ikut ter-`pull` lewat `git pull` di `main`.
+Prompt ini dipakai di host **tempat issue diklaim** (mis. `<host>` untuk #117). Ia melanjutkan pekerjaan dari branch lokal yang sudah ada sampai PR dan verifikasi label. File ini ikut ter-`pull` lewat `git pull` di `main`.
 
 Prasyarat: langkah 1–6 checklist multi-server sudah PASS (lihat `.claude/commands/verify-second-server.md` dan komentar `<!-- multi-server-checklist -->` di issue #119).
 
