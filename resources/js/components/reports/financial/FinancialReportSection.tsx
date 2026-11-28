@@ -275,7 +275,9 @@ export function FinancialReportSection({
             <CardHeader className="pb-2">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex flex-wrap items-center gap-2">
-                        <CardTitle className="text-lg">{sectionTitle}</CardTitle>
+                        <CardTitle className="text-lg">
+                            {sectionTitle}
+                        </CardTitle>
                         <div className="flex items-center gap-2">
                             <Button
                                 size="sm"

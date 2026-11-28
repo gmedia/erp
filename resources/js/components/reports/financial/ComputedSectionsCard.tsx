@@ -76,7 +76,11 @@ export function ComputedSectionsCard({
     sections,
     title = 'Computed Sections',
     titleKey,
-}: Readonly<{ sections: ComputedSection[]; title?: string; titleKey?: string }>) {
+}: Readonly<{
+    sections: ComputedSection[];
+    title?: string;
+    titleKey?: string;
+}>) {
     const { t } = useTranslation();
 
     if (sections.length === 0) {
@@ -84,7 +88,8 @@ export function ComputedSectionsCard({
     }
 
     const sorted = [...sections].sort((a, b) => a.sort_order - b.sort_order);
-    const cardTitle = titleKey && t(titleKey) !== titleKey ? t(titleKey) : title;
+    const cardTitle =
+        titleKey && t(titleKey) !== titleKey ? t(titleKey) : title;
 
     return (
         <Card>

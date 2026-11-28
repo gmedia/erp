@@ -165,9 +165,7 @@ export default function IncomeStatement() {
                     status={
                         <FinancialStatusBadge
                             isPositive={isProfit}
-                            positiveLabel={t(
-                                'reports.financial.status.profit',
-                            )}
+                            positiveLabel={t('reports.financial.status.profit')}
                             negativeLabel={t('reports.financial.status.loss')}
                         />
                     }
