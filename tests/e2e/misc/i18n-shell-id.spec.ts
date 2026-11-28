@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { APPLY_FILTERS_LABEL, login } from '../helpers';
+import { createPurchaseOrder } from '../purchase-orders/helpers';
 
 const LOCALE_KEY = 'app_locale';
 
@@ -59,12 +60,16 @@ test.describe('i18n shell (locale id)', () => {
         await login(page);
         await page.goto('/purchase-orders', { waitUntil: 'domcontentloaded' });
 
+        // Seed data spans 13 months, so a draft PO is not guaranteed to be on
+        // the first page. Create one so the badge assertion is deterministic.
+        await createPurchaseOrder(page);
+
         await expect(
             page.getByRole('columnheader', { name: 'Status' }),
         ).toBeVisible({ timeout: 15000 });
         await expect(
             page.getByText('Draf', { exact: true }).first(),
-        ).toBeVisible();
+        ).toBeVisible({ timeout: 15000 });
         await expect(page.getByText('Draft', { exact: true })).toHaveCount(0);
     });
 });
@@ -80,12 +85,16 @@ test.describe('i18n shell (locale en)', () => {
         await login(page);
         await page.goto('/purchase-orders', { waitUntil: 'domcontentloaded' });
 
+        // Seed data spans 13 months, so a draft PO is not guaranteed to be on
+        // the first page. Create one so the badge assertion is deterministic.
+        await createPurchaseOrder(page);
+
         await expect(
             page.getByRole('columnheader', { name: 'Status' }),
         ).toBeVisible({ timeout: 15000 });
         await expect(
             page.getByText('Draft', { exact: true }).first(),
-        ).toBeVisible();
+        ).toBeVisible({ timeout: 15000 });
         await expect(page.getByText('Draf', { exact: true })).toHaveCount(0);
     });
 
