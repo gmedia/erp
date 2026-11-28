@@ -6,8 +6,6 @@ Report Configurations adalah modul untuk mendefinisikan template dan layout lapo
 
 Modul ini memungkinkan akuntan membuat struktur laporan kustom tanpa perubahan kode program. Laporan seperti Balance Sheet, Income Statement, dan Trial Balance dapat mereferensikan konfigurasi ini untuk menampilkan data sesuai kebutuhan bisnis.
 
-[Screenshot: Halaman daftar Report Configurations dengan tabel data]
-
 ---
 
 ## Menu & Navigasi
@@ -30,8 +28,6 @@ Halaman Report Configurations menampilkan tabel semua konfigurasi dengan kolom:
 | Name | Nama konfigurasi | Ya |
 | Actions | Tombol View, Edit, Delete | Tidak |
 
-[Screenshot: Tabel Report Configurations dengan kolom Code, Name, Actions]
-
 ### Fitur pada Tabel
 
 | Fitur | Deskripsi |
@@ -48,8 +44,6 @@ Halaman Report Configurations menampilkan tabel semua konfigurasi dengan kolom:
 1. Buka halaman **Report Configurations** (`/report-configurations`)
 2. Klik tombol **Add New** di bagian atas tabel
 3. Isi form dengan data konfigurasi:
-
-[Screenshot: Form Add New Report Configuration]
 
 | Field | Keterangan | Wajib |
 |-------|------------|-------|
@@ -71,8 +65,6 @@ Halaman Report Configurations menampilkan tabel semua konfigurasi dengan kolom:
 1. Klik tombol **View** (ikon mata) pada baris konfigurasi
 2. Modal detail akan muncul menampilkan informasi:
 
-[Screenshot: Modal View Report Configuration Details]
-
 Informasi yang ditampilkan:
 - Code
 - Name
@@ -88,8 +80,6 @@ Informasi yang ditampilkan:
 3. Ubah field yang diperlukan
 4. Klik **Save** untuk menyimpan perubahan
 
-[Screenshot: Form Edit Report Configuration]
-
 ### Catatan Edit
 
 - Code dapat diubah selama masih unique
@@ -103,8 +93,6 @@ Informasi yang ditampilkan:
 2. Konfirmasi penghapusan pada dialog yang muncul
 3. Klik **Delete** untuk menghapus permanen
 
-[Screenshot: Dialog konfirmasi delete Report Configuration]
-
 ### Peringatan Penghapusan
 
 Konfigurasi **tidak bisa dihapus** jika:
@@ -117,8 +105,6 @@ Konfigurasi **tidak bisa dihapus** jika:
 
 1. Klik tombol **Export** di bagian atas tabel
 2. File Excel akan diunduh dengan semua data konfigurasi
-
-[Screenshot: Tombol Export dan hasil file Excel]
 
 ### Kolom dalam Export
 
@@ -156,8 +142,6 @@ Laporan laba rugi dapat menggunakan konfigurasi untuk:
 Laporan daftar saldo dapat menggunakan konfigurasi untuk:
 - Memilih akun-akun yang ditampilkan
 - Mengatur format tampilan (dengan atau tanpa saldo awal)
-
-[Screenshot: Dropdown pemilihan konfigurasi di halaman laporan keuangan]
 
 ---
 
@@ -203,7 +187,7 @@ Tidak ada batasan teknis. Namun, disarankan untuk membuat konfigurasi yang benar
 
 **Q: Bagaimana jika konfigurasi yang digunakan sudah diubah?**
 
-Perubahan pada konfigurasi akan langsung berlaku untuk laporan yang menggunakannya. Jika laporan historical memerlukan format lama, buat konfigurasi baru dengan versi berbeda daripada mengubah konfigurasi existing.
+Perubahan pada konfigurasi akan langsung berlaku untuk laporan yang menggunakannya. Jika laporan historical memerlukan format lama, buat konfigurasi baru dengan versi berbeda daripada mengubah konfigurasi yang ada.
 
 **Q: Bisakah konfigurasi dicopy atau diduplikasi?**
 
@@ -238,7 +222,7 @@ Pastikan konfigurasi sudah tersimpan dengan benar. Refresh halaman laporan dan p
 
 ### Error "Code already exists" saat save
 
-Code yang dimasukkan sudah digunakan oleh konfigurasi lain. Gunakan code yang berbeda atau edit konfigurasi existing.
+Code yang dimasukkan sudah digunakan oleh konfigurasi lain. Gunakan code yang berbeda atau edit konfigurasi yang ada.
 
 ### Laporan tidak sesuai dengan konfigurasi
 

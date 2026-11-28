@@ -13,8 +13,8 @@ Setiap rekonsiliasi bank memiliki komponen utama:
 - **Difference**: Selisih antara saldo bank dan saldo buku (harus nol untuk rekonsilasi lengkap)
 
 Status rekonsiliasi:
-- **In Progress**: Proses pencocokan masih berlangsung
-- **Reconciled**: Rekonsilasi selesai dan saldo seimbang
+- **Sedang Berjalan**: Proses pencocokan masih berlangsung
+- **Direkonsiliasi**: Rekonsilasi selesai dan saldo seimbang
 
 ## Menu & Navigasi
 
@@ -40,8 +40,6 @@ Status rekonsiliasi:
    - **Statement Ending Balance**: Masukkan saldo akhir sesuai bank statement
 4. Klik **Save** untuk menyimpan
 
-[Screenshot: Form pembuatan rekonsiliasi bank baru dengan field Bank Account, Fiscal Year, Statement Date, dan Statement Ending Balance]
-
 Sistem akan otomatis menghitung:
 - **Internal Book Balance**: Saldo buku berdasarkan transaksi kas/bank yang tercatat
 - **Difference**: Selisih antara Statement Ending Balance dan Internal Book Balance
@@ -50,7 +48,7 @@ Sistem akan otomatis menghitung:
 
 ### Langkah-langkah:
 
-1. Buka detail rekonsiliasi yang berstatus **In Progress**
+1. Buka detail rekonsiliasi yang berstatus **Sedang Berjalan**
 2. Klik tombol **Import Statement** di toolbar
 3. Pilih file CSV atau Excel dari komputer Anda
 4. Pastikan format file sesuai dengan template yang disediakan:
@@ -58,8 +56,6 @@ Sistem akan otomatis menghitung:
    - Format tanggal: YYYY-MM-DD atau DD/MM/YYYY
    - Amount: Angka positif untuk penerimaan, negatif untuk pengeluaran
 5. Klik **Import** untuk memproses
-
-[Screenshot: Dialog import bank statement dengan preview data]
 
 Setelah import berhasil, sistem akan menampilkan daftar transaksi dari bank statement yang siap dicocokkan.
 
@@ -82,8 +78,6 @@ Untuk transaksi yang tidak terdeteksi otomatis:
 3. Klik tombol **Match** untuk menghubungkan keduanya
 4. Jika tidak ada transaksi yang cocok, Anda dapat membuat jurnal penyesuaian langsung
 
-[Screenshot: Tampilan pencocokan manual dengan dua panel: bank statement items dan internal transactions]
-
 ### Unmatched Items
 
 Transaksi yang belum dicocokkan akan muncul di bagian **Unmatched Items**:
@@ -105,10 +99,8 @@ Anda perlu menyelesaikan semua unmatched items sebelum menyelesaikan rekonsilias
 1. Pastikan semua transaksi sudah direkonsiliasi
 2. Verifikasi nilai **Difference** = 0
 3. Klik tombol **Complete Reconciliation**
-4. Sistem akan mengubah status menjadi **Reconciled**
-5. Rekonsiliasi tidak dapat diedit setelah berstatus Reconciled
-
-[Screenshot: Halaman detail rekonsiliasi dengan summary matched/unmatched items dan tombol Complete Reconciliation]
+4. Sistem akan mengubah status menjadi **Direkonsiliasi**
+5. Rekonsiliasi tidak dapat diedit setelah berstatus Direkonsiliasi
 
 ## 5. Laporan Rekonsiliasi
 
@@ -129,7 +121,7 @@ Setelah rekonsiliasi selesai, Anda dapat melihat laporan yang berisi:
 
 Endpoint export: `/api/bank-reconciliations/export`
 
-## 6. Mengelola Rekonsiliasi Existing
+## 6. Mengelola Rekonsiliasi yang Ada
 
 ### Melihat Detail
 
@@ -140,17 +132,15 @@ Endpoint export: `/api/bank-reconciliations/export`
 ### Mengedit Rekonsiliasi
 
 1. Klik tombol **Edit** (ikon pensil) pada baris rekonsiliasi
-2. Hanya rekonsiliasi berstatus **In Progress** yang dapat diedit
+2. Hanya rekonsiliasi berstatus **Sedang Berjalan** yang dapat diedit
 3. Ubah data yang diperlukan dan klik **Save**
 
 ### Menghapus Rekonsiliasi
 
 1. Klik tombol **Delete** (ikon tempat sampah) pada baris rekonsiliasi
 2. Konfirmasi penghapusan pada dialog yang muncul
-3. Hanya rekonsiliasi berstatus **In Progress** yang dapat dihapus
+3. Hanya rekonsiliasi berstatus **Sedang Berjalan** yang dapat dihapus
 4. Penghapusan tidak dapat dibatalkan
-
-[Screenshot: Dialog konfirmasi penghapusan rekonsiliasi]
 
 ## FAQ & Tips
 
@@ -168,7 +158,7 @@ Outstanding checks (cek yang sudah dikeluarkan tapi belum dicairkan) tidak perlu
 
 ### Apakah rekonsiliasi bisa dibatalkan setelah selesai?
 
-Tidak. Setelah rekonsiliasi berstatus **Reconciled**, data tidak dapat diubah. Jika terjadi kesalahan, Anda perlu membuat rekonsiliasi baru dengan adjustment yang sesuai.
+Tidak. Setelah rekonsiliasi berstatus **Direkonsiliasi**, data tidak dapat diubah. Jika terjadi kesalahan, Anda perlu membuat rekonsiliasi baru dengan adjustment yang sesuai.
 
 ### Format file import apa yang didukung?
 
@@ -212,7 +202,7 @@ Buka halaman Bank Reconciliations di `/bank-reconciliations`, klik tombol **Add*
 
 **Q: Bagaimana cara mengimpor bank statement?**
 
-Buka detail rekonsiliasi berstatus **In Progress**, klik tombol **Import Statement**, lalu pilih file CSV atau Excel. Pastikan file memiliki kolom wajib Date, Description, dan Amount dengan format tanggal YYYY-MM-DD atau DD/MM/YYYY, serta nilai Amount positif untuk penerimaan dan negatif untuk pengeluaran. Klik **Import** untuk memproses. Setelah berhasil, transaksi siap dicocokkan.
+Buka detail rekonsiliasi berstatus **Sedang Berjalan**, klik tombol **Import Statement**, lalu pilih file CSV atau Excel. Pastikan file memiliki kolom wajib Date, Description, dan Amount dengan format tanggal YYYY-MM-DD atau DD/MM/YYYY, serta nilai Amount positif untuk penerimaan dan negatif untuk pengeluaran. Klik **Import** untuk memproses. Setelah berhasil, transaksi siap dicocokkan.
 
 **Q: Bagaimana cara kerja pencocokan (matching) transaksi?**
 
@@ -220,7 +210,7 @@ Ada dua mode. Auto-Matching mencocokkan transaksi secara otomatis berdasarkan ni
 
 **Q: Apa perbedaan status In Progress dan Reconciled?**
 
-Status **In Progress** berarti proses pencocokan masih berlangsung dan data masih dapat diedit atau dihapus. Status **Reconciled** berarti rekonsiliasi sudah selesai dan saldo seimbang; data tidak dapat diubah lagi setelah berstatus Reconciled.
+Status **Sedang Berjalan** berarti proses pencocokan masih berlangsung dan data masih dapat diedit atau dihapus. Status **Direkonsiliasi** berarti rekonsiliasi sudah selesai dan saldo seimbang; data tidak dapat diubah lagi setelah berstatus Direkonsiliasi.
 
 **Q: Apa arti nilai Difference pada rekonsiliasi?**
 
@@ -228,7 +218,7 @@ Difference adalah selisih antara Statement Ending Balance (saldo laporan bank) d
 
 **Q: Mengapa hanya rekonsiliasi In Progress yang bisa dihapus?**
 
-Pembatasan ini menjaga integritas audit trail. Rekonsiliasi berstatus **Reconciled** sudah final dan menjadi catatan resmi keuangan, sehingga tidak boleh dihapus atau diubah. Hanya rekonsiliasi yang masih dalam proses (In Progress) yang dapat dihapus karena belum dianggap sebagai catatan final. Penghapusan tidak dapat dibatalkan.
+Pembatasan ini menjaga integritas audit trail. Rekonsiliasi berstatus **Direkonsiliasi** sudah final dan menjadi catatan resmi keuangan, sehingga tidak boleh dihapus atau diubah. Hanya rekonsiliasi yang masih dalam proses (Sedang Berjalan) yang dapat dihapus karena belum dianggap sebagai catatan final. Penghapusan tidak dapat dibatalkan.
 
 **Q: Bagaimana cara mengekspor data rekonsiliasi?**
 
@@ -244,4 +234,4 @@ Outstanding checks (cek yang sudah dikeluarkan tapi belum dicairkan) tidak perlu
 
 **Q: Apa yang harus dilakukan jika terjadi kesalahan setelah rekonsiliasi selesai?**
 
-Rekonsiliasi berstatus **Reconciled** tidak dapat diedit atau dibatalkan. Jika ditemukan kesalahan, buat rekonsiliasi baru dengan adjustment yang sesuai untuk mengoreksi data. Karena itu, periksa kembali semua matched dan unmatched items serta pastikan nilai Difference benar-benar nol sebelum menekan tombol **Complete Reconciliation**.
+Rekonsiliasi berstatus **Direkonsiliasi** tidak dapat diedit atau dibatalkan. Jika ditemukan kesalahan, buat rekonsiliasi baru dengan adjustment yang sesuai untuk mengoreksi data. Karena itu, periksa kembali semua matched dan unmatched items serta pastikan nilai Difference benar-benar nol sebelum menekan tombol **Complete Reconciliation**.

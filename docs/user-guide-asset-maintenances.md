@@ -2,16 +2,14 @@
 
 ## Gambaran Umum
 
-Modul Asset Maintenances mencatat jadwal dan riwayat perawatan aset perusahaan. Setiap perawatan memiliki tipe (preventive, corrective, calibration, other), status, jadwal, dan biaya. Terintegrasi dengan modul Assets dan Supplier untuk tracking perawatan lengkap.
+Modul Asset Maintenances mencatat jadwal dan riwayat perawatan aset perusahaan. Setiap perawatan memiliki tipe (preventive, corrective, calibration, other), status, jadwal, dan biaya. Terintegrasi dengan modul Aset dan Supplier untuk pelacakan perawatan lengkap.
 
 Fitur utama:
 - Penjadwalan perawatan preventif dan korektif
-- Tracking status perawatan (scheduled, in_progress, completed, cancelled)
+- Pelacakan status perawatan (scheduled, in_progress, completed, cancelled)
 - Pencatatan biaya perawatan dan supplier/vendor
 - Integrasi dengan data aset (nama, kode, lokasi)
 - Export data ke Excel
-
-[Screenshot: Daftar Asset Maintenances]
 
 ## Menu & Navigasi
 
@@ -44,8 +42,6 @@ Halaman `/asset-maintenances` menampilkan tabel perawatan:
 
 **Sorting:** Semua kolom sortable.
 
-[Screenshot: Tabel Asset Maintenances dengan filter]
-
 ## 2. Membuat Perawatan Baru
 
 Klik tombol **Add** untuk membuka form perawatan.
@@ -64,8 +60,6 @@ Klik tombol **Add** untuk membuka form perawatan.
 - Cost: biaya perawatan (opsional)
 - Notes: catatan atau deskripsi pekerjaan (opsional)
 
-[Screenshot: Form Asset Maintenance]
-
 Klik **Save**. Perawatan dibuat dengan status **scheduled**.
 
 ## 3. Workflow Perawatan
@@ -81,7 +75,7 @@ Klik **Save**. Perawatan dibuat dengan status **scheduled**.
 
 1. Buka detail perawatan
 2. Klik **Edit**
-3. Ubah status menjadi **Completed**
+3. Ubah status menjadi **Selesai**
 4. Isi **Performed Date** dan **Cost** (jika ada)
 5. Klik **Save**
 

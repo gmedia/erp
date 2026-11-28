@@ -17,8 +17,6 @@ Kategori aset menjadi fondasi untuk:
 
 Modul ini berada di grup menu **Aset** dan dapat diakses melalui navigasi sidebar.
 
-[Screenshot: Sidebar menu dengan grup Asset dan submenu Asset Categories]
-
 ## 1. Menampilkan Daftar Kategori Aset
 
 Halaman utama Asset Categories menampilkan tabel dengan kolom:
@@ -36,13 +34,9 @@ Halaman utama Asset Categories menampilkan tabel dengan kolom:
 - Pagination: navigasi halaman dengan kontrol di bagian bawah tabel
 - Row selection: checkbox di kolom pertama untuk seleksi batch (tanpa checkbox di header)
 
-[Screenshot: Tabel Asset Categories dengan 5 baris data sample]
-
 ### 1.1 Mencari Kategori Aset
 
 Gunakan field search di toolbar atas tabel untuk memfilter data.
-
-[Screenshot: Search field dengan placeholder "Search asset categories..."]
 
 Ketik kata kunci dan tekan Enter. Sistem akan memfilter hasil berdasarkan kode atau nama kategori.
 
@@ -57,13 +51,9 @@ Dialog menampilkan:
 - Created At (format lokal)
 - Updated At (format lokal)
 
-[Screenshot: View dialog Asset Category dengan detail lengkap]
-
 ## 2. Menambah Kategori Aset Baru
 
 Klik tombol **Add New Asset Category** di toolbar atas tabel.
-
-[Screenshot: Toolbar dengan tombol Add New Asset Category]
 
 Form input memiliki 3 field:
 
@@ -72,8 +62,6 @@ Form input memiliki 3 field:
 | Code | Text | Ya | e.g., KND |
 | Name | Text | Ya | e.g., Kendaraan |
 | Default Useful Life (Months) | Number | Ya | e.g., 48 |
-
-[Screenshot: Form Add New Asset Category dengan 3 input field]
 
 **Catatan field:**
 - **Code**: Kode singkat unik untuk identifikasi kategori. Gunakan format konsisten (misal 3-4 karakter uppercase).
@@ -86,17 +74,13 @@ Setelah isi semua field, klik **Save**. Dialog akan tertutup dan kategori baru m
 
 Klik tombol **Edit** (ikon pensil) pada baris kategori yang ingin diubah.
 
-[Screenshot: Baris tabel dengan ikon Edit aktif]
+Dialog Edit akan terbuka dengan nilai yang ada. Ubah field yang diperlukan dan klik **Save**.
 
-Dialog Edit akan terbuka dengan nilai existing. Ubah field yang diperlukan dan klik **Save**.
-
-Perubahan pada Default Useful Life tidak akan retroactively mempengaruhi aset yang sudah ada. Aset existing tetap menggunakan masa manfaat yang sudah diset pada saat registrasi.
+Perubahan pada Default Useful Life tidak akan mempengaruhi secara retroaktif aset yang sudah ada. Aset yang ada tetap menggunakan masa manfaat yang sudah diset pada saat registrasi.
 
 ## 4. Menghapus Kategori Aset
 
 Klik tombol **Delete** (ikon trash) pada baris kategori.
-
-[Screenshot: Konfirmasi dialog delete dengan warning message]
 
 Sistem akan menampilkan konfirmasi:
 
@@ -109,8 +93,6 @@ Klik **Delete** untuk konfirmasi atau **Cancel** untuk membatalkan.
 ## 5. Export Data Kategori Aset
 
 Klik tombol **Export** di toolbar untuk mengunduh data dalam format Excel (.xlsx).
-
-[Screenshot: Toolbar dengan tombol Export]
 
 File export berisi kolom:
 - ID
@@ -158,8 +140,6 @@ Ya. Asset Depreciation Runs menggunakan useful life untuk menghitung depresiasi 
 - Formula: `(Cost - Salvage Value) / Useful Life Months`
 - Aset tanpa useful life eksplisit akan menggunakan default dari kategori
 
-[Screenshot: Dialog form dengan highlight pada field Default Useful Life]
-
 **Q:** Bagaimana cara membuat kategori aset baru dengan benar?
 
 **J:** Klik tombol **Add New Asset Category** di toolbar. Isi tiga field wajib: Code (kode unik, disarankan 3-4 karakter uppercase seperti "KND" untuk Kendaraan), Name (nama deskriptif seperti "Kendaraan Operasional"), dan Default Useful Life dalam bulan (misal 48 untuk 4 tahun). Klik **Save**. Kategori akan langsung muncul di tabel. Pastikan Code tidak duplikat dengan kategori yang sudah ada karena sistem akan menolak kode yang sama.
@@ -180,7 +160,7 @@ Ya. Asset Depreciation Runs menggunakan useful life untuk menghitung depresiasi 
 
 **J:** Klik tombol **Export** di toolbar atas tabel. Sistem akan mengunduh file Excel (.xlsx) yang berisi seluruh data kategori aset sesuai filter dan pencarian yang sedang aktif. Kolom yang diekspor meliputi: ID, Code, Name, Default Useful Life (Months), Created At, dan Updated At. File dapat langsung dibuka di Microsoft Excel, Google Sheets, atau aplikasi spreadsheet lainnya.
 
-**Q:** Apa hubungan antara kategori aset dengan modul Assets dan Asset Models?
+**Q:** Apa hubungan antara kategori aset dengan modul Aset dan Asset Models?
 
 **J:** Kategori aset adalah data master yang menjadi acuan untuk dua modul lain: (1) **Assets** -- setiap aset wajib memiliki satu kategori yang menentukan kelompok aset tersebut, (2) **Asset Models** -- saat membuat model aset baru, pilih kategori dan sistem akan otomatis mengisi default useful life dari kategori tersebut. Kategori juga mempengaruhi laporan dan perhitungan depresiasi karena sistem mengelompokkan aset berdasarkan kategori.
 
@@ -190,7 +170,7 @@ Ya. Asset Depreciation Runs menggunakan useful life untuk menghitung depresiasi 
 
 **Q:** Apa yang terjadi jika Default Useful Life diubah setelah ada aset yang terdaftar dalam kategori tersebut?
 
-**J:** Perubahan Default Useful Life pada kategori TIDAK akan mempengaruhi aset yang sudah terdaftar sebelumnya (tidak retroaktif). Aset yang sudah ada tetap menggunakan masa manfaat yang diset pada saat registrasi. Nilai baru hanya akan digunakan sebagai default untuk aset atau asset model yang dibuat setelah perubahan. Jika ingin mengubah masa manfaat aset existing, Anda harus mengedit data aset tersebut satu per satu melalui modul Assets.
+**J:** Perubahan Default Useful Life pada kategori TIDAK akan mempengaruhi aset yang sudah terdaftar sebelumnya (tidak retroaktif). Aset yang sudah ada tetap menggunakan masa manfaat yang diset pada saat registrasi. Nilai baru hanya akan digunakan sebagai default untuk aset atau asset model yang dibuat setelah perubahan. Jika ingin mengubah masa manfaat aset yang ada, Anda harus mengedit data aset tersebut satu per satu melalui modul Aset.
 
 **Q:** Bagaimana jika saya tidak ingin suatu kategori aset disusutkan (misalnya Tanah)?
 

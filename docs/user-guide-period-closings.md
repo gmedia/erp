@@ -42,8 +42,6 @@ Halaman utama menampilkan tabel semua record penutupan periode dengan kolom-kolo
 - **Net Income**: Laba bersih periode tersebut
 - **Closed At**: Waktu penutupan selesai
 
-[Screenshot: Tabel Period Closings dengan filter dan toolbar]
-
 ### Mengurutkan Data
 
 Klik header kolom untuk mengurutkan data ascending/descending. Kolom yang dapat diurutkan: Fiscal Year, Period Month, Period Year, Closing Type, Status, Net Income, Closed At.
@@ -51,8 +49,6 @@ Klik header kolom untuk mengurutkan data ascending/descending. Kolom yang dapat 
 ### Mencari dan Memfilter
 
 Gunakan field pencarian dan filter untuk mempersempit data yang ditampilkan.
-
-[Screenshot: Panel filter Period Closings]
 
 ## 2. Membuat Period Closing Baru
 
@@ -67,8 +63,6 @@ Klik tombol "+ Add" untuk membuat record penutupan periode baru.
 | Period Year | Number | Ya | Tahun periode |
 | Closing Type | Dropdown | Ya | Monthly untuk penutupan bulanan, Yearly untuk penutupan tahunan |
 | Status | Dropdown | Ya | Status penutupan: Open, In Progress, Closed |
-
-[Screenshot: Form tambah Period Closing baru]
 
 ### Auto-Select Fiscal Year
 
@@ -98,8 +92,6 @@ Modal detail menampilkan informasi lengkap:
 - Timestamp penutupan (Closed At)
 - Informasi audit (Created At, Updated At)
 
-[Screenshot: Modal detail Period Closing]
-
 ## 4. Mengubah Period Closing
 
 Klik tombol Edit pada baris untuk mengubah data penutupan.
@@ -111,19 +103,15 @@ Semua field dapat diubah selama status masih Open. Untuk status In Progress atau
 ### Alur Perubahan Status
 
 Status penutupan mengikuti lifecycle:
-1. **Open**: Penutupan baru dibuat, belum diproses
-2. **In Progress**: Proses penutupan sedang berjalan
-3. **Closed**: Penutupan selesai, jurnal penutupan sudah diposting
-
-[Screenshot: Form edit Period Closing]
+1. **Terbuka**: Penutupan baru dibuat, belum diproses
+2. **Sedang Berjalan**: Proses penutupan sedang berjalan
+3. **Ditutup**: Penutupan selesai, jurnal penutupan sudah diposting
 
 ## 5. Menghapus Period Closing
 
 Klik tombol Delete pada baris untuk menghapus record penutupan.
 
 Peringatan akan muncul untuk konfirmasi penghapusan. Data yang sudah Closed biasanya tidak dapat dihapus untuk menjaga integritas laporan keuangan.
-
-[Screenshot: Dialog konfirmasi hapus Period Closing]
 
 ## 6. Export Data Period Closings
 
@@ -138,8 +126,6 @@ File Excel berisi semua kolom yang ditampilkan di tabel ditambah kolom tambahan 
 1. Terapkan filter jika diperlukan
 2. Klik tombol "Export"
 3. File Excel akan diunduh otomatis
-
-[Screenshot: Hasil export Period Closings di Excel]
 
 ## 7. Proses Penutupan Periode
 

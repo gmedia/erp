@@ -4,8 +4,6 @@
 
 Modul Customer mengelola **data pelanggan** yang digunakan dalam transaksi Accounts Receivable (AR). Setiap pelanggan memiliki informasi kontak, alamat, cabang, kategori, dan status aktif. Data pelanggan menjadi referensi saat membuat Customer Invoice, AR Receipt, dan Credit Note.
 
-[Screenshot: Halaman daftar Customer dengan tabel dan filter]
-
 ---
 
 ## Menu & Navigasi
@@ -36,8 +34,6 @@ Halaman Customers menampilkan tabel semua pelanggan dengan kolom:
 | Status | Active / Inactive | Ya |
 | Actions | Tombol View, Edit, Delete | Tidak |
 
-[Screenshot: Tabel Customer dengan kolom-kolom di atas]
-
 ### Filter dan Pencarian
 
 Gunakan filter di bagian atas tabel untuk menyaring data:
@@ -47,8 +43,6 @@ Gunakan filter di bagian atas tabel untuk menyaring data:
 3. **Category** — pilih kategori pelanggan
 4. **Status** — pilih Active atau Inactive
 
-[Screenshot: Panel filter Customer]
-
 ---
 
 ## 2. Menambah Pelanggan Baru
@@ -56,8 +50,6 @@ Gunakan filter di bagian atas tabel untuk menyaring data:
 1. Buka halaman **Customers** (`/customers`)
 2. Klik tombol **Add New** di bagian atas tabel
 3. Isi form dengan data pelanggan:
-
-[Screenshot: Form Add New Customer]
 
 | Field | Keterangan | Wajib |
 |-------|------------|-------|
@@ -85,8 +77,6 @@ Gunakan filter di bagian atas tabel untuk menyaring data:
 1. Klik tombol **View** (ikon mata) pada baris pelanggan
 2. Modal detail akan muncul menampilkan semua informasi:
 
-[Screenshot: Modal View Customer Details]
-
 Informasi yang ditampilkan:
 - Name, Email, Phone
 - Address
@@ -103,8 +93,6 @@ Informasi yang ditampilkan:
 3. Ubah field yang diperlukan
 4. Klik **Save** untuk menyimpan perubahan
 
-[Screenshot: Form Edit Customer]
-
 ### Catatan Edit
 
 - Semua field bisa diubah kecuali ID
@@ -118,8 +106,6 @@ Informasi yang ditampilkan:
 1. Klik tombol **Delete** (ikon trash) pada baris pelanggan
 2. Konfirmasi penghapusan pada dialog yang muncul
 3. Klik **Delete** untuk menghapus permanen
-
-[Screenshot: Dialog konfirmasi delete Customer]
 
 ### Peringatan Penghapusan
 
@@ -136,8 +122,6 @@ Hapus atau batalkan semua transaksi terkait sebelum menghapus pelanggan.
 
 1. Klik tombol **Export** di bagian atas tabel
 2. File Excel akan diunduh dengan semua data pelanggan
-
-[Screenshot: Tombol Export Customer]
 
 ### Kolom dalam Export
 
@@ -204,11 +188,11 @@ Modul Customer saat ini belum memiliki fitur import bulk. Pelanggan harus ditamb
 
 **Q: Bagaimana cara menambah customer baru dengan cepat?**
 
-Pastikan data Customer Categories dan Branch sudah tersedia sebelum menambah customer. Buka menu Customers, klik Add New, isi field wajib (Name, Email, Address, Branch, Category), lalu Save. Jika sering menambah customer dengan data serupa, gunakan fitur Duplicate dengan mengedit customer existing dan mengubah nama serta data yang berbeda.
+Pastikan data Customer Categories dan Branch sudah tersedia sebelum menambah customer. Buka menu Customers, klik Add New, isi field wajib (Name, Email, Address, Branch, Category), lalu Save. Jika sering menambah customer dengan data serupa, gunakan fitur Duplicate dengan mengedit pelanggan yang ada dan mengubah nama serta data yang berbeda.
 
-**Q: Apa perbedaan status Active dan Inactive pada customer?**
+**Q: Apa perbedaan status Aktif dan Tidak Aktif pada customer?**
 
-Customer dengan status Active muncul di dropdown saat membuat Customer Invoice, AR Receipt, atau Credit Note. Customer Inactive tetap tersimpan di sistem dan riwayat transaksi tetap bisa diakses, namun tidak direkomendasikan untuk transaksi baru. Gunakan status Inactive untuk customer yang sudah tidak beroperasi atau tidak lagi bekerja sama, tanpa menghapus data historis.
+Customer dengan status Aktif muncul di dropdown saat membuat Customer Invoice, AR Receipt, atau Credit Note. Customer Tidak Aktif tetap tersimpan di sistem dan riwayat transaksi tetap bisa diakses, namun tidak direkomendasikan untuk transaksi baru. Gunakan status Tidak Aktif untuk customer yang sudah tidak beroperasi atau tidak lagi bekerja sama, tanpa menghapus data historis.
 
 **Q: Mengapa harus memilih Branch dan Category saat menambah customer?**
 
