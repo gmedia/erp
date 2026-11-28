@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasCustomerRelation;
+use App\Models\Concerns\LogsFinancialActivity;
 use Database\Factories\CreditNoteFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -73,7 +74,7 @@ use Illuminate\Support\Carbon;
 class CreditNote extends Model
 {
     /** @use HasFactory<CreditNoteFactory> */
-    use BuildsAttributeCasts, HasCustomerRelation, HasFactory;
+    use BuildsAttributeCasts, HasCustomerRelation, HasFactory, LogsFinancialActivity;
 
     /**
      * The attributes that are mass assignable.

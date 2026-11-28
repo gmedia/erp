@@ -656,6 +656,7 @@
         "ap_payment_history_report": "Riwayat Pembayaran Utang",
         "approval_audit_trail": "Jejak Audit Persetujuan",
         "security_log": "Log Keamanan",
+        "audit_log": "Audit Log",
         "approval_delegation": "Delegasi Persetujuan",
         "approval_flow": "Alur Persetujuan",
         "approval_monitoring": "Pemantauan Persetujuan",
@@ -1066,6 +1067,36 @@
             "pick_date": "Pilih tanggal",
             "ip_placeholder": "mis. 192.168.1.10"
         },
+        "audit_logs": {
+            "description": "Riwayat perubahan data keuangan dan pengaturan: siapa mengubah apa, kapan, dan nilai lama → baru.",
+            "search_placeholder": "Cari ringkasan, ID dokumen...",
+            "select_user": "Pilih pengguna",
+            "start_date": "Tanggal mulai",
+            "end_date": "Tanggal selesai",
+            "column_date": "Waktu",
+            "column_user": "Pengguna",
+            "column_module": "Modul",
+            "column_document_id": "ID Dokumen",
+            "column_action": "Aksi",
+            "column_summary": "Ringkasan",
+            "system_user": "Sistem",
+            "summary_created": "Membuat data",
+            "summary_updated": "Mengubah {count} kolom: {fields}",
+            "summary_updated_empty": "Mengubah data",
+            "summary_deleted": "Menghapus data",
+            "summary_unknown": "Perubahan data",
+            "field_description": "deskripsi",
+            "field_entry_date": "tanggal",
+            "field_date": "tanggal",
+            "field_reference": "referensi",
+            "field_status": "status",
+            "field_name": "nama",
+            "field_value": "nilai",
+            "field_type": "tipe",
+            "field_key": "kunci",
+            "field_code": "kode",
+            "field_amount": "jumlah"
+        },
         "approval_audit_trail": {
             "description": "Riwayat tindakan persetujuan pada permintaan.",
             "search_placeholder": "Cari IP, ID dokumen, pengguna..."
@@ -1089,7 +1120,10 @@
         "journal_entries": {
             "title": "Jurnal Umum",
             "description": "Jurnal manual dengan baris debit dan kredit.",
-            "search_placeholder": "Cari jurnal..."
+            "search_placeholder": "Cari jurnal...",
+            "audit_history_title": "Riwayat perubahan",
+            "audit_history_loading": "Memuat riwayat…",
+            "audit_history_empty": "Belum ada riwayat perubahan."
         },
         "stock_monitor": {
             "title": "Pemantauan Stok",
@@ -1528,6 +1562,9 @@
     },
     "filter": {
         "security_event_login_success": "Login Berhasil",
+        "audit_event_created": "Dibuat",
+        "audit_event_updated": "Diubah",
+        "audit_event_deleted": "Dihapus",
         "security_event_login_failed": "Login Gagal",
         "security_event_logout": "Logout",
         "security_event_password_reset": "Atur Ulang Kata Sandi",
@@ -3457,6 +3494,17 @@
             "ip_address": "Alamat IP",
             "user_agent": "User Agent",
             "metadata": "Metadata"
+        }
+    },
+    "audit_logs": {
+        "export_headers": {
+            "date": "Waktu",
+            "event": "Aksi",
+            "user": "Pengguna",
+            "module": "Modul",
+            "document_id": "ID Dokumen",
+            "summary": "Ringkasan",
+            "changes": "Perubahan"
         }
     }
 }

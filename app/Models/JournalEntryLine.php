@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsFinancialActivity;
 use Database\Factories\JournalEntryLineFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -47,6 +48,8 @@ class JournalEntryLine extends Model
 {
     /** @use HasFactory<JournalEntryLineFactory> */
     use HasFactory;
+
+    use LogsFinancialActivity;
 
     /**
      * The attributes that are mass assignable.

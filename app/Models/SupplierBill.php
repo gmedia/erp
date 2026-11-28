@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\BuildsAttributeCasts;
 use App\Models\Concerns\HasSupplierRelation;
+use App\Models\Concerns\LogsFinancialActivity;
 use Database\Factories\SupplierBillFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -95,7 +96,7 @@ use Illuminate\Support\Carbon;
 class SupplierBill extends Model
 {
     /** @use HasFactory<SupplierBillFactory> */
-    use BuildsAttributeCasts, HasFactory, HasSupplierRelation;
+    use BuildsAttributeCasts, HasFactory, HasSupplierRelation, LogsFinancialActivity;
 
     /**
      * The attributes that are mass assignable.
