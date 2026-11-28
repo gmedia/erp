@@ -4,8 +4,11 @@ namespace Database\Seeders;
 
 use App\Actions\AccountingPosting\PostGoodsReceiptJournalAction;
 use App\Actions\AccountingPosting\PostSupplierReturnJournalAction;
+use App\Actions\Approvals\ApproveApprovalRequestAction;
+use App\Actions\Approvals\TriggerApprovalAction;
 use App\Actions\GoodsReceipts\PostGoodsReceiptMovementsAction;
 use App\Actions\SupplierReturns\PostSupplierReturnMovementsAction;
+use App\Models\ApprovalRequest;
 use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\FiscalYear;
@@ -29,13 +32,16 @@ use App\Services\PurchaseOrderReceiptService;
 use App\Support\Demo\DemoCalendar;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Aktivitas pembelian bulanan untuk jendela demo 13 bulan (#571).
  *
- * Tiap bulan mendapat PO (confirm langsung), penerimaan barang (GR confirmed) dan, pada
- * sebagian bulan, retur ke supplier (confirmed). Konfirmasi memakai action yang sama dengan
- * controller: jurnal GR/GR-IR dan jurnal retur, serta pergerakan stok lewat StockPostingService.
+ * Tiap bulan mendapat PO yang melewati approval (draft -> pending_approval -> confirmed),
+ * penerimaan barang (GR confirmed) dan, pada sebagian bulan, retur ke supplier (confirmed).
+ * Pengajuan dan persetujuan memakai action approval produk dengan flow purchase_order_default;
+ * jurnal GR/GR-IR, jurnal retur, dan pergerakan stok memakai action yang sama dengan controller.
  * Retur hanya mengurangi stok yang baru diterima bulan itu, sehingga tidak pernah minus.
  * Utang supplier (AP) tidak berubah di sini: tagihan dibuat oleh ApMonthlyDemoSeeder.
  *
@@ -63,6 +69,7 @@ class PurchasingMonthlyDemoSeeder extends Seeder
     {
         $adminUserId = User::query()->where('email', config('app.admin'))->value('id')
             ?? User::query()->value('id');
+        $requesterUserId = $this->approvalRequesterId((int) $adminUserId);
         $branch = Branch::query()->first();
         $warehouse = Warehouse::query()->first();
         $fallbackUnitId = Unit::query()->value('id');
@@ -132,6 +139,9 @@ class PurchasingMonthlyDemoSeeder extends Seeder
                     $adminUserId,
                     $orderDate,
                 );
+
+                $this->submitAndApproveOrder($order, $requesterUserId, (int) $adminUserId);
+
                 $receipt = $this->seedReceipt(
                     $code,
                     $n,
@@ -192,7 +202,7 @@ class PurchasingMonthlyDemoSeeder extends Seeder
                 'tax_amount' => $taxAmount,
                 'discount_amount' => 0,
                 'grand_total' => $grandTotal,
-                'status' => 'fully_received',
+                'status' => 'draft',
                 'notes' => 'Pesanan pembelian rutin bulanan',
                 'shipping_address' => 'Gudang Utama',
                 'approved_by' => null,
@@ -344,7 +354,75 @@ class PurchasingMonthlyDemoSeeder extends Seeder
     }
 
     /**
-     * Status PO dicatat di pipeline po_lifecycle: draft → confirmed (konfirmasi langsung) →
+     * Pengaju dokumen: user demo yang bukan admin dan bukan approver flow pembelian.
+     * Dipakai sebagai submitted_by approval request agar pengaju tidak pernah menjadi
+     * pelaku transisi pipeline (W7-16, W8-459).
+     */
+    private function approvalRequesterId(int $adminUserId): int
+    {
+        $approverIds = DB::table('approval_flow_steps')
+            ->whereNotNull('approver_user_id')
+            ->pluck('approver_user_id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        return (int) (User::query()
+            ->where('id', '!=', $adminUserId)
+            ->whereNotIn('id', $approverIds)
+            ->orderBy('id')
+            ->value('id') ?? $adminUserId);
+    }
+
+    /**
+     * Ajukan PO lewat ApprovalFlow pembelian, lalu setujui tiap langkah oleh approver
+     * yang tercatat di flow. Listener produk memindahkan status PO ke confirmed setelah
+     * approval final; status tidak ditulis langsung oleh seeder.
+     */
+    private function submitAndApproveOrder(PurchaseOrder $order, int $requesterUserId, int $adminUserId): void
+    {
+        ApprovalRequest::query()
+            ->where('approvable_type', PurchaseOrder::class)
+            ->where('approvable_id', $order->id)
+            ->delete();
+
+        $requester = User::query()->find($requesterUserId);
+        $admin = User::query()->find($adminUserId);
+
+        if ($requester === null || $admin === null) {
+            return;
+        }
+
+        Auth::setUser($requester);
+        $request = app(TriggerApprovalAction::class)->execute(
+            $order,
+            ['flow_code' => 'purchase_order_default'],
+        );
+
+        if ($request !== null) {
+            $approve = app(ApproveApprovalRequestAction::class);
+
+            foreach ($request->steps()->orderBy('step_order')->get() as $step) {
+                $step->loadMissing('flowStep');
+                $approverId = (int) ($step->flowStep->approver_user_id ?? 0);
+
+                if ($approverId === 0) {
+                    continue;
+                }
+
+                $approve->execute(
+                    $request->refresh(),
+                    $step->refresh(),
+                    $approverId,
+                    'Disetujui pada data demo',
+                );
+            }
+        }
+
+        Auth::setUser($admin);
+    }
+
+    /**
+     * Status PO dicatat di pipeline po_lifecycle: draft → pending_approval → confirmed →
      * fully_received (GR penuh). Riwayat dibentuk ulang setiap seed agar tidak menggandakan.
      *
      * @param  array<string, mixed>  $pipelines  pipeline, states, transitions (lihat pipelineStates())
@@ -376,7 +454,8 @@ class PurchasingMonthlyDemoSeeder extends Seeder
 
         $steps = [
             [null, 'draft', null, 'Initial pipeline assignment', $orderDate->copy()->setTime(8, 0)],
-            ['draft', 'confirmed', 'confirm_direct', null, $orderDate->copy()->setTime(9, 0)],
+            ['draft', 'pending_approval', 'submit', null, $orderDate->copy()->setTime(9, 0)],
+            ['pending_approval', 'confirmed', 'approve', null, $orderDate->copy()->setTime(10, 0)],
             [
                 'confirmed',
                 'fully_received',
@@ -418,7 +497,12 @@ class PurchasingMonthlyDemoSeeder extends Seeder
             ->keyBy('code')
             ->all();
 
-        if (! isset($states['draft'], $states['confirmed'], $states['fully_received'])) {
+        if (! isset(
+            $states['draft'],
+            $states['pending_approval'],
+            $states['confirmed'],
+            $states['fully_received'],
+        )) {
             return null;
         }
 

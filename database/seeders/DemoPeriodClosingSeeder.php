@@ -2,15 +2,19 @@
 
 namespace Database\Seeders;
 
+use App\Actions\JournalEntries\CreateJournalEntryAction;
 use App\Actions\PeriodClosings\ClosePeriodAction;
 use App\Models\Account;
 use App\Models\CoaVersion;
 use App\Models\FiscalYear;
+use App\Models\JournalEntry;
 use App\Models\PeriodClosing;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Menutup tahun fiskal tahun lalu SETELAH seluruh transaksi demo tercatat (#571).
@@ -23,7 +27,10 @@ use Illuminate\Support\Facades\Auth;
  */
 class DemoPeriodClosingSeeder extends Seeder
 {
-    public function __construct(private ClosePeriodAction $close) {}
+    public function __construct(
+        private ClosePeriodAction $close,
+        private CreateJournalEntryAction $createJournalEntry,
+    ) {}
 
     public function run(): void
     {
@@ -55,6 +62,10 @@ class DemoPeriodClosingSeeder extends Seeder
 
         $this->closeYear($fiscalYear, $periodYear, $user->id, $retainedEarningsAccountId);
 
+        // Saldo akun neraca tahun lalu dibawa ke COA tahun berjalan lewat account mapping,
+        // sehingga laporan yang hanya membaca COA aktif tetap melihat saldo awal (#571).
+        $this->carryForwardBalanceSheet($fiscalYear);
+
         // Status FY ikut closed setelah seluruh periodenya ditutup, sama seperti kondisi
         // awal data demo (CoaSeeder). Penutupan periode tetap lewat ClosePeriodAction.
         $fiscalYear->update(['status' => 'closed']);
@@ -67,6 +78,124 @@ class DemoPeriodClosingSeeder extends Seeder
             ->where('status', 'active')
             ->get()
             ->each(fn (CoaVersion $coaVersion) => $coaVersion->update(['status' => 'archived']));
+    }
+
+    /**
+     * Jurnal saldo awal di COA tahun berjalan: seluruh saldo akun neraca (asset, liability,
+     * equity) tahun yang ditutup dipindahkan ke akun padanannya. Padanan dicari dari kode
+     * yang sama di COA aktif; bila kode tidak ada (mis. 11100 dipecah menjadi 11110/11120),
+     * dipakai account_mappings dan target berurut kode pertama (mapping "primary").
+     *
+     * Idempoten: jurnal dengan referensi OPENING-FY-{id} tidak dibuat ulang.
+     */
+    private function carryForwardBalanceSheet(FiscalYear $closedYear): void
+    {
+        $nextYear = FiscalYear::query()
+            ->where('start_date', '>', $closedYear->end_date)
+            ->orderBy('start_date')
+            ->first();
+
+        if ($nextYear === null) {
+            return;
+        }
+
+        $targetCoa = CoaVersion::query()
+            ->where('fiscal_year_id', $nextYear->id)
+            ->where('status', 'active')
+            ->first();
+
+        if ($targetCoa === null) {
+            return;
+        }
+
+        $reference = 'OPENING-FY-' . $nextYear->id;
+
+        if (JournalEntry::query()->where('reference', $reference)->exists()) {
+            return;
+        }
+
+        $rows = DB::table('journal_entry_lines')
+            ->join('journal_entries', 'journal_entries.id', '=', 'journal_entry_lines.journal_entry_id')
+            ->join('accounts', 'accounts.id', '=', 'journal_entry_lines.account_id')
+            ->where('journal_entries.fiscal_year_id', $closedYear->id)
+            ->where('journal_entries.status', 'posted')
+            ->whereIn('accounts.type', ['asset', 'liability', 'equity'])
+            ->groupBy('accounts.id', 'accounts.code', 'journal_entry_lines.branch_id')
+            ->select('accounts.id', 'accounts.code', 'journal_entry_lines.branch_id')
+            ->selectRaw('COALESCE(SUM(journal_entry_lines.debit), 0) as debit_total')
+            ->selectRaw('COALESCE(SUM(journal_entry_lines.credit), 0) as credit_total')
+            ->get();
+
+        $lines = [];
+
+        foreach ($rows as $row) {
+            $net = round((float) $row->debit_total - (float) $row->credit_total, 2);
+
+            if (abs($net) < 0.005) {
+                continue;
+            }
+
+            $target = $this->openingTargetAccount((int) $row->id, (string) $row->code, $targetCoa);
+
+            if ($target === null) {
+                throw ValidationException::withMessages([
+                    'opening_balance' => "Akun {$row->code} tidak punya padanan di COA {$targetCoa->name}.",
+                ]);
+            }
+
+            $lines[] = [
+                'account_id' => $target->id,
+                'branch_id' => $row->branch_id,
+                'debit' => $net > 0 ? $net : 0,
+                'credit' => $net < 0 ? -$net : 0,
+                'memo' => 'Saldo awal dari COA ' . $closedYear->name,
+            ];
+        }
+
+        if ($lines === []) {
+            return;
+        }
+
+        $totalDebit = array_sum(array_column($lines, 'debit'));
+        $totalCredit = array_sum(array_column($lines, 'credit'));
+
+        if (abs($totalDebit - $totalCredit) > 0.005) {
+            throw ValidationException::withMessages([
+                'opening_balance' => 'Saldo awal tidak seimbang: debit '
+                    . $totalDebit . ' vs kredit ' . $totalCredit,
+            ]);
+        }
+
+        $this->createJournalEntry->execute([
+            'entry_date' => $nextYear->start_date->toDateString(),
+            'reference' => $reference,
+            'description' => 'Saldo awal tahun fiskal ' . $nextYear->name,
+            'status' => 'posted',
+            'journal_type' => 'system',
+            'lines' => $lines,
+        ]);
+    }
+
+    private function openingTargetAccount(int $sourceAccountId, string $code, CoaVersion $targetCoa): ?Account
+    {
+        $sameCode = Account::query()
+            ->where('coa_version_id', $targetCoa->id)
+            ->where('code', $code)
+            ->where('is_active', true)
+            ->first();
+
+        if ($sameCode !== null) {
+            return $sameCode;
+        }
+
+        return Account::query()
+            ->join('account_mappings', 'account_mappings.target_account_id', '=', 'accounts.id')
+            ->where('account_mappings.source_account_id', $sourceAccountId)
+            ->where('accounts.coa_version_id', $targetCoa->id)
+            ->where('accounts.is_active', true)
+            ->orderBy('accounts.code')
+            ->select('accounts.*')
+            ->first();
     }
 
     /**
