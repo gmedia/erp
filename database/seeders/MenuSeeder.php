@@ -29,7 +29,7 @@ class MenuSeeder extends Seeder
             ],
             [
                 'name' => 'mobile_app_download',
-                'display_name' => 'Mobile App Download',
+                'display_name' => 'Download App',
                 'permissions' => [],
                 'icon' => 'Download',
                 'url' => 'mobile-app',
