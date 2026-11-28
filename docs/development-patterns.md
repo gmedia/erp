@@ -311,11 +311,13 @@ Trait otomatis: kalau request tidak kirim `fiscal_year_id`, fallback ke preferre
 
 `tests/e2e/fiscal-year-auto-select/fiscal-year-auto-select.spec.ts` covers 4 representative forms (AP Payment, AR Receipt, Period Closing, Bank Reconciliation) — one per backend filter shape. The spec opens each `Add` dialog, waits for `/api/fiscal-years`, and asserts the FY combobox no longer shows a `Select…` placeholder. If the wave 13 wiring regresses (backend stops attaching the meta key, or `AsyncSelectField` stops forwarding `preferredMetaKey`), every case fails.
 
-Run via:
+Run via (E2E ramping: jalankan hanya spec yang ditambah/diubah):
 
 ```bash
-PLAYWRIGHT_USE_SAIL=1 ./vendor/bin/sail npx playwright test tests/e2e/fiscal-year-auto-select/
+bash scripts/e2e-full.sh tests/e2e/fiscal-year-auto-select/fiscal-year-auto-select.spec.ts
 ```
+
+`scripts/e2e-full.sh` sudah menghentikan Vite dev, menghapus `public/hot`, dan build aset sendiri. Jangan menjalankan Playwright langsung tanpa script ini. Folder modul penuh dan suite besar dijalankan CI, bukan lokal.
 
 ---
 

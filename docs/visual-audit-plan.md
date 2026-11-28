@@ -1,6 +1,6 @@
 # Visual Audit Plan — All Module Registry Pages
 
-**Status:** Planned (not executed)  
+**Status:** In progress — audit wave sudah berjalan (lihat `docs/visual-audit/FINDINGS.md` dan `docs/visual-audit/BACKLOG.md`; wave-8 2026-11-24/25 menghasilkan #436–#442). Plan ini tetap menjadi acuan cakupan; wave berikutnya dilanjutkan per milestone.
 **Created:** 2026-08-08  
 **Owner handoff:** See https://github.com/gmedia/erp/issues (active claim/checkpoint) + this doc (full plan); root `task.md` is deprecated  
 **Related:** `docs/module-registry.md`, `database/seeders/MenuSeeder.php`, `resources/js/app-routes.tsx`

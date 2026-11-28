@@ -1,6 +1,6 @@
 # Implementation Status — Database Modules
 
-> **Last updated:** 2026-08-04
+> **Last updated:** 2026-11-28
 >
 > **Purpose:** Referensi cepat untuk AI agent dan developer tentang status implementasi setiap modul database. Dokumen ini adalah satu-satunya sumber kebenaran untuk status implementasi — jangan duplikasi informasi ini di file desain individual.
 >
@@ -39,6 +39,15 @@
 | 21 | Aging Dashboard | — | ✅ Implemented | AR/AP aging; permission `aging_dashboard` |
 | 22 | Asset Dashboard | — | ✅ Implemented | Asset distribution / alerts |
 | 23 | Pipeline Dashboard | — | ✅ Implemented | Pipeline monitoring |
+| 24 | Vehicle Loans | `docs/vehicle-loan-design.md` | ✅ Implemented | Request/pickup/return/security/dashboard/detail; approval + notifikasi (#568, #569) |
+| 25 | System Health | — | ✅ Implemented | Endpoint `/api/system-health` + `/run`; backup & object storage health check |
+| 26 | Security Logs | — | ✅ Implemented | Read-only + export; recording, retensi, dan alert |
+| 27 | Audit Logs | — | ✅ Implemented | Read-only + export; recording perubahan entitas |
+| 28 | Notifications | — | ✅ Implemented | In-app + push FCM; device token API |
+| 29 | Device Tokens | — | ✅ Implemented | Registrasi/penghapusan token perangkat (push notification) |
+| 30 | User Guide | — | ✅ Implemented | API `/api/user-guide` untuk halaman Panduan Pengguna |
+| 31 | Social Login | `docs/social-login-design.md` | ✅ Implemented | OAuth state, policy, 2FA, ticket cleanup |
+| 32 | Backup | — | ✅ Implemented | Scheduler `backup:run`/`clean` + staging object storage (lihat `routes/console.php`) |
 
 ---
 
@@ -284,6 +293,8 @@ Modul-modul berikut sudah diimplementasi sebagai master data pendukung:
 | Permissions & Menus | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Users | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Settings | ✅ | ✅ | ✅ | ✅ | — |
+| Vehicle Units | ✅ | ✅ | ✅ | ✅ (API master) | ✅ |
+| Vehicle Drivers | ✅ | ✅ | ✅ | ✅ (API master) | ✅ |
 
 ---
 
@@ -382,6 +393,7 @@ Task-task ini bisa dikerjakan kapan saja, tidak harus menunggu Fase 1-3.
 
 | Date | Milestone |
 |------|-----------|
+| 2026-11-28 | Status modul baru: vehicle-loans, system-health, security-logs, audit-logs, notifications, device-tokens, user-guide, social-login, backup |
 | 2026-08-05 | Budget variance report E2E on PR #75 (`tests/e2e/budget-variance-report/`) |
 | 2026-08-05 | Budget design + status: E2E suite on PR #72 (`tests/e2e/budgets/`) |
 | 2026-08-04 | Docs cleanup: budget design truth, status table +19–23, Sonar progress frozen |
